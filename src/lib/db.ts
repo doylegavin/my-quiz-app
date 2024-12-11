@@ -9,7 +9,7 @@ declare global {
 export let prisma: PrismaClient;
 if (process.env.NODE_ENV === "production") {
   prisma = new PrismaClient();
-} else {
+} else { //if we are in development
   if (!global.cachedPrisma) {
     global.cachedPrisma = new PrismaClient();
   }
