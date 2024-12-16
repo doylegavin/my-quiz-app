@@ -1,0 +1,156 @@
+
+let baseInstructions = `
+You are an exam creator for the Leaving Certificate in Ireland. You will produce content in pure JSON format.
+Output structure:
+{
+  "questions": [
+    {"question": "Question text ..."},
+    ...
+  ],
+  "solutions": [
+    {"questionIndex": 1, "solution": "Solution text ...", "notes": "Explanation of why this approach is good.", "markingScheme": "Details on marks allocation"},
+    ...
+  ]
+}
+
+**General Instructions:**
+- Do not include solutions inline with questions. Keep them separated as above.
+- Provide detailed solutions for each question, with step-by-step explanation (line by line for Maths), notes, and marking schemes.
+- Format questions as if they appear on an official exam paper.
+- Ensure solutions contain reasoning notes.
+- The final response must be strictly valid JSON with no additional commentary outside the JSON structure.
+`;
+
+    // Subject-specific refinements
+    if (subject === "english") {
+      // If it's English and poetry, pick a poet from the current syllabus
+      if (topic.toLowerCase().includes("poetry")) {
+        const poet = currentEnglishPoets[Math.floor(Math.random() * currentEnglishPoets.length)];
+        baseInstructions += `
+**English Poetry Instructions:**
+- Include an unseen poem by ${poet} (you may craft a poem in their style if necessary) before the questions.
+- Then ask ${questionCount} questions analyzing the poem (theme, imagery, structure, style).
+- Include references to current LC marking schemes for poetry analysis.
+`;
+      } else if (topic.toLowerCase().includes("comprehension")) {
+        baseInstructions += `
+**English Comprehension Instructions:**
+- Provide a short unseen passage relevant to the selected topic.
+- Ask ${questionCount} comprehension questions that test understanding, language features, and contextual analysis.
+`;
+      }
+    }
+
+    if (subject === "irish") {
+      if (topic.toLowerCase().includes("poetry")) {
+        const poet = currentIrishPoets[Math.floor(Math.random() * currentIrishPoets.length)];
+        baseInstructions += `
+**Irish Poetry Instructions:**
+- Include an unseen poem in Irish by ${poet} before the questions.
+- Ask ${questionCount} questions in Irish related to theme, language, and cultural context.
+- Provide solutions and marking schemes in Irish, referencing the LC syllabus.
+`;
+      } else if (topic.toLowerCase().includes("comprehension")) {
+        baseInstructions += `
+**Irish Comprehension Instructions:**
+- Include an unseen Irish text (short passage).
+- Ask ${questionCount} comprehension questions in Irish.
+- Provide solutions in Irish, with marking schemes aligned to current LC standards.
+`;
+      }
+    }
+
+    if (subject === "mathematics") {
+      baseInstructions += `
+**Mathematics Instructions:**
+- Use LaTeX formatting for all mathematical expressions, for example: $x^2 + y^2$.
+- Provide step-by-step solutions line by line.
+- Include marking schemes based on correct approach, method, and final answer.
+- The ${questionCount} questions should focus on ${topic}, as it would appear in a ${level} level ${paper}.
+`;
+    }
+
+    // Build the final user prompt
+    const userPrompt = `
+Produce ${questionCount} ${level} ${subject} questions on the topic: ${topic}.
+Follow the instructions above.
+Remember: Return only valid JSON as per the given structure.
+`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: baseInstructions },
+        { role: "user", content: userPrompt },
+      ],
+      temperature: 0.7,
+    });
+
+
+
+//src/app/quiz/generated/page.tsx
+
+"use client";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+
+export default function GeneratedQuiz() {
+  const searchParams = useSearchParams();
+  const data = JSON.parse(searchParams.get("questions") || "{}");
+
+  const [showSolutions, setShowSolutions] = useState(false);
+
+  if (!data.questions || !data.solutions) {
+    return <p>No data generated.</p>;
+  }
+
+  return (
+    <div className="container mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-4">Generated Questions</h1>
+      <ul className="space-y-4">
+        {data.questions.map((q: { question: string }, index: number) => (
+          <li key={index} className="border p-4 rounded">
+            <strong>Question {index + 1}:</strong> {q.question}
+          </li>
+        ))}
+      </ul>
+
+      <button
+        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+        onClick={() => setShowSolutions(!showSolutions)}
+      >
+        {showSolutions ? "Hide Solutions" : "Show Solutions"}
+      </button>
+
+      {showSolutions && (
+        <div className="mt-6">
+          <h2 className="text-xl font-bold mb-2">Solutions</h2>
+          <ul className="space-y-4">
+            {data.solutions.map(
+              (
+                sol: { questionIndex: number; solution: string; notes: string; markingScheme: string },
+                idx: number
+              ) => (
+                <li key={idx} className="border p-4 rounded">
+                  <strong>Solution for Question {sol.questionIndex}:</strong>
+                  <p>{sol.solution}</p>
+                  <p><em>Notes:</em> {sol.notes}</p>
+                  <p><em>Marking Scheme:</em> {sol.markingScheme}</p>
+                </li>
+              )
+            )}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+
+
+
+
+
+
+

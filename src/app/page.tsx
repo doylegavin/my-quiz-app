@@ -15,7 +15,7 @@ export default function Home() {
           Personalized learning experience with AI-powered quizzes and adaptive study tools.
         </p>
         <div className="flex gap-4 justify-center">
-          <Link href="/dashboard">
+          <Link href="/quiz/create">
             <Button size="lg" className="bg-purple-600 hover:bg-purple-700">
               Get Started
             </Button>

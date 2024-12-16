@@ -1,76 +1,347 @@
-// components/quiz-form.tsx
+//src/components//quiz-form.tsx
+
+"use client";
+
+import { useState } from "react";
+import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { useRouter } from "next/navigation";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
+type PaperOptions = {
+  [key: string]: {
+    name: string;
+    sections: string[];
+    topics: string[];
+  };
+};
+
+type SubjectStructure = {
+  [key: string]: {
+    papers: PaperOptions;
+    levels: string[];
+  };
+};
+
+const examStructure: SubjectStructure = {
+  mathematics: {
+    papers: {
+      paper1: {
+        name: "Paper 1",
+        sections: ["Short Questions", "Long Questions"],
+        topics: [
+          "Algebra",
+          "Complex Numbers",
+          "Sequences and Series",
+          "Functions",
+          "Calculus",
+          "Financial Maths"
+        ]
+      },
+      paper2: {
+        name: "Paper 2",
+        sections: ["Short Questions", "Long Questions"],
+        topics: [
+          "Geometry",
+          "Trigonometry",
+          "Coordinate Geometry",
+          "Probability",
+          "Statistics"
+        ]
+      }
+    },
+    levels: ["Higher Level", "Ordinary Level"]
+  },
+  english: {
+    papers: {
+      paper1: {
+        name: "Paper 1 (Language and Comprehension)",
+        sections: ["Comprehension", "Composition"],
+        topics: [
+          "Language Analysis",
+          "Comprehension",
+          "Discursive Essay",
+          "Personal Essay",
+          "Descriptive Essay",
+          "Short Story"
+        ]
+      },
+      paper2: {
+        name: "Paper 2 (Literature)",
+        sections: ["Single Text", "Comparative Study", "Poetry"],
+        topics: [
+          "Character Analysis",
+          "Theme Analysis",
+          "Comparative Modes",
+          "Poetry Analysis",
+          "Unseen Poetry"
+        ]
+      }
+    },
+    levels: ["Higher Level", "Ordinary Level"]
+  },
+  irish: {
+    papers: {
+      paper1: {
+        name: "Paper 1 (Language and Composition)",
+        sections: ["Reading Comprehension", "Composition"],
+        topics: [
+          "Comprehension",
+          "Language Use",
+          "Personal Essay",
+          "Discursive Essay",
+          "Story Writing"
+        ]
+      },
+      paper2: {
+        name: "Paper 2 (Literature and Oral)",
+        sections: ["Prose", "Poetry", "Unseen Texts"],
+        topics: [
+          "Prose Analysis",
+          "Poetry Analysis",
+          "Oral Comprehension",
+          "Aural Comprehension"
+        ]
+      }
+    },
+    levels: ["Higher Level", "Ordinary Level"]
+  }
+};
 
 export function QuizForm() {
+  const [selectedSubject, setSelectedSubject] = useState<string>("");
+  const [selectedPaper, setSelectedPaper] = useState<string>("");
+  const [selectedLevel, setSelectedLevel] = useState<string>("");
+  const [selectedSection, setSelectedSection] = useState<string>("");
+  const [selectedTopic, setSelectedTopic] = useState<string>("");
+  const [questionCount, setQuestionCount] = useState<number>(5);
+  const [questions, setQuestions] = useState<Array<{ question: string; options: string[] }>>([]);
+  const [loading, setLoading] = useState(false);
+
+
+  const router = useRouter();
+
+ // Function to handle slider change
+ const handleSliderChange = (value: number[]) => {
+  setQuestionCount(value[0]);
+
+  // Initialize or adjust questions array based on new count
+  const newQuestions = Array(value[0]).fill({
+    question: "",
+    options: ["", "", "", ""]
+  });
+  setQuestions(newQuestions);
+};
+
+//submit function
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+
+  // Prepare the data to send to the API
+  const requestData = {
+    subject: selectedSubject,
+    topic: selectedTopic,
+    level: selectedLevel,
+    paper: selectedPaper,
+    questionCount: questionCount,
+  };
+
+  try {
+    // Make an API call to fetch questions
+    const response = await fetch("/api/generate-questions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestData),
+    });
+
+    console.log("Response:", response); // Log the raw response
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Data received:", data); // Log the JSON data
+
+      if (data.questions && Array.isArray(data.questions)) {
+        // Pass data to the generated page using query parameters
+        router.push(
+          `/quiz/generated?questions=${encodeURIComponent(JSON.stringify(data))}`
+        );
+      } else {
+        console.error("Questions data is missing or invalid.");
+      }
+    } else {
+      const errorData = await response.json();
+      console.error("Error response:", errorData);
+    }
+  } catch (error) {
+    console.error("Fetch error:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
+
   return (
-    <form className="space-y-6">
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Quiz Title</label>
-        <Input placeholder="Enter quiz title..." />
-      </div>
-
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Subject</label>
-        <Select>
-          <SelectTrigger>
-            <SelectValue placeholder="Select subject" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="math">Mathematics</SelectItem>
-            <SelectItem value="science">Science</SelectItem>
-            <SelectItem value="english">English</SelectItem>
-            <SelectItem value="history">History</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Description</label>
-        <Textarea placeholder="Enter quiz description..." />
-      </div>
-
+    <><form onSubmit={handleSubmit} className="space-y-6">
       <Card>
         <CardContent className="pt-6">
           <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="font-medium">Questions</h3>
-              <Button type="button" variant="outline" size="sm">
-                Add Question
-              </Button>
+            <div className="space-y-2">
+              <Label>Quiz Title</Label>
+              <Input placeholder="Enter quiz title..." />
             </div>
 
-            {/* Question fields would be dynamically added here */}
-            <div className="space-y-4 border rounded-lg p-4">
-              <Input placeholder="Enter question..." />
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <Textarea placeholder="Enter quiz description..." />
+            </div>
+
+            <div className="space-y-4">
               <div className="space-y-2">
-                <Input placeholder="Answer option 1" />
-                <Input placeholder="Answer option 2" />
-                <Input placeholder="Answer option 3" />
-                <Input placeholder="Answer option 4" />
+                <Label>Subject</Label>
+                <Select onValueChange={setSelectedSubject}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select subject" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.keys(examStructure).map((subject) => (
+                      <SelectItem key={subject} value={subject}>
+                        {subject.charAt(0).toUpperCase() + subject.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select correct answer" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Option 1</SelectItem>
-                  <SelectItem value="2">Option 2</SelectItem>
-                  <SelectItem value="3">Option 3</SelectItem>
-                  <SelectItem value="4">Option 4</SelectItem>
-                </SelectContent>
-              </Select>
+
+              {selectedSubject && (
+                <div className="space-y-2">
+                  <Label>Level</Label>
+                  <Select onValueChange={setSelectedLevel}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {examStructure[selectedSubject].levels.map((level) => (
+                        <SelectItem key={level} value={level}>
+                          {level}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {selectedSubject && (
+                <div className="space-y-2">
+                  <Label>Paper</Label>
+                  <Select onValueChange={setSelectedPaper}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select paper" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(examStructure[selectedSubject].papers).map(
+                        ([key, paper]) => (
+                          <SelectItem key={key} value={key}>
+                            {paper.name}
+                          </SelectItem>
+                        )
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {selectedPaper && (
+                <div className="space-y-2">
+                  <Label>Section</Label>
+                  <Select onValueChange={setSelectedSection}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select section" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {examStructure[selectedSubject].papers[selectedPaper].sections.map(
+                        (section) => (
+                          <SelectItem key={section} value={section}>
+                            {section}
+                          </SelectItem>
+                        )
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {selectedSection && (
+                <div className="space-y-2">
+                  <Label>Topic</Label>
+                  <Select onValueChange={setSelectedTopic}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select topic" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {examStructure[selectedSubject].papers[selectedPaper].topics.map(
+                        (topic) => (
+                          <SelectItem key={topic} value={topic}>
+                            {topic}
+                          </SelectItem>
+                        )
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
+            <div className="space-y-6">
+
+              <Label className="font-medium">Number of Questions</Label>
+              <div className="px-3">
+                <Slider
+                  defaultValue={[5]}
+                  max={10}
+                  min={1}
+                  step={1}
+                  onValueChange={handleSliderChange}
+                  className="my-4" />
+                <div className="flex justify-between text-sm text-gray-500">
+                  <span>1</span>
+                  <span>{questionCount} questions</span>
+                  <span>10</span>
+                </div>
+              </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
       <div className="flex justify-end">
-        <Button>Create Quiz</Button>
+        <Button type="submit" className="btn-primary" >{loading ? "Generating..." : "Generate Questions"}</Button>
       </div>
-    </form>
+    </form><div>
+        {questions.length > 0 && (
+          <div className="space-y-4 mt-6">
+            <h2 className="text-lg font-medium">Generated Questions</h2>
+            {questions.map((q, index) => (
+              <div key={index} className="border p-4 rounded-md">
+                <p><strong>Question {index + 1}:</strong> {q.question}</p>
+                {q.options && (
+                  <ul>
+                    {q.options.map((option, i) => (
+                      <li key={i}>{option}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div></>
+    
   );
 }
