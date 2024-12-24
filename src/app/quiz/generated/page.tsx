@@ -3,7 +3,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function GeneratedQuiz() {
   const searchParams = useSearchParams();
@@ -16,6 +16,14 @@ export default function GeneratedQuiz() {
 
   const questionsArray = data.questions || [];
   const solutionsArray = data.solutions || [];
+
+  useEffect(() => {
+    // Only run in browser
+    if (typeof window !== "undefined" && (window as any).MathJax) {
+      // Force MathJax to re-render the content
+      (window as any).MathJax.typesetPromise();
+    }
+  }, [questionsArray, showSolutions]);
 
   return (
     <div className="container mx-auto p-6">

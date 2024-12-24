@@ -13,19 +13,29 @@ export const maxDuration = 500;
 
 export async function POST(req: Request) {
     try {
-      const { subject, topic, level, paper, questionCount } = await req.json();
-  
-      const prompt = `
-        Generate ${questionCount} ${level} ${subject} questions on ${topic} for ${paper}.
-        Include solutions and options if applicable.
-      `;
-  
-      const systemPrompt = "You are an expert tutor creating exam questions.";
-      const outputFormat = {
-        question: "<string>",
-        solution: "<string>",
-        options: ["<string>", "<string>", "<string>", "<string>"], // Optional
-      };
+      const { subject, difficulty, topic, level, paper, questionCount } = await req.json();
+
+    const prompt = `
+      Generate ${questionCount} ${level} ${subject} questions on ${topic} for ${paper} that are ${difficulty} difficulty level.
+      Include solutions and marking scheme with notes if applicable.
+      All math expressions must be written in LaTeX. 
+      - Use inline math notation for shorter expressions, like \\( x + y \\).
+      - For multi-line derivations or bigger expressions, use display math notation: $$ x^2 + y^2 = 1 $$.
+    `;
+
+    const systemPrompt = `
+      You are an expert tutor creating exam questions.
+      Return the output as valid JSON array of objects, 
+      each containing "question", "solution" and "markingScheme" keys.
+      Do not include any extra keys.
+      Example: [{"question":"...","solution":"...","markingScheme":"..."}]
+    `;
+
+    const outputFormat = {
+      question: "<string>",
+      solution: "<string>",
+      markingScheme: "<string>"
+    };
   
       const questions = await strict_output(systemPrompt, prompt, outputFormat);
   

@@ -23,6 +23,7 @@ type PaperOptions = {
 
 type SubjectStructure = {
   [key: string]: {
+    difficulty: string[];
     papers: PaperOptions;
     levels: string[];
   };
@@ -30,6 +31,7 @@ type SubjectStructure = {
 
 const examStructure: SubjectStructure = {
   mathematics: {
+    
     papers: {
       paper1: {
         name: "Paper 1",
@@ -55,9 +57,11 @@ const examStructure: SubjectStructure = {
         ]
       }
     },
+    difficulty: ["Easy", "Medium", "Hard"],
     levels: ["Higher Level", "Ordinary Level"]
   },
-  english: {
+  /* english: {
+    difficulty: ["Easy", "Medium", "Hard"],
     papers: {
       paper1: {
         name: "Paper 1 (Language and Comprehension)",
@@ -86,6 +90,7 @@ const examStructure: SubjectStructure = {
     levels: ["Higher Level", "Ordinary Level"]
   },
   irish: {
+    difficulty: ["Easy", "Medium", "Hard"],
     papers: {
       paper1: {
         name: "Paper 1 (Language and Composition)",
@@ -110,12 +115,13 @@ const examStructure: SubjectStructure = {
       }
     },
     levels: ["Higher Level", "Ordinary Level"]
-  }
+  } */
 };
 
 export function QuizForm() {
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [selectedPaper, setSelectedPaper] = useState<string>("");
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>("");
   const [selectedLevel, setSelectedLevel] = useState<string>("");
   const [selectedSection, setSelectedSection] = useState<string>("");
   const [selectedTopic, setSelectedTopic] = useState<string>("");
@@ -146,6 +152,7 @@ const handleSubmit = async (e: React.FormEvent) => {
   // Prepare the data to send to the API
   const requestData = {
     subject: selectedSubject,
+    difficulty: selectedDifficulty,
     topic: selectedTopic,
     level: selectedLevel,
     paper: selectedPaper,
@@ -192,7 +199,6 @@ const handleSubmit = async (e: React.FormEvent) => {
     <><form onSubmit={handleSubmit} className="space-y-6">
       <Card>
         <CardContent className="pt-6">
-          <div className="space-y-4">
             <div className="space-y-2">
               <Label>Quiz Title</Label>
               <Input placeholder="Enter quiz title..." />
@@ -220,6 +226,8 @@ const handleSubmit = async (e: React.FormEvent) => {
                 </Select>
               </div>
 
+      
+
               {selectedSubject && (
                 <div className="space-y-2">
                   <Label>Level</Label>
@@ -231,6 +239,25 @@ const handleSubmit = async (e: React.FormEvent) => {
                       {examStructure[selectedSubject].levels.map((level) => (
                         <SelectItem key={level} value={level}>
                           {level}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+
+              {selectedSubject && (
+                <div className="space-y-2">
+                  <Label>Difficulty</Label>
+                  <Select onValueChange={setSelectedDifficulty}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select difficulty" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {examStructure[selectedSubject].difficulty.map((difficulty) => (
+                        <SelectItem key={difficulty} value={difficulty}>
+                          {difficulty}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -315,7 +342,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                   <span>10</span>
                 </div>
               </div>
-            </div>
           </div>
         </CardContent>
       </Card>
