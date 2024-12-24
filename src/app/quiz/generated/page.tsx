@@ -1,6 +1,8 @@
 // src/app/quiz/generated/page.tsx
 
 "use client";
+export const dynamic = "force-dynamic"; 
+
 
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
