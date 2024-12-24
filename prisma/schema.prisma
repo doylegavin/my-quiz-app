@@ -43,6 +43,9 @@ model Question {
   difficulty    Difficulty // Enum: Easy, Medium, Hard
   paper         Paper // Enum linking to Paper 1 or 2
   stats         Json? // Metadata: % correct, user stats, etc.
+  game      Game    @relation(fields: [gameId], references: [id])
+  gameId    String
+
 }
 
 model Game {
@@ -53,6 +56,7 @@ model Game {
   quiz      Quiz      @relation(fields: [quizId], references: [id])
   startTime DateTime  @default(now())
   endTime   DateTime?
+  questions Question[]
   results   Json? // JSON to store user answers and scores
 }
 
