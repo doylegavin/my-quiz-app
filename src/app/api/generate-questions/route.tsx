@@ -24,6 +24,11 @@ export async function POST(req: Request) {
     - Double-escape any backslashes in LaTeX. 
       For example, LaTeX inline math should appear as: \\( x^2 \\) 
       becomes \\\\( x^2 \\\\) in the raw JSON.
+      If special characters are used in maths make sure to escape before: e.g.
+       $$
+       \$2000
+       $$
+
     
     Return JSON with "questions" and "solutions" keys, for example:
     {
