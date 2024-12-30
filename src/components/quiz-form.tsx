@@ -349,25 +349,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       <div className="flex justify-end">
         <Button type="submit" className="btn-primary" >{loading ? "Generating..." : "Generate Questions"}</Button>
       </div>
-    </form><div>
-        {questions.length > 0 && (
-          <div className="space-y-4 mt-6">
-            <h2 className="text-lg font-medium">Generated Questions</h2>
-            {questions.map((q, index) => (
-              <div key={index} className="border p-4 rounded-md">
-                <p><strong>Question {index + 1}:</strong> {q.question}</p>
-                {q.options && (
-                  <ul>
-                    {q.options.map((option, i) => (
-                      <li key={i}>{option}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div></>
+    </form></>
     
   );
 }
