@@ -60,7 +60,7 @@ const examStructure: SubjectStructure = {
     difficulty: ["Easy", "Medium", "Hard"],
     levels: ["Higher Level", "Ordinary Level"]
   },
-  /* english: {
+  english: {
     difficulty: ["Easy", "Medium", "Hard"],
     papers: {
       paper1: {
@@ -115,7 +115,7 @@ const examStructure: SubjectStructure = {
       }
     },
     levels: ["Higher Level", "Ordinary Level"]
-  } */
+  }
 };
 
 export function QuizForm() {
