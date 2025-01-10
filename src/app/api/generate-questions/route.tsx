@@ -66,12 +66,12 @@ export async function POST(req: Request) {
       
       // ... Add similar logic for Irish, Maths, etc. here
 
-      if (subject === 'irish') {
+     /*  if (subject === 'irish') {
         baseInstructions +=  `All questions and solutions must be given in Gaeilge (Irish)`;
-      }
+      } */
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       messages: [
         { role: "system", content: baseInstructions },
         { role: "user", content: userPrompt },
