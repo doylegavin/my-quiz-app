@@ -12,6 +12,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Progress } from "@/components/ui/progress";
+
 
 type PaperOptions = {
   [key: string]: {
@@ -125,10 +127,22 @@ export function QuizForm() {
   const [selectedLevel, setSelectedLevel] = useState<string>("");
   const [selectedSection, setSelectedSection] = useState<string>("");
   const [selectedTopic, setSelectedTopic] = useState<string>("");
-  const [questionCount, setQuestionCount] = useState<number>(5);
+  const [questionCount, setQuestionCount] = useState<number>(3);
   const [questions, setQuestions] = useState<Array<{ question: string; options: string[] }>>([]);
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
 
+  
+  const simulateProgress = () => {
+    let value = 0;
+    const interval = setInterval(() => {
+      value += 10;
+      setProgress(value);
+      if (value >= 100) {
+        clearInterval(interval);
+      }
+    }, 100);
+  };
 
   const router = useRouter();
 
@@ -148,6 +162,8 @@ export function QuizForm() {
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   setLoading(true);
+  simulateProgress();
+
 
   // Prepare the data to send to the API
   const requestData = {
@@ -330,8 +346,8 @@ const handleSubmit = async (e: React.FormEvent) => {
               <Label className="font-medium">Number of Questions</Label>
               <div className="px-3">
                 <Slider
-                  defaultValue={[5]}
-                  max={10}
+                  defaultValue={[3]}
+                  max={5}
                   min={1}
                   step={1}
                   onValueChange={handleSliderChange}
@@ -339,7 +355,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>1</span>
                   <span>{questionCount} questions</span>
-                  <span>10</span>
+                  <span>5</span>
                 </div>
               </div>
           </div>
@@ -349,6 +365,11 @@ const handleSubmit = async (e: React.FormEvent) => {
       <div className="flex justify-end">
         <Button type="submit" className="btn-primary" >{loading ? "Generating..." : "Generate Questions"}</Button>
       </div>
+      {loading && (
+          <div className="w-full mb-4">
+            <Progress value={progress} />
+          </div>
+        )}
     </form></>
     
   );
