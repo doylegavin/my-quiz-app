@@ -44,7 +44,8 @@ const examStructure: SubjectStructure = {
           "Sequences and Series",
           "Functions",
           "Calculus",
-          "Financial Maths"
+          "Financial Maths",
+          "Proof by Induction"
         ]
       },
       paper2: {
@@ -53,14 +54,16 @@ const examStructure: SubjectStructure = {
         topics: [
           "Geometry",
           "Trigonometry",
-          "Coordinate Geometry",
+          "Coordinate Geometry The Line",
+           "Coordinate Geometry The Circle",
           "Probability",
-          "Statistics"
+          "Statistics",
+          "Constructions"
         ]
       }
     },
     difficulty: ["Easy", "Medium", "Hard"],
-    levels: ["Higher Level", "Ordinary Level"]
+    levels: ["Higher Level", "Ordinary Level", "Foundation Level"]
   },
   english: {
     difficulty: ["Easy", "Medium", "Hard"],

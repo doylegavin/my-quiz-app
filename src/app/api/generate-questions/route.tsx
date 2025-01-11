@@ -71,7 +71,7 @@ export async function POST(req: Request) {
       }
 
     const response = await openai.chat.completions.create({
-      model: "ft:gpt-4o-2024-08-06:personal:my-quiz-app:AoEVUL2R", //works with gpt-4o-mini
+      model: "ft:gpt-4o-2024-08-06:personal:my-quiz-app2:AoXLUjAo", //works with gpt-4o-mini
       messages: [
         { role: "system", content: baseInstructions },
         { role: "user", content: userPrompt },

@@ -9,7 +9,7 @@ export default function About() {
           About Us
         </h1>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto text-center mb-12">
-          Discover the story behind our AI-powered platform and how we empower students to master their studies.
+          We’re here to help you feel confident, learn faster, and do your very best in your exams.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -19,21 +19,21 @@ export default function About() {
             </CardHeader>
             <CardContent>
               <p className="text-gray-600">
-                Our mission is to make learning engaging, effective, and accessible for all students. We leverage AI to adapt to each learner's unique needs and provide tools that foster deep understanding and retention.
+                Our goal is to make studying easier and more fun. With tools that match your learning style, you can build confidence, understand tricky topics, and get the grades you want.
               </p>
             </CardContent>
           </Card>
 
           <Card className="bg-white/50 backdrop-blur">
             <CardHeader>
-              <CardTitle>Why Choose Us?</CardTitle>
+              <CardTitle>Why Use This App?</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
-                <li>✓ Personalized quizzes tailored to your strengths and weaknesses</li>
-                <li>✓ Intuitive design with accessibility features for all learners</li>
-                <li>✓ Insights and analytics to track progress</li>
-                <li>✓ Cutting-edge technology for an unmatched learning experience</li>
+                <li>✓ Quizzes made just for you based on what you need to learn</li>
+                <li>✓ Easy-to-use and works for everyone</li>
+                <li>✓ Track how you’re doing and celebrate your wins</li>
+                <li>✓ Built with smart technology to make studying more effective</li>
               </ul>
             </CardContent>
           </Card>
@@ -41,10 +41,10 @@ export default function About() {
 
         <div className="mt-16 text-center">
           <h2 className="text-3xl font-bold mb-6">
-            Join Us in Shaping the Future of Education
+            Meet Gavin
           </h2>
           <p className="text-gray-600 max-w-xl mx-auto mb-8">
-            Become part of a community of learners achieving their goals with innovative tools and support.
+            Hi, I’m Gavin Doyle, a teacher who loves helping students succeed. I’ve taught PE and maths, and I’ve seen how hard it can be to feel ready for exams. That’s why I built this app—to give you the tools you need to study smarter and feel confident on exam day. Let’s do this together!
           </p>
         </div>
       </section>
