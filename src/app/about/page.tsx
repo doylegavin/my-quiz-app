@@ -1,5 +1,6 @@
 // src/app/about.tsx
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CheckCircle, Hourglass, Circle } from "lucide-react";
 
 export default function About() {
   return (
@@ -37,6 +38,38 @@ export default function About() {
               </ul>
             </CardContent>
           </Card>
+        </div>
+
+        <div className="mt-16">
+          <h2 className="text-3xl font-bold text-center mb-6">
+            Development Timeline
+          </h2>
+          <ol className="space-y-4 max-w-2xl mx-auto">
+            <li className="flex items-center text-lg text-green-600">
+              <CheckCircle className="w-6 h-6 mr-3" />
+              <span><strong>Phase 0:</strong> Home page, About page, and quiz generation for Leaving Cert Maths (Completed)</span>
+            </li>
+            <li className="flex items-center text-lg text-yellow-600">
+              <Hourglass className="w-6 h-6 mr-3" />
+              <span><strong>Phase 1:</strong> Add login/sign-up, state management for authentication, and a database (In Progress)</span>
+            </li>
+            <li className="flex items-center text-lg text-gray-600">
+              <Circle className="w-6 h-6 mr-3" />
+              <span><strong>Phase 2:</strong> Create a side navbar, quiz history page, and improve question generation with diagrams/graphs</span>
+            </li>
+            <li className="flex items-center text-lg text-gray-600">
+              <Circle className="w-6 h-6 mr-3" />
+              <span><strong>Phase 3:</strong> Enable photo-based answer checking and add teacher-specific features (e.g., save/export quizzes as PDFs)</span>
+            </li>
+            <li className="flex items-center text-lg text-gray-600">
+              <Circle className="w-6 h-6 mr-3" />
+              <span><strong>Phase 4:</strong> Launch web app, expand to other subjects, and introduce a subscription model</span>
+            </li>
+            <li className="flex items-center text-lg text-gray-600">
+              <Circle className="w-6 h-6 mr-3" />
+              <span><strong>Phase 5:</strong> Build and optimize a mobile app for iOS/Android</span>
+            </li>
+          </ol>
         </div>
 
         <div className="mt-16 text-center">

@@ -1,105 +1,108 @@
+// Prisma schema for the Leaving Cert Revision App
+// Learn more at: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "postgresql" // Adjust this if using MySQL
   url      = env("DATABASE_URL")
 }
 
+// User model for authentication and roles
 model User {
-  id            String    @id @default(cuid())
-  name          String?   @unique
-  email         String?   @unique
-  image         String?
+  id            String      @id @default(cuid())
+  name          String?
+  email         String?     @unique
+  password      String?
   emailVerified DateTime?
-  quizzes       Quiz[] // One-to-many relationship to quizzes
-  games         Game[] // One-to-many relationship to games
+  image         String?
+  role          Role        @default(STUDENT)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  quizzes       Quiz[]
+  progress      Progress[]
 }
 
+enum Role {
+  STUDENT
+  TEACHER
+}
+
+// Account model for OAuth providers
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+// Session model for session management
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Quiz model for storing quiz details
 model Quiz {
-  id        String     @id @default(cuid())
-  title     String
-  subject   Subject // Enum linking to a subject
-  paper     Paper // Enum linking to paper (1 or 2)
-  level     Level // Higher, Ordinary, or Foundation
-  topic     Topic // Enum linking to specific topics
-  createdAt DateTime   @default(now())
-  questions Question[] // Relationship to questions
-  user      User?      @relation(fields: [userId], references: [id])
-  userId    String? // User who created the quiz
-  Game      Game[]
+  id          String     @id @default(cuid())
+  userId      String
+  topic       String
+  score       Int
+  createdAt   DateTime   @default(now())
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questions   Question[]
 }
 
+// Question model for quiz questions
 model Question {
-  id            String       @id @default(cuid())
-  text          String // Question text
-  type          QuestionType // Enum: multiple-choice, open-ended, etc.
-  options       String[] // Options for multiple-choice questions
-  correctAnswer String // Correct answer (text or index)
-  quiz          Quiz         @relation(fields: [quizId], references: [id])
-  quizId        String
-  topic         Topic // Enum linking to the specific topic
-  difficulty    Difficulty // Enum: Easy, Medium, Hard
-  paper         Paper // Enum linking to Paper 1 or 2
-  stats         Json? // Metadata: % correct, user stats, etc.
-  game      Game    @relation(fields: [gameId], references: [id])
-  gameId    String
-
+  id          String   @id @default(cuid())
+  quizId      String
+  question    String
+  options     Json?    // For MCQs
+  answer      String
+  userAnswer  String?
+  isCorrect   Boolean?
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
 }
 
-model Game {
-  id        String    @id @default(cuid())
-  userId    String // User who played the game
-  user      User      @relation(fields: [userId], references: [id])
-  quizId    String // Quiz associated with the game
-  quiz      Quiz      @relation(fields: [quizId], references: [id])
-  startTime DateTime  @default(now())
-  endTime   DateTime?
-  questions Question[]
-  results   Json? // JSON to store user answers and scores
+// Progress model for tracking learning
+model Progress {
+  id        String   @id @default(cuid())
+  userId    String
+  topic     String
+  completed Boolean  @default(false)
+  lastStudied DateTime?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-enum Subject {
-  Maths
-  English
-  Irish
+// Exam structure model for mathematics
+model ExamStructure {
+  id          String   @id @default(cuid())
+  subject     String   @default("mathematics")
+  papers      Paper[]
+  difficulty  String[] @default(["Easy", "Medium", "Hard"])
+  levels      String[] @default(["Higher Level", "Ordinary Level", "Foundation Level"])
 }
 
-enum Paper {
-  Paper1
-  Paper2
-}
-
-enum Level {
-  Higher
-  Ordinary
-  Foundation
-}
-
-enum QuestionType {
-  MultipleChoice
-  OpenEnded
-  FillInTheBlanks
-}
-
-enum Difficulty {
-  Easy
-  Medium
-  Hard
-}
-
-enum Topic {
-  // Add granular topics by subject
-  Algebra
-  Calculus
-  Trigonometry
-  Statistics
-  Probability
-  Geometry
-  Poetry
-  Comparative
-  ReadingComprehension
-  EssayWriting
-  // Extend for all subjects
+model Paper {
+  id          String   @id @default(cuid())
+  name        String
+  sections    String[] @default(["Short Questions", "Long Questions"])
+  topics      String[]
+  exam        ExamStructure @relation(fields: [examStructureId], references: [id], onDelete: Cascade)
+  examStructureId String
 }
