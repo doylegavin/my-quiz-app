@@ -67,7 +67,6 @@ model Quiz {
   questions   Question[]
 }
 
-// Question model for quiz questions
 model Question {
   id          String   @id @default(cuid())
   quizId      String
@@ -76,6 +75,9 @@ model Question {
   answer      String
   userAnswer  String?
   isCorrect   Boolean?
+  gameId      String
+  game        Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  questionType String
   quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
 }
 
@@ -106,3 +108,11 @@ model Paper {
   exam        ExamStructure @relation(fields: [examStructureId], references: [id], onDelete: Cascade)
   examStructureId String
 }
+model Game {
+  id          String    @id @default(uuid())
+  gameType    String
+  timeStarted DateTime @default(now())
+  topic       String
+  questions   Question[]
+}
+
