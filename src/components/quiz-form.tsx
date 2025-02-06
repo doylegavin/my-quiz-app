@@ -35,10 +35,34 @@ const examStructure: SubjectStructure = {
   mathematics: {
     
     papers: {
+
+      Both: {
+        name: "Both",
+        sections: ["Random","Short Questions", "Long Questions"],
+        topics: [
+          "Random",
+          "Algebra",
+          "Complex Numbers",
+          "Sequences and Series",
+          "Functions",
+          "Calculus",
+          "Financial Maths",
+          "Proof by Induction",
+          "Geometry",
+          "Trigonometry",
+          "Coordinate Geometry The Line",
+           "Coordinate Geometry The Circle",
+          "Probability",
+          "Statistics",
+          "Constructions"
+        ]
+      },
+
       paper1: {
         name: "Paper 1",
-        sections: ["Short Questions", "Long Questions"],
+        sections: ["Random", "Short Questions", "Long Questions"],
         topics: [
+          "Random",
           "Algebra",
           "Complex Numbers",
           "Sequences and Series",
@@ -46,12 +70,14 @@ const examStructure: SubjectStructure = {
           "Calculus",
           "Financial Maths",
           "Proof by Induction"
+          
         ]
       },
       paper2: {
         name: "Paper 2",
-        sections: ["Short Questions", "Long Questions"],
+        sections: ["Random", "Short Questions", "Long Questions"],
         topics: [
+          "Random",
           "Geometry",
           "Trigonometry",
           "Coordinate Geometry The Line",
@@ -62,7 +88,7 @@ const examStructure: SubjectStructure = {
         ]
       }
     },
-    difficulty: ["Easy", "Medium", "Hard"],
+    difficulty: ["Random", "Easy", "Medium", "Hard"],
     levels: ["Higher Level", "Ordinary Level", "Foundation Level"]
   },
   english: {
@@ -124,14 +150,12 @@ const examStructure: SubjectStructure = {
 };
 
 export function QuizForm() {
-  const [selectedSubject, setSelectedSubject] = useState<string>("");
-  const [selectedPaper, setSelectedPaper] = useState<string>("");
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string>("");
+  const [selectedSubject, setSelectedSubject] = useState<string>("mathematics");
+  const [selectedPaper, setSelectedPaper] = useState<string>("Both");
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>("Random");
   const [selectedLevel, setSelectedLevel] = useState<string>("");
-  const [selectedSection, setSelectedSection] = useState<string>("");
-  const [selectedTopic, setSelectedTopic] = useState<string>("");
-  const [questionCount, setQuestionCount] = useState<number>(3);
-  const [questions, setQuestions] = useState<Array<{ question: string; options: string[] }>>([]);
+  const [selectedSection, setSelectedSection] = useState<string>("Random");
+  const [selectedTopic, setSelectedTopic] = useState<string>("Random");
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
 
@@ -139,7 +163,7 @@ export function QuizForm() {
   const simulateProgress = () => {
     let value = 0;
     const interval = setInterval(() => {
-      value += 10;
+      value += 3;
       setProgress(value);
       if (value >= 100) {
         clearInterval(interval);
@@ -149,22 +173,17 @@ export function QuizForm() {
 
   const router = useRouter();
 
- // Function to handle slider change
- const handleSliderChange = (value: number[]) => {
-  setQuestionCount(value[0]);
 
-  // Initialize or adjust questions array based on new count
-  const newQuestions = Array(value[0]).fill({
-    question: "",
-    options: ["", "", "", ""]
-  });
-  setQuestions(newQuestions);
-};
 
 //submit function
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   setLoading(true);
+    if (!selectedLevel) {
+      alert("Please select a level.");
+      setLoading(false);
+      return;
+    }
   simulateProgress();
 
 
@@ -175,7 +194,6 @@ const handleSubmit = async (e: React.FormEvent) => {
     topic: selectedTopic,
     level: selectedLevel,
     paper: selectedPaper,
-    questionCount: questionCount,
   };
 
   try {
@@ -231,7 +249,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Subject</Label>
-                <Select onValueChange={setSelectedSubject}>
+                <Select onValueChange={setSelectedSubject} defaultValue="mathematics">
                   <SelectTrigger>
                     <SelectValue placeholder="Select subject" />
                   </SelectTrigger>
@@ -247,12 +265,11 @@ const handleSubmit = async (e: React.FormEvent) => {
 
       
 
-              {selectedSubject && (
                 <div className="space-y-2">
                   <Label>Level</Label>
                   <Select onValueChange={setSelectedLevel}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select level" />
+                      <SelectValue placeholder="Select level (Required)" />
                     </SelectTrigger>
                     <SelectContent>
                       {examStructure[selectedSubject].levels.map((level) => (
@@ -263,10 +280,8 @@ const handleSubmit = async (e: React.FormEvent) => {
                     </SelectContent>
                   </Select>
                 </div>
-              )}
 
 
-              {selectedSubject && (
                 <div className="space-y-2">
                   <Label>Difficulty</Label>
                   <Select onValueChange={setSelectedDifficulty}>
@@ -282,9 +297,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     </SelectContent>
                   </Select>
                 </div>
-              )}
 
-              {selectedSubject && (
                 <div className="space-y-2">
                   <Label>Paper</Label>
                   <Select onValueChange={setSelectedPaper}>
@@ -302,9 +315,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     </SelectContent>
                   </Select>
                 </div>
-              )}
 
-              {selectedPaper && (
                 <div className="space-y-2">
                   <Label>Section</Label>
                   <Select onValueChange={setSelectedSection}>
@@ -322,9 +333,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     </SelectContent>
                   </Select>
                 </div>
-              )}
 
-              {selectedSection && (
                 <div className="space-y-2">
                   <Label>Topic</Label>
                   <Select onValueChange={setSelectedTopic}>
@@ -342,26 +351,8 @@ const handleSubmit = async (e: React.FormEvent) => {
                     </SelectContent>
                   </Select>
                 </div>
-              )}
             </div>
-            <div className="space-y-6">
-
-              <Label className="font-medium">Number of Questions</Label>
-              <div className="px-3">
-                <Slider
-                  defaultValue={[3]}
-                  max={5}
-                  min={1}
-                  step={1}
-                  onValueChange={handleSliderChange}
-                  className="my-4" />
-                <div className="flex justify-between text-sm text-gray-500">
-                  <span>1</span>
-                  <span>{questionCount} questions</span>
-                  <span>5</span>
-                </div>
-              </div>
-          </div>
+           
         </CardContent>
       </Card>
 
