@@ -38,7 +38,7 @@ const examStructure: SubjectStructure = {
 
       Both: {
         name: "Both",
-        sections: ["Random","Short Questions", "Long Questions"],
+        sections: ["Short Questions", "Long Questions"],
         topics: [
           "Random",
           "Algebra",
@@ -60,7 +60,7 @@ const examStructure: SubjectStructure = {
 
       paper1: {
         name: "Paper 1",
-        sections: ["Random", "Short Questions", "Long Questions"],
+        sections: [ "Short Questions", "Long Questions"],
         topics: [
           "Random",
           "Algebra",
@@ -75,7 +75,7 @@ const examStructure: SubjectStructure = {
       },
       paper2: {
         name: "Paper 2",
-        sections: ["Random", "Short Questions", "Long Questions"],
+        sections: ["Short Questions", "Long Questions"],
         topics: [
           "Random",
           "Geometry",
@@ -154,7 +154,7 @@ export function QuizForm() {
   const [selectedPaper, setSelectedPaper] = useState<string>("Both");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("Random");
   const [selectedLevel, setSelectedLevel] = useState<string>("");
-  const [selectedSection, setSelectedSection] = useState<string>("Random");
+  const [selectedSection, setSelectedSection] = useState<string>("Short Questions");
   const [selectedTopic, setSelectedTopic] = useState<string>("Random");
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -179,13 +179,14 @@ export function QuizForm() {
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   setLoading(true);
-    if (!selectedLevel) {
-      alert("Please select a level.");
-      setLoading(false);
-      return;
-    }
-  simulateProgress();
 
+  if (!selectedLevel) {
+    alert("Please select a level.");
+    setLoading(false);
+    return;
+  }
+
+  simulateProgress();
 
   // Prepare the data to send to the API
   const requestData = {
@@ -194,27 +195,35 @@ const handleSubmit = async (e: React.FormEvent) => {
     topic: selectedTopic,
     level: selectedLevel,
     paper: selectedPaper,
+    sections: selectedSection,
   };
 
   try {
-    // Make an API call to fetch questions
     const response = await fetch("/api/generate-questions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(requestData),
     });
 
-    console.log("Response:", response); // Log the raw response
+    console.log("Response:", response);
 
     if (response.ok) {
       const data = await response.json();
-      console.log("Data received:", data); // Log the JSON data
+      console.log("Data received:", data);
 
       if (data.questions && Array.isArray(data.questions)) {
-        // Pass data to the generated page using query parameters
-        router.push(
-          `/quiz/generated?questions=${encodeURIComponent(JSON.stringify(data))}`
-        );
+        // Encode query params with selected fields
+        const queryParams = new URLSearchParams({
+          questions: JSON.stringify(data),
+          subject: selectedSubject,
+          level: selectedLevel,
+          difficulty: selectedDifficulty,
+          paper: selectedPaper,
+          section: selectedSection,
+          topic: selectedTopic
+        });
+
+        router.push(`/quiz/generated?${queryParams.toString()}`);
       } else {
         console.error("Questions data is missing or invalid.");
       }
@@ -228,6 +237,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     setLoading(false);
   }
 };
+
 
 
 
@@ -320,7 +330,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   <Label>Section</Label>
                   <Select onValueChange={setSelectedSection}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select section" />
+                      <SelectValue placeholder="Short Questions" />
                     </SelectTrigger>
                     <SelectContent>
                       {examStructure[selectedSubject].papers[selectedPaper].sections.map(

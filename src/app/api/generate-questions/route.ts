@@ -3,6 +3,9 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
+
+
+
 // Example lists (replace these with actual curriculum data)
 //const currentEnglishPoets = ["Eavan Boland", "Seamus Heaney", "Emily Dickinson"];
 //const currentIrishPoets = ["Nuala Ní Dhomhnaill", "Máire Mhac an tSaoi"];
@@ -13,7 +16,7 @@ const openai = new OpenAI({
 
 export async function POST(req: Request) {
   try {
-    const { subject, topic, level, paper, questionCount, difficulty } = await req.json();
+    const { subject, topic, level, paper, questionCount, difficulty, type } = await req.json();
 
     // Build the base instructions here and conditionally add instructions
     // based on subject/topic (as previously discussed)
@@ -54,30 +57,18 @@ export async function POST(req: Request) {
     No extra text.
     `;
     
-      /* // For English poetry, for example:
-      if (subject === "english" && topic.toLowerCase().includes("poetry")) {
-        const poet = currentEnglishPoets[Math.floor(Math.random() * currentEnglishPoets.length)];
-        baseInstructions += `
-        Include an unseen poem by ${poet}.
-        Ask ${questionCount} questions based on the poem, then provide a separate solutions section.
-        Each solution should have notes and marking scheme.
-      `;
-      } */
-      
-      // ... Add similar logic for Irish, Maths, etc. here
-
-      if (subject === 'irish') {
-        baseInstructions +=  `All questions and solutions must be given in Gaeilge (Irish)`;
-      }
 
     const response = await openai.chat.completions.create({
-      model: "ft:gpt-4o-2024-08-06:personal:my-quiz-app2:AoXLUjAo", //works with gpt-4o-mini
+      model: "ft:gpt-4o-2024-08-06:personal:my-quiz-app2:AoXLUjAo",
       messages: [
         { role: "system", content: baseInstructions },
         { role: "user", content: userPrompt },
       ],
       temperature: 0.7,
     });
+    
+    // 👇 Add this console log BEFORE parsing
+    console.log("Raw OpenAI Response:", response.choices[0]?.message?.content);
 
     let content = response.choices[0]?.message?.content?.trim() || "";
     const data = JSON.parse(content);

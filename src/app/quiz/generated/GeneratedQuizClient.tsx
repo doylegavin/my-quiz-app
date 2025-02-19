@@ -11,6 +11,17 @@ export default function GeneratedQuizClient() {
   const questionsArray = data.questions || [];
   const solutionsArray = data.solutions || [];
 
+  // Extract selected quiz parameters
+  const subject = searchParams.get("subject") || "Random";
+  const level = searchParams.get("level") || "Random";
+  const difficulty = searchParams.get("difficulty") || "Random";
+  const paper = searchParams.get("paper") || "Random";
+  const section = searchParams.get("section") || "Random";
+  const topic = searchParams.get("topic") || "Random";
+
+  // Construct the selected quiz fields string
+  const selectedFields = `${difficulty} ${level} ${topic} ${section} (${paper}, ${subject})`;
+
   useEffect(() => {
     if (typeof window !== "undefined" && (window as any).MathJax) {
       (window as any).MathJax.typesetPromise();
@@ -19,7 +30,10 @@ export default function GeneratedQuizClient() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">Generated Questions</h1>
+      <h1 className="text-2xl font-bold mb-4">
+        Generated Questions: <span className="text-gray-600">{selectedFields}</span>
+      </h1>
+
       {questionsArray.length > 0 ? (
         <ul className="space-y-4">
           {questionsArray.map((q: { question: string }, index: number) => (
