@@ -234,7 +234,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
 
   return (
-    <><form onSubmit={handleSubmit} className="space-y-6">
+    <><form onSubmit={handleSubmit} className="space-y-6 ml-16 mr-4 md:ml-64 mr-8">
       <Card>
         <CardContent className="pt-6">
             <div className="space-y-2">

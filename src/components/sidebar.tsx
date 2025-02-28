@@ -60,11 +60,11 @@ export default function Sidebar() {
         <Link href="/" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-purple-800 transition">
           <FiHome size={20} /> {isOpen && "Home"}
         </Link>
-        <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-purple-800 transition">
-          <FiEdit size={20} /> {isOpen && "Dashboard"}
-        </Link>
+       {/*  <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-purple-800 transition">
+          <FiSend size={20} /> {isOpen && "Dashboard"}
+        </Link> */}
         <Link href="/quiz/create" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-purple-800 transition">
-          <FiSend size={20} /> {isOpen && "Create Quiz"}
+          <FiEdit size={20} /> {isOpen && "Create Quiz"}
         </Link>
         <Link href="/about" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-purple-800 transition">
           <FiInfo size={20} /> {isOpen && "About"}

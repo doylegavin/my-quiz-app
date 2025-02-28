@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pl-16">
       {/* Hero Section */}
       <section className="container mx-auto px-4 pt-10 text-center">
       <h1 className="text-7xl md:text-8xl font-bold tracking-tight mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent text-center drop-shadow-lg">

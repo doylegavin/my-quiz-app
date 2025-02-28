@@ -5,7 +5,7 @@ import { CheckCircle, Hourglass, Circle } from "lucide-react";
 
 export default function About() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pl-16">
       <section className="container mx-auto px-4 pt-20 pb-16">
         {/* About Quiz Generator */}
         <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent text-center">
