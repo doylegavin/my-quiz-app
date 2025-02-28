@@ -4,6 +4,11 @@ import "./globals.css";
 import { ReactQueryProvider } from "@/lib/ReactQueryProvider"
 import { Inter } from 'next/font/google'
 import Script from "next/script"; // ADDED
+import Sidebar from "@/components/sidebar"; // ADD THIS
+import SessionProviderWrapper from "@/components/SessionProviderWrapper"; // ✅ Import
+import FeedbackButton from "@/components/FeedbackButton";
+
+
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -40,10 +45,16 @@ export default function RootLayout({
           async
         />
       </head>
-      <body
-        className={`min-h-screen bg-background font-sans antialiased ${inter.variable}`}
-      >
-        <ReactQueryProvider>{children}</ReactQueryProvider>
+      <body className={`min-h-screen bg-background font-sans antialiased ${inter.variable}`}>
+            <SessionProviderWrapper>
+              <div className="flex min-h-screen">
+                <Sidebar />
+                <main className="flex-1 p-6">
+                  <ReactQueryProvider>{children}</ReactQueryProvider>
+                  <FeedbackButton/>
+                </main>
+              </div>
+          </SessionProviderWrapper>
       </body>
     </html>
   );

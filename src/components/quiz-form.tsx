@@ -91,7 +91,7 @@ const examStructure: SubjectStructure = {
     difficulty: ["Random", "Easy", "Medium", "Hard"],
     levels: ["Higher Level", "Ordinary Level", "Foundation Level"]
   },
-  english: {
+  /* english: {
     difficulty: ["Easy", "Medium", "Hard"],
     papers: {
       paper1: {
@@ -146,7 +146,7 @@ const examStructure: SubjectStructure = {
       }
     },
     levels: ["Higher Level", "Ordinary Level"]
-  }
+  } */
 };
 
 export function QuizForm() {
@@ -179,14 +179,13 @@ export function QuizForm() {
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   setLoading(true);
-
-  if (!selectedLevel) {
-    alert("Please select a level.");
-    setLoading(false);
-    return;
-  }
-
+    if (!selectedLevel) {
+      alert("Please select a level.");
+      setLoading(false);
+      return;
+    }
   simulateProgress();
+
 
   // Prepare the data to send to the API
   const requestData = {
@@ -199,31 +198,24 @@ const handleSubmit = async (e: React.FormEvent) => {
   };
 
   try {
+    // Make an API call to fetch questions
     const response = await fetch("/api/generate-questions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(requestData),
     });
 
-    console.log("Response:", response);
+    console.log("Response:", response); // Log the raw response
 
     if (response.ok) {
       const data = await response.json();
-      console.log("Data received:", data);
+      console.log("Data received:", data); // Log the JSON data
 
       if (data.questions && Array.isArray(data.questions)) {
-        // Encode query params with selected fields
-        const queryParams = new URLSearchParams({
-          questions: JSON.stringify(data),
-          subject: selectedSubject,
-          level: selectedLevel,
-          difficulty: selectedDifficulty,
-          paper: selectedPaper,
-          section: selectedSection,
-          topic: selectedTopic
-        });
-
-        router.push(`/quiz/generated?${queryParams.toString()}`);
+        // Pass data to the generated page using query parameters
+        router.push(
+          `/quiz/generated?questions=${encodeURIComponent(JSON.stringify(data))}`
+        );
       } else {
         console.error("Questions data is missing or invalid.");
       }
@@ -237,7 +229,6 @@ const handleSubmit = async (e: React.FormEvent) => {
     setLoading(false);
   }
 };
-
 
 
 

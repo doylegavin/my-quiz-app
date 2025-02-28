@@ -1,14 +1,18 @@
 // Prisma schema for the Leaving Cert Revision App
 // Learn more at: https://pris.ly/d/prisma-schema
 
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  
+  // Uncomment the next line **only if** you use Prisma <5.10
+  //directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "postgresql" // Adjust this if using MySQL
-  url      = env("DATABASE_URL")
-}
 
 // User model for authentication and roles
 model User {
