@@ -7,11 +7,11 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       {/* Hero Section */}
-      <section className="container mx-auto px-4 pt-20 text-center">
-        <h1 className="text-6xl md:text-7xl font-bold tracking-tight mb-6 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-          Examinaite
+      <section className="container mx-auto px-4 pt-10 text-center">
+      <h1 className="text-7xl md:text-8xl font-bold tracking-tight mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent text-center drop-shadow-lg">
+      Examinaite
         </h1>
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+        <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-6 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
           The Future of Exam Prep
         </h1>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
@@ -32,23 +32,29 @@ export default function Home() {
       </section>
 
       {/* Waitlist Signup Section */}
-      <section className="container mx-auto px-4 py-16 text-center">
-        <h2 className="text-3xl font-bold mb-4">
-          Be the First to Access Examinaite!
-        </h2>
-        <p className="text-xl text-gray-600 mb-8">
-          Join our waitlist and get early access to exclusive features before anyone else.
-        </p>
-        <a
-          href="https://forms.gle/LkDQbXotyPJQndzc6"
-          target="_blank"
-          rel="noopener noreferrer"
+      <section className="container mx-auto px-4 py-16 text-center bg-gradient-to-b to-white rounded-lg ">
+      <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+        Be the First to Access Examinaite!
+      </h2>
+      <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-6">
+        Join our waitlist and get early access to AI-powered exam prep tools before anyone else.
+      </p>
+      <p className="text-gray-500 text-sm md:text-base mb-8">
+        Limited spots available for beta testers! 🚀
+      </p>
+      <a
+        href="https://forms.gle/LkDQbXotyPJQndzc6"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Button
+          size="lg"
+          className="bg-blue-600 hover:bg-blue-700 px-8 py-4 text-lg font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-105"
         >
-          <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
-            Join the Waitlist
-          </Button>
-        </a>
-      </section>
+          Join the Waitlist 🚀
+        </Button>
+      </a>
+    </section>
 
       {/* Features Section */}
       <section className="container mx-auto px-4 py-16">
