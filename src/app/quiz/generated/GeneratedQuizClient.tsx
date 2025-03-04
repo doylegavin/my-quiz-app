@@ -12,12 +12,12 @@ export default function GeneratedQuizClient() {
   const solutionsArray = data.solutions || [];
 
   // Extract selected quiz parameters
-  const subject = searchParams.get("subject") || "Random";
-  const level = searchParams.get("level") || "Random";
-  const difficulty = searchParams.get("difficulty") || "Random";
-  const paper = searchParams.get("paper") || "Random";
-  const section = searchParams.get("section") || "Random";
-  const topic = searchParams.get("topic") || "Random";
+  const subject = searchParams.get("subject") || "";
+  const level = searchParams.get("level") || "";
+  const difficulty = searchParams.get("difficulty") || "Random difficulty";
+  const paper = searchParams.get("paper") || "";
+  const section = searchParams.get("section") || "";
+  const topic = searchParams.get("topic") || "Random Topic";
 
   // Construct the selected quiz fields string
   const selectedFields = `${difficulty} ${level} ${topic} ${section} (${paper}, ${subject})`;

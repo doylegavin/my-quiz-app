@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -159,7 +159,26 @@ export function QuizForm() {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
 
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  /* useEffect(() => {
+    setErrorMessage(errorMessages[Math.floor(Math.random() * errorMessages.length)]);
+  }, []); */
   
+  
+
+const errorMessages = [
+  "Oops! Question was too hard! Try again",
+  "Oops! Question was too easy! Try again",
+  "The AI just woke up! Try again",
+  "404 Brain Not Found! Try again",
+  "Oops! The AI blinked! Try again",
+  "Even AI needs a break... Try again",
+  "Our AI is currently daydreaming. Try again!",
+  "The question vanished into the void! Try again",
+];
+
+
   const simulateProgress = () => {
     let value = 0;
     const interval = setInterval(() => {
@@ -209,22 +228,21 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     if (response.ok) {
       const data = await response.json();
-      console.log("Data received:", data); // Log the JSON data
-
+      console.log("Data received:", data);
+  
       if (data.questions && Array.isArray(data.questions)) {
-        // Pass data to the generated page using query parameters
         router.push(
           `/quiz/generated?questions=${encodeURIComponent(JSON.stringify(data))}`
         );
       } else {
-        console.error("Questions data is missing or invalid.");
+        setErrorMessage(errorMessages[Math.floor(Math.random() * errorMessages.length)]);
       }
     } else {
-      const errorData = await response.json();
-      console.error("Error response:", errorData);
+      setErrorMessage(errorMessages[Math.floor(Math.random() * errorMessages.length)]);
     }
   } catch (error) {
     console.error("Fetch error:", error);
+    setErrorMessage(errorMessages[Math.floor(Math.random() * errorMessages.length)]);
   } finally {
     setLoading(false);
   }
@@ -234,8 +252,8 @@ const handleSubmit = async (e: React.FormEvent) => {
 
 
   return (
-    <><form onSubmit={handleSubmit} className="space-y-6 ml-16 mr-4 md:ml-64 mr-8">
-      <Card>
+<><form onSubmit={handleSubmit} className="space-y-6 mx-auto max-w-2xl px-4 md:px-8">
+<Card className="w-full">
         <CardContent className="pt-6">
             <div className="space-y-2">
               <Label>Quiz Title</Label>
@@ -357,9 +375,23 @@ const handleSubmit = async (e: React.FormEvent) => {
         </CardContent>
       </Card>
 
-      <div className="flex justify-end">
+      <div className="flex justify-end mt-8 pb-16">
         <Button type="submit" className="btn-primary" >{loading ? "Generating..." : "Generate Questions"}</Button>
       </div>
+
+      {errorMessage && (
+        <div className="fixed bottom-16 left-3/4 transform -translate-x-1/2 z-50 md:bottom-12 md:left-auto md:right-8 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2">
+        <span>{errorMessage}</span>
+    <button
+      onClick={() => setErrorMessage(null)}
+      className="ml-2 text-white font-bold text-lg leading-none"
+    >
+      ✖
+    </button>
+  </div>
+)}
+
+
       {loading && (
           <div className="w-full mb-4">
             <Progress value={progress} />
