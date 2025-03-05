@@ -499,61 +499,63 @@ export function QuizForm() {
   
   
   
-  //submit function
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    if (!selectedLevel) {
-      alert("Please select a level.");
-      setLoading(false);
-      return;
-    }
-    simulateProgress();
+ // handleSubmit function for quiz-form.tsx
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+  if (!selectedLevel) {
+    alert("Please select a level.");
+    setLoading(false);
+    return;
+  }
+  simulateProgress();
+  
+  // Prepare the data to send to the API
+  const requestData = {
+    subject: selectedSubject,
+    difficulty: selectedDifficulty,
+    topics: selectedTopic, // Changed from 'topic' to 'topics'
+    level: selectedLevel,
+    paper: selectedPaper,
+    sections: selectedSection,
+    // Add subtopic if it exists in your form
+    ...(selectedSubtopic && { subtopic: selectedSubtopic })
+  };
+  
+  try {
+    // Make an API call to fetch questions
+    const response = await fetch("/api/generate-questions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestData),
+    });
     
-    // Prepare the data to send to the API
-    const requestData = {
-      subject: selectedSubject,
-      difficulty: selectedDifficulty,
-      topics: selectedTopic, // Changed from 'topic' to 'topics'
-      level: selectedLevel,
-      paper: selectedPaper,
-      sections: selectedSection,
-      // Add subtopic if it exists in your form
-      ...(selectedSubtopic && { subtopic: selectedSubtopic })
-    };
+    console.log("Request data:", requestData); // Log request data
+    console.log("Response:", response);
     
-    try {
-      // Make an API call to fetch questions
-      const response = await fetch("/api/generate-questions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestData),
-      });
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Data received:", data);
       
-      console.log("Request data:", requestData); // Added for debugging
-      console.log("Response:", response);
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Data received:", data);
-        
-        if (data.questions && Array.isArray(data.questions)) {
-          router.push(
-            `/quiz/generated?questions=${encodeURIComponent(JSON.stringify(data))}`
-          );
-        } else {
-          setErrorMessage(errorMessages[Math.floor(Math.random() * errorMessages.length)]);
-        }
+      if (data.questions && Array.isArray(data.questions)) {
+        // Just pass the entire data object (includes metadata)
+        router.push(
+          `/quiz/generated?questions=${encodeURIComponent(JSON.stringify(data))}`
+        );
       } else {
         setErrorMessage(errorMessages[Math.floor(Math.random() * errorMessages.length)]);
       }
-    } catch (error) {
-      console.error("Fetch error:", error);
+    } else {
       setErrorMessage(errorMessages[Math.floor(Math.random() * errorMessages.length)]);
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (error) {
+    console.error("Fetch error:", error);
+    setErrorMessage(errorMessages[Math.floor(Math.random() * errorMessages.length)]);
+  } finally {
+    setLoading(false);
+  }
+};
   
   
   

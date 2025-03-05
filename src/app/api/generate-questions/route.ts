@@ -1,3 +1,5 @@
+// src/app/api/generate-questions/route.ts
+
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
@@ -5,11 +7,9 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-
 export const config = {
   maxDuration: 60, // Set max duration to 60 seconds
 };
-
 
 export async function POST(req: Request) {
   try {
@@ -88,46 +88,55 @@ export async function POST(req: Request) {
     
     console.log("Sending to OpenAI:", userPrompt);
     
-    // Set a timeout for the OpenAI request
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
-    
-
-    const response = await openai.chat.completions.create({
-      model: "ft:gpt-4o-2024-08-06:personal:my-quiz-app2:AoXLUjAo",
-      messages: [
-        { role: "system", content: baseInstructions },
-        { role: "user", content: userPrompt },
-      ],
-      temperature: 0.7,
-    });
-    
-    // Log raw response for debugging
-    console.log("Raw OpenAI Response:", response.choices[0]?.message?.content);
-    
-    let content = response.choices[0]?.message?.content?.trim() || "";
-    
     try {
-      const data = JSON.parse(content);
+      // Set a timeout for the OpenAI request
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
       
-      // Return data with metadata
-      return NextResponse.json({
-        ...data,
-        metadata: {
-          subject,
-          level,
-          difficulty,
-          paper,
-          sections,
-          topic,
-          subtopic
-        }
-      });
-    } catch (parseError) {
-      console.error("JSON parse error:", parseError, "Content:", content);
+      const response = await openai.chat.completions.create({
+        model: "ft:gpt-4o-2024-08-06:personal:my-quiz-app2:AoXLUjAo",
+        messages: [
+          { role: "system", content: baseInstructions },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: 0.7,
+      }, { signal: controller.signal }); // Add the signal here
+      
+      clearTimeout(timeoutId); // Clear the timeout if request completes
+      
+      // Log raw response for debugging
+      console.log("Raw OpenAI Response:", response.choices[0]?.message?.content);
+      
+      let content = response.choices[0]?.message?.content?.trim() || "";
+      
+      try {
+        const data = JSON.parse(content);
+        
+        // Return data with metadata
+        return NextResponse.json({
+          ...data,
+          metadata: {
+            subject,
+            level,
+            difficulty,
+            paper,
+            sections,
+            topic,
+            subtopic
+          }
+        });
+      } catch (parseError) {
+        console.error("JSON parse error:", parseError, "Content:", content);
+        return NextResponse.json(
+          { error: "Failed to parse response", content },
+          { status: 500 }
+        );
+      }
+    } catch (openaiError) {
+      console.error("OpenAI request error:", openaiError);
       return NextResponse.json(
-        { error: "Failed to parse response", content },
-        { status: 500 }
+        { error: "The AI model took too long to respond. Please try again." },
+        { status: 503 }
       );
     }
   } catch (error: unknown) {
