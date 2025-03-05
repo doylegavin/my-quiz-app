@@ -1,7 +1,0 @@
-{
-    "functions": {
-      "api/generate-questions/**": {
-        "maxDuration": 60
-      }
-    }
-  }
