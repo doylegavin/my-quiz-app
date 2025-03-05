@@ -5,6 +5,12 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+
+export const config = {
+  maxDuration: 60, // Set max duration to 60 seconds
+};
+
+
 export async function POST(req: Request) {
   try {
     // Accept either topic or topics for backward compatibility
@@ -21,9 +27,6 @@ export async function POST(req: Request) {
     // Allow either topic or topics for backward compatibility
     const topic = requestData.topic || requestData.topics || "Random";
     
-    // Default question count
-    const questionCount = 5;
-
     // Build the base instructions
     let baseInstructions = `
     You are an exam creator for the Leaving Certificate in Ireland.
@@ -57,7 +60,7 @@ export async function POST(req: Request) {
     
     // Build the user prompt with all available parameters
     let userPrompt = `
-    Produce ${questionCount} ${level} ${subject} questions that is difficulty ${difficulty} on the topic: ${topic}.
+    Produce ${level} ${subject} questions that is difficulty ${difficulty} on the topic: ${topic}.
     `;
     
     // Add paper information if provided
@@ -85,6 +88,11 @@ export async function POST(req: Request) {
     
     console.log("Sending to OpenAI:", userPrompt);
     
+    // Set a timeout for the OpenAI request
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
+    
+
     const response = await openai.chat.completions.create({
       model: "ft:gpt-4o-2024-08-06:personal:my-quiz-app2:AoXLUjAo",
       messages: [
