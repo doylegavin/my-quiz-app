@@ -7,9 +7,9 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export const config = {
+/* export const config = {
   maxDuration: 60, // Set max duration to 60 seconds
-};
+}; */
 
 export async function POST(req: Request) {
   try {
