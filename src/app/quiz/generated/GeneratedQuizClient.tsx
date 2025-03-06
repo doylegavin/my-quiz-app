@@ -4,6 +4,9 @@
 
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation"; // Import useRouter at the top
+
+
 
 export default function GeneratedQuizClient() {
   const searchParams = useSearchParams();
@@ -13,6 +16,9 @@ export default function GeneratedQuizClient() {
   const questionsArray = data.questions || [];
   const solutionsArray = data.solutions || [];
   const metadata = data.metadata || {};
+
+  const router = useRouter(); // Initialize the router
+
 
   // Extract metadata from the response - fallback to search params if metadata not available
   const subject = metadata.subject || "";
@@ -77,6 +83,13 @@ export default function GeneratedQuizClient() {
       >
         {showSolutions ? "Hide Solutions" : "Show Solutions"}
       </button>
+      <button
+          className="mt-8 ml-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium shadow-md transition-colors"
+          onClick={() => router.push("/quiz/create")} // Use router.push() to navigate
+        >
+          Generate Another
+      </button>
+
 
       {showSolutions && solutionsArray.length > 0 && (
         <div className="mt-8">
