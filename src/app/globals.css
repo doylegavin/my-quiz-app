@@ -85,3 +85,23 @@
 .animate-soft-pulse {
   animation: soft-pulse 2s infinite ease-in-out;
 }
+
+@layer components {
+  h1 {
+    @apply text-4xl sm:text-5xl font-bold break-words;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
+@layer utilities {
+  .responsive-container {
+    @apply px-4 sm:px-6 md:px-8 max-w-full;
+  }
+}
+
+@media (max-width: 640px) {
+  .mobile-wrap {
+    white-space: normal !important;
+  }
+}

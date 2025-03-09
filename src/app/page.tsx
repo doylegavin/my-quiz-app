@@ -6,13 +6,13 @@ import { CheckCircle, Hourglass, Circle } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pl-16 max-w-full overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pl-16 w-full max-w-[100vw] overflow-x-hidden">
       {/* Hero Section */}
       <section className="container mx-auto px-4 pt-10 text-center">
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent text-center drop-shadow-lg">
+        <h1 className="text-4xl md:text-7xl lg:text-7xl font-bold tracking-tight mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent text-center drop-shadow-lg">
           Examinaite
         </h1>
-        <h1 className="text-2xl md:text-4xl font-bold tracking-tight mb-6 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+        <h1 className="text-lg md:text-4xl font-bold tracking-tight mb-6 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
           🚀 Personalised Exam-Style Questions So You Can Ace the Leaving Cert
         </h1>
         <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-8">
@@ -107,26 +107,27 @@ export default function Home() {
 
       {/* Embedded YouTube Video */}
       <section className="container mx-auto px-4 py-16 text-center">
-        <h2 className="text-3xl font-bold mb-6">See Examinaite in Action</h2>
-        <div className="flex justify-center">
-          <iframe
-            width="560"
-            height="315"
-            src="https://www.youtube.com/embed/8xGoWuRCyws"
-            title="Examinaite Demo Video"
-            frameBorder="0"
-            allowFullScreen
-            className="rounded-lg shadow-lg"
-          ></iframe>
-        </div>
-        <div className="flex gap-4 justify-center pt-16">
-          <Link href="/quiz/create">
-            <Button size="lg" className="bg-purple-600 hover:bg-purple-700">
-              🟢 <strong>TRY FOR FREE</strong> 
-            </Button>
-          </Link>
-        </div>
-      </section>
+  <h2 className="text-3xl font-bold mb-6">See Examinaite in Action</h2>
+  
+  {/* Video container with aspect ratio */}
+  <div className="w-full max-w-3xl mx-auto aspect-video relative">
+    <iframe
+      src="https://www.youtube.com/embed/8xGoWuRCyws"
+      title="Examinaite Demo Video"
+      frameBorder="0"
+      allowFullScreen
+      className="rounded-lg shadow-lg absolute inset-0 w-full h-full"
+    ></iframe>
+  </div>
+  
+  <div className="flex gap-4 justify-center pt-16">
+    <Link href="/quiz/create">
+      <Button size="lg" className="bg-purple-600 hover:bg-purple-700 py-3 md:py-4">
+        🟢 <strong>TRY FOR FREE</strong>
+      </Button>
+    </Link>
+  </div>
+</section>
 
       {/* Why Examinaite? */}
       <section className="container mx-auto px-4 pb-16 text-center">
@@ -145,10 +146,13 @@ export default function Home() {
           📢 Join <strong>500+ Leaving Cert students & teachers</strong> already using Examinaite!
         </p>
         <Link href="/quiz/create">
-          <Button size="lg" className="mt-6 bg-blue-600 hover:bg-blue-700">
-            🔹 Start Generating Questions Now →
-          </Button>
-        </Link>
+  <Button 
+    size="lg" 
+    className="mt-6 bg-blue-600 hover:bg-blue-700"
+  >
+    🔹 Start Generating Questions Now →
+  </Button>
+</Link>
       </section>
     </div>
   );

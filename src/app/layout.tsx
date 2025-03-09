@@ -44,15 +44,18 @@ export default function RootLayout({
           strategy="beforeInteractive"
           async
         />
-      </head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
       <body className={`min-h-screen bg-background font-sans antialiased ${inter.variable}`}>
             <SessionProviderWrapper>
               <div className="flex min-h-screen">
                 <Sidebar />
-                <main className="flex-1 p-6">
-                  <ReactQueryProvider>{children}</ReactQueryProvider>
-                  <FeedbackButton/>
-                </main>
+                <main className="flex-1 p-6 overflow-x-hidden">
+  <div className="max-w-full">
+    <ReactQueryProvider>{children}</ReactQueryProvider>
+    <FeedbackButton/>
+  </div>
+</main>
               </div>
           </SessionProviderWrapper>
       </body>
