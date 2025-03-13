@@ -157,13 +157,15 @@ export default function Home() {
       </p>
       <p className="mt-4 text-gray-600 font-semibold">— 6+ Years Teacher, Ireland & UK</p>
     </div>
+    <div className="flex gap-4 justify-center pt-16">
     <Link href="/quiz/create">
       <Button size="lg" className="bg-purple-600 hover:bg-purple-700 py-3 md:py-4">
          <strong>Give it a Go 💪</strong>
       </Button>
     </Link>
-  </div>
-</section>
+    </div>
+    </div>
+    </section>
 
 
       {/* Embedded YouTube Video */}
