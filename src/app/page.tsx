@@ -105,6 +105,67 @@ export default function Home() {
         </div>
       </section>
 
+        {/* Testimonials Section */}
+<section className="container mx-auto px-4 py-16 text-center">
+  <h2 className="text-3xl font-bold mb-8">What Teachers Are Saying</h2>
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    
+    {/* Testimonial 1 */}
+    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-blue-600">
+      <p className="text-gray-800 italic">
+        "Has the potential to be really good, and the bones of it already look excellent."
+      </p>
+      <p className="mt-4 text-gray-600 font-semibold">— Teacher, Institute of Education</p>
+    </div>
+
+    {/* Testimonial 2 */}
+    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-blue-600">
+      <p className="text-gray-800 italic">
+        "A tool that personalises learning would be a game-changer."
+      </p>
+      <p className="mt-4 text-gray-600 font-semibold">— SEN Co-Ordinator </p>
+    </div>
+
+    {/* Testimonial 3 */}
+    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-blue-600">
+      <p className="text-gray-800 italic">
+        "The potential of this is huge, like, HUGE."
+      </p>
+      <p className="mt-4 text-gray-600 font-semibold">— Seán McWeeney, 10+ years Maths Teacher, Founder NW StemFest</p>
+    </div>
+
+    {/* Testimonial 4 */}
+    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-blue-600">
+      <p className="text-gray-800 italic">
+        "I've been using this with my Leaving Certs, and it has really improved weaker students' ability and confidence."
+      </p>
+      <p className="mt-4 text-gray-600 font-semibold">—  Maths & Science Teacher</p>
+    </div>
+
+    {/* Testimonial 5 */}
+    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-blue-600">
+      <p className="text-gray-800 italic">
+        "Chef’s kiss, everything StudyClix is missing."
+      </p>
+      <p className="mt-4 text-gray-600 font-semibold">—  Former StudyClix Employee, Maths & Science Teacher</p>
+    </div>
+
+    {/* Testimonial 6 */}
+    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-blue-600">
+      <p className="text-gray-800 italic">
+        "The Irish education system is seriously missing out on tools like this. An app like your proposal would be game-changing for teachers to facilitate revision in an interactive way."
+      </p>
+      <p className="mt-4 text-gray-600 font-semibold">— 6+ Years Teacher, Ireland & UK</p>
+    </div>
+    <Link href="/quiz/create">
+      <Button size="lg" className="bg-purple-600 hover:bg-purple-700 py-3 md:py-4">
+         <strong>Give it a Go 💪</strong>
+      </Button>
+    </Link>
+  </div>
+</section>
+
+
       {/* Embedded YouTube Video */}
       <section className="container mx-auto px-4 py-16 text-center">
   <h2 className="text-3xl font-bold mb-6">See Examinaite in Action</h2>
@@ -143,7 +204,7 @@ export default function Home() {
       {/* Call to Action */}
       <section className="container mx-auto px-4 py-16 text-center">
         <p className="text-xl text-gray-600 mt-8">
-          📢 Join <strong>500+ Leaving Cert students & teachers</strong> already using Examinaite!
+          📢 Join <strong>Hundreds of Leaving Cert students & teachers</strong> already using Examinaite!
         </p>
         <Link href="/quiz/create">
   <Button 
@@ -154,6 +215,7 @@ export default function Home() {
   </Button>
 </Link>
       </section>
+    
     </div>
   );
 }
