@@ -44,14 +44,18 @@ export async function POST(req: Request) {
     Return JSON with "questions" and "solutions" keys, for example:
     {
       "questions": [
-        {"question": "Solve \\\\(2x + 3 = 7\\\\)."}
+        {
+          "question": "Solve \\\\(2x + 3 = 7\\\\).",
+          "geogebraCommands": "ZoomIn(0,6,-10,20)"
+        }
       ],
       "solutions": [
         {
           "questionIndex": 1,
           "solution": "Rearrange to get \\\\(x=2\\\\).",
           "notes": "One step solution",
-          "markingScheme": "2 marks"
+          "markingScheme": "0,4,7,10 Marks\\\\nLow partial credit: Finds at least 2 points\\\\nHigh partial credit: Plots points correctly but doesn't connect",
+          "geogebraCommands": "f(x)=3x^2-20x+10;ZoomIn(0,6,-10,20)"
         }
       ]
     }
@@ -60,7 +64,13 @@ export async function POST(req: Request) {
     
     // Build the user prompt with all available parameters
     let userPrompt = `
-    Produce ${level} ${subject} questions that is difficulty ${difficulty} on the topic: ${topic}.
+    Generate ${level} ${subject} questions that is difficulty ${difficulty} on the topic: ${topic}.
+    
+    For any graphing or visualization questions:
+    - Include "geogebraCommands" field in both questions and solutions
+    - For questions, only provide axis limits with "ZoomIn(xmin,xmax,ymin,ymax)"
+    - For solutions, provide the full plotting command with function and limits
+    - Provide detailed marking schemes with partial credit breakdown
     `;
     
     // Add paper information if provided

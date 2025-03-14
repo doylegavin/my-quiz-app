@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, Hourglass, Circle } from "lucide-react";
+import Image from "next/image";
+
 
 export default function Home() {
   return (
@@ -217,7 +219,55 @@ export default function Home() {
   </Button>
 </Link>
       </section>
-    
+
+   {/* Backed By Section */}
+<section className="container mx-auto px-4 py-16 text-center">
+  <h2 className="text-3xl font-bold mb-8">Backed By</h2>
+  <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
+    <Link 
+      href="https://www.newfrontiers.ie/" 
+      target="_blank" 
+      rel="noopener noreferrer" 
+      className="w-40 md:w-48 h-24 relative flex items-center justify-center transform hover:scale-110 transition-all duration-300"
+    >
+      <Image 
+        src="/images/backedby/enterprise-ireland.png" 
+        alt="Enterprise Ireland"
+        fill
+        className="object-contain"
+      />
+    </Link>
+    <Link 
+      href="https://dogpatchlabs.com/" 
+      target="_blank" 
+      rel="noopener noreferrer" 
+      className="w-40 md:w-48 h-24 relative flex items-center justify-center transform hover:scale-110 transition-all duration-300"
+    >
+      <Image 
+        src="/images/backedby/dogpatch-labs.png" 
+        alt="Dogpatch Labs"
+        fill
+        className="object-contain"
+      />
+    </Link>
+    <Link 
+      href="https://www.ndrc.ie/" 
+      target="_blank" 
+      rel="noopener noreferrer" 
+      className="w-40 md:w-48 h-24 relative flex items-center justify-center transform hover:scale-110 transition-all duration-300"
+    >
+      <Image 
+        src="/images/backedby/ndrc.png" 
+        alt="NDRC"
+        fill
+        className="object-contain"
+      />
+    </Link>
+  </div>
+  <p className="text-gray-600 mt-8">
+    Proudly supported by Ireland's leading innovation partners
+  </p>
+</section>    
     </div>
   );
 }
