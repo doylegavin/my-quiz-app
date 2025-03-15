@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, Hourglass, Circle } from "lucide-react";
 import Image from "next/image";
+import WaitlistSection from "@/components/WaitlistSection";
 
 
 export default function Home() {
@@ -22,35 +23,9 @@ export default function Home() {
         </p>
       </section>
 
-      {/* Join Waitlist Section */}
-      <section className="container mx-auto px-4 py-16 text-center">
-        <h2 className="text-3xl font-bold mb-4">
-          📩 Join the Waitlist & Get Early Access!
-        </h2>
-        <p className="text-lg text-gray-600 mb-6">
-          Enter your email to be the first to try new features
-        </p>
-        <form 
-          action="https://docs.google.com/forms/d/e/1FAIpQLScvS415wKF4WF0aeiGgh1UOs1GjxKn3xD3DRNCJR90IrQnyXQ/formResponse"
-          method="POST"
-          target="_blank"
-          className="flex flex-col gap-4 md:flex-row justify-center items-center w-full max-w-md mx-auto"
-        >
-          <input
-            type="email"
-            name="entry.1569025193"
-            placeholder="Enter your email..."
-            required
-            className="px-4 py-3 text-lg border rounded-lg w-full md:w-96"
-          />
-          <button
-            type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all"
-          >
-            🚀 Join the Waitlist
-          </button>
-        </form>
-      </section>
+            {/* Join Waitlist Section - Now using the new component */}
+            <WaitlistSection />
+
 
       {/* How It Works Section */}
       <section className="container mx-auto px-4 py-16 text-center">
