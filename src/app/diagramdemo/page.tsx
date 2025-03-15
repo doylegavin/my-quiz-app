@@ -1,28 +1,36 @@
+//src/app/diagramdemo/page.tsx
+
 "use client";
 
 import React, { useState } from 'react';
-import UniversalDiagram from '@/components/UniversalDiagram';
+import UniversalDiagram, { Circle, Line, Angle, Point, DiagramElement } from '@/components/UniversalDiagram';
 
 
 const DiagramDemo = () => {
   // Example diagram data for a circle
-  const [circleData] = useState({
+  const [circleData] = useState<{
+    points: Record<string, Point>;
+    elements: DiagramElement[];
+  }>({
     points: {
       "center": { id: "center", x: 4, y: -1, label: "O" },
     },
     elements: [
       {
         id: "circle1",
-        type: "circle",
+        type: "circle" as const,
         centerPointId: "center",
         radius: 3,
         label: "Circle C",
-      }
+      } as Circle
     ]
   });
-
+  
   // Example data for a triangle with labeled angles
-  const [triangleData] = useState({
+  const [triangleData] = useState<{
+    points: Record<string, Point>;
+    elements: DiagramElement[];
+  }>({
     points: {
       "A": { id: "A", x: -5, y: -2, label: "A" },
       "B": { id: "B", x: 5, y: -2, label: "B" },
@@ -31,51 +39,52 @@ const DiagramDemo = () => {
     elements: [
       {
         id: "AB",
-        type: "line",
+        type: "line" as const,
         point1Id: "A",
         point2Id: "B",
         measurement: "10 cm"
-      },
+      } as Line,
       {
         id: "BC",
-        type: "line",
+        type: "line" as const,
         point1Id: "B",
         point2Id: "C",
         measurement: "8.6 cm"
-      },
+      } as Line,
       {
         id: "CA",
-        type: "line",
+        type: "line" as const,
         point1Id: "C",
         point2Id: "A",
         measurement: "8.6 cm"
-      },
+      } as Line,
       {
         id: "angleA",
-        type: "angle",
+        type: "angle" as const,
         vertex: "A",
         point1: "C",
         point2: "B",
         measurement: "53°"
-      },
+      } as Angle,
       {
         id: "angleB",
-        type: "angle",
+        type: "angle" as const,
         vertex: "B",
         point1: "A",
         point2: "C",
         measurement: "53°"
-      },
+      } as Angle,
       {
         id: "angleC",
-        type: "angle",
+        type: "angle" as const,
         vertex: "C",
         point1: "A",
         point2: "B",
         measurement: "74°"
-      }
+      } as Angle
     ]
   });
+  
 
   return (
     <div className="container mx-auto p-4">
