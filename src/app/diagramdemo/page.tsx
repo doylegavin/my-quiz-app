@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from 'react';
-import UniversalDiagram from '@/components/UniversalDiagram'; // Adjust the import path as needed
+import UniversalDiagram from '@/components/UniversalDiagram';
+
 
 const DiagramDemo = () => {
   // Example diagram data for a circle

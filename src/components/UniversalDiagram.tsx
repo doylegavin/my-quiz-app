@@ -411,9 +411,19 @@ const UniversalDiagram: React.FC<UniversalDiagramProps> = ({
       if (element.visible === false) return null;
       
       // Apply styles based on element type and custom style
-      const baseStyle = defaultStyles[element.type as keyof typeof defaultStyles];
-      const style = { ...baseStyle, ...element.style };
-      
+      const baseStyle = defaultStyles[element.type as keyof typeof defaultStyles] || {};
+      const elementStyle = element.style || {};
+      const style = { ...baseStyle, ...elementStyle };
+            
+
+
+      const stroke = style.stroke as string;
+        const strokeWidth = style.strokeWidth as number;
+        const fill = style.fill as string | undefined;
+        const fillOpacity = style.fillOpacity as number | undefined;
+        const strokeDasharray = style.strokeDasharray as string | undefined;
+
+
       switch (element.type) {
         case 'line': {
           const p1 = points[element.point1Id];
@@ -428,9 +438,9 @@ const UniversalDiagram: React.FC<UniversalDiagramProps> = ({
                 y1={transformY(p1.y)}
                 x2={transformX(p2.x)}
                 y2={transformY(p2.y)}
-                stroke={style.stroke}
-                strokeWidth={style.strokeWidth}
-                strokeDasharray={style.strokeDasharray}
+                stroke={stroke}
+                strokeWidth={strokeWidth}
+                strokeDasharray={strokeDasharray}
               />
               
               {/* Add measurement if provided */}
@@ -441,7 +451,7 @@ const UniversalDiagram: React.FC<UniversalDiagramProps> = ({
                   fontFamily="sans-serif"
                   fontSize="12"
                   textAnchor="middle"
-                  fill={defaultStyles.text.fill}
+                  fill={fill}
                 >
                   {element.measurement}
                 </text>
@@ -464,8 +474,8 @@ const UniversalDiagram: React.FC<UniversalDiagramProps> = ({
                 stroke={style.stroke}
                 strokeWidth={style.strokeWidth}
                 fill={style.fill}
-                fillOpacity={style.fillOpacity}
-                strokeDasharray={style.strokeDasharray}
+                fillOpacity={fillOpacity}
+                strokeDasharray={strokeDasharray}
               />
               
               {/* Add label if provided */}
