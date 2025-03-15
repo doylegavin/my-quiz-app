@@ -44,7 +44,7 @@ export default function Sidebar() {
 
   return (
     <div
-      className={`bg-purple-600 text-white py-3 ${
+      className={`bg-brand text-white py-3 ${
         isOpen ? "w-64" : "w-16"
       } transition-all duration-300 flex flex-col fixed top-0 left-0 h-full shadow-lg z-50`}
     >
@@ -57,23 +57,23 @@ export default function Sidebar() {
 
       {/* Navigation Links */}
       <nav className="flex flex-col gap-4 p-2 transition-all duration-300">
-        <Link href="/" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-purple-800 transition">
+        <Link href="/" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-brand-dark transition">
           <FiHome size={20} /> {isOpen && "Home"}
         </Link>
        {/*  <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-purple-800 transition">
           <FiSend size={20} /> {isOpen && "Dashboard"}
         </Link> */}
-        <Link href="/quiz/create" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-purple-800 transition">
+        <Link href="/quiz/create" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-brand-dark transition">
           <FiEdit size={20} /> {isOpen && "Create Quiz"}
         </Link>
-        <Link href="/about" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-purple-800 transition">
+        <Link href="/about" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-brand-dark transition">
           <FiInfo size={20} /> {isOpen && "About"}
         </Link>
       </nav>
 
       {/* Quick Feedback Form (Hidden when sidebar is collapsed) */}
       {isOpen && (
-        <div className="p-4 border-t border-purple-500">
+        <div className="p-4 border-t border-brand">
           <h3 className="text-sm font-semibold mb-2">Quick Anonymous Feedback</h3>
           <form onSubmit={handleSubmitFeedback} className="space-y-2">
             <textarea
@@ -86,7 +86,7 @@ export default function Sidebar() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+              className="w-full bg-brand-light text-white py-2 rounded-lg hover:bg-brand-dark transition"
             >
               {isSubmitting ? "Submitting..." : "Submit"}
             </button>
@@ -96,7 +96,7 @@ export default function Sidebar() {
       )}
 
       {/* Sign In / User Info (Always at the bottom) */}
-      <div className="mt-auto p-4 border-t border-purple-500">
+      <div className="mt-auto p-4 border-t border-brand">
         {session ? (
           <div className="flex items-center justify-between">
             <Link href="/profile" className="flex items-center gap-3">
@@ -113,7 +113,7 @@ export default function Sidebar() {
         ) : (
           <button
             onClick={() => signIn()}
-            className="bg-white text-purple-600 w-full py-2 rounded hover:bg-gray-200 transition"
+            className="bg-white text-brand w-full py-2 rounded hover:bg-gray-200 transition"
           >
             {isOpen ? "Sign In" : "🔑"}
           </button>

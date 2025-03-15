@@ -12,10 +12,10 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pl-16 w-full max-w-[100vw] overflow-x-hidden">
       {/* Hero Section */}
       <section className="container mx-auto px-4 pt-10 text-center">
-        <h1 className="text-4xl md:text-7xl lg:text-7xl font-bold tracking-tight mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent text-center drop-shadow-lg">
+        <h1 className="text-4xl md:text-7xl lg:text-7xl font-bold tracking-tight mb-4 bg-gradient-to-r from-brand to-brand bg-clip-text text-transparent text-center drop-shadow-lg">
           Examinaite
         </h1>
-        <h1 className="text-lg md:text-4xl font-bold tracking-tight mb-6 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+        <h1 className="text-lg md:text-4xl font-bold tracking-tight mb-6 bg-gradient-to-r from-brand to-brand bg-clip-text text-transparent">
           🚀 Personalised Exam-Style Questions So You Can Ace the Leaving Cert
         </h1>
         <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-8">
@@ -51,7 +51,7 @@ export default function Home() {
           </Card>
         </div>
         <Link href="/quiz/create">
-          <Button size="lg" className="mt-6 bg-blue-600 hover:bg-blue-700">
+          <Button size="lg" className="mt-6 bg-brand hover:bg-brand">
             🎯 Generate Your First Question →
           </Button>
         </Link>
@@ -88,7 +88,7 @@ export default function Home() {
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
     
     {/* Testimonial 1 */}
-    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-blue-600">
+    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
       <p className="text-gray-800 italic">
         "Has the potential to be really good, and the bones of it already look excellent."
       </p>
@@ -96,7 +96,7 @@ export default function Home() {
     </div>
 
     {/* Testimonial 2 */}
-    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-blue-600">
+    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
       <p className="text-gray-800 italic">
         "A tool that personalises learning would be a game-changer."
       </p>
@@ -104,7 +104,7 @@ export default function Home() {
     </div>
 
     {/* Testimonial 3 */}
-    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-blue-600">
+    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
       <p className="text-gray-800 italic">
         "The potential of this is huge, like, HUGE."
       </p>
@@ -112,7 +112,7 @@ export default function Home() {
     </div>
 
     {/* Testimonial 4 */}
-    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-blue-600">
+    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
       <p className="text-gray-800 italic">
         "I've been using this with my Leaving Certs, and it has really improved weaker students' ability and confidence."
       </p>
@@ -120,15 +120,15 @@ export default function Home() {
     </div>
 
     {/* Testimonial 5 */}
-    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-blue-600">
+    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
       <p className="text-gray-800 italic">
-        "Chef’s kiss, everything StudyClix is missing."
+        "Chef's kiss, everything StudyClix is missing."
       </p>
       <p className="mt-4 text-gray-600 font-semibold">—  Former StudyClix Employee, Maths & Science Teacher</p>
     </div>
 
     {/* Testimonial 6 */}
-    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-blue-600">
+    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
       <p className="text-gray-800 italic">
         "The Irish education system is seriously missing out on tools like this. An app like your proposal would be game-changing for teachers to facilitate revision in an interactive way."
       </p>
@@ -136,7 +136,7 @@ export default function Home() {
     </div>
     <div className="flex gap-4 justify-center pt-16">
     <Link href="/quiz/create">
-      <Button size="lg" className="bg-purple-600 hover:bg-purple-700 py-3 md:py-4">
+      <Button size="lg" className="bg-brand hover:bg-brand py-3 md:py-4">
          <strong>Give it a Go 💪</strong>
       </Button>
     </Link>
@@ -162,7 +162,7 @@ export default function Home() {
   
   <div className="flex gap-4 justify-center pt-16">
     <Link href="/quiz/create">
-      <Button size="lg" className="bg-purple-600 hover:bg-purple-700 py-3 md:py-4">
+      <Button size="lg" className="bg-brand hover:bg-brand py-3 md:py-4">
         🟢 <strong>TRY FOR FREE</strong>
       </Button>
     </Link>
@@ -188,7 +188,7 @@ export default function Home() {
         <Link href="/quiz/create">
   <Button 
     size="lg" 
-    className="mt-6 bg-blue-600 hover:bg-blue-700"
+    className="mt-6 bg-brand hover:bg-brand"
   >
     🔹 Start Generating Questions Now →
   </Button>

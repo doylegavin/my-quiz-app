@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useState, FormEvent } from 'react';
 
@@ -67,7 +67,7 @@ const WaitlistSection = () => {
           <button
             type="submit"
             className={`${
-              isSubmitting ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+              isSubmitting ? 'bg-brand/70' : 'bg-brand hover:bg-brand'
             } text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all`}
             disabled={isSubmitting}
           >

@@ -10,7 +10,7 @@ export default function FeedbackButton() {
       href="https://docs.google.com/forms/d/e/1FAIpQLSdWeFnLbo3DImicGuFlyJ02kmcKnjFtemdQPswtBdWiXb_l4Q/viewform?usp=header"
       target="_blank"
       rel="noopener noreferrer"
-      className={`fixed bottom-6 right-6 bg-purple-600 text-white px-5 py-3 rounded-full shadow-lg transition-all duration-300 flex items-center gap-2 ${
+      className={`fixed bottom-6 right-6 bg-brand text-white px-5 py-3 rounded-full shadow-lg transition-all duration-300 flex items-center gap-2 ${
         isHovered ? "scale-110" : "animate-soft-pulse"
       }`}
       onMouseEnter={() => setIsHovered(true)}
