@@ -7,9 +7,10 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export const config = {
-  maxDuration: 60, // Set max duration to 60 seconds
-};
+// New Next.js route config format
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60; // 60 seconds timeout
 
 export async function POST(req: Request) {
   try {
