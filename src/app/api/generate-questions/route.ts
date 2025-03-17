@@ -7,9 +7,9 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-/* export const config = {
+export const config = {
   maxDuration: 60, // Set max duration to 60 seconds
-}; */
+};
 
 export async function POST(req: Request) {
   try {
@@ -99,50 +99,92 @@ userPrompt += `
     console.log("Sending to OpenAI:", userPrompt);
     
     try {
-      // Set a timeout for the OpenAI request
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
+      let retryCount = 0;
+      const maxRetries = 3;
+      let lastError: any;
       
-      const response = await openai.chat.completions.create({
-        model: "ft:gpt-4o-2024-08-06:personal:my-quiz-app2:AoXLUjAo",
-        messages: [
-          { role: "system", content: baseInstructions },
-          { role: "user", content: userPrompt },
-        ],
-        temperature: 0.7,
-      }, { signal: controller.signal }); // Add the signal here
-      
-      clearTimeout(timeoutId); // Clear the timeout if request completes
-      
-      // Log raw response for debugging
-      console.log("Raw OpenAI Response:", response.choices[0]?.message?.content);
-      
-      let content = response.choices[0]?.message?.content?.trim() || "";
-      
-      try {
-        const data = JSON.parse(content);
-        
-        // Return data with metadata
-        return NextResponse.json({
-          ...data,
-          metadata: {
-            subject,
-            level,
-            difficulty,
-            paper,
-            sections,
-            topic,
-            subtopic
+      while (retryCount <= maxRetries) {
+        try {
+          // Apply backoff if this is a retry
+          if (retryCount > 0) {
+            const backoffDelay = Math.pow(2, retryCount - 1) * 1000;
+            console.log(`Retry attempt ${retryCount} after ${backoffDelay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, backoffDelay));
           }
-        });
-      } catch (parseError) {
-        console.error("JSON parse error:", parseError, "Content:", content);
-        return NextResponse.json(
-          { error: "Failed to parse response", content },
-          { status: 500 }
-        );
+          
+          // Set a timeout for the OpenAI request
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
+          
+          const response = await openai.chat.completions.create({
+            model: "ft:gpt-4o-2024-08-06:personal:my-quiz-app2:AoXLUjAo",
+            messages: [
+              { role: "system", content: baseInstructions },
+              { role: "user", content: userPrompt },
+            ],
+            temperature: 0.5,
+          }, { signal: controller.signal }); // Add the signal here
+          
+          clearTimeout(timeoutId); // Clear the timeout if request completes
+          
+          // Log raw response for debugging
+          console.log("Raw OpenAI Response:", response.choices[0]?.message?.content);
+          
+          let content = response.choices[0]?.message?.content?.trim() || "";
+          
+          try {
+            const data = JSON.parse(content);
+            
+            // Return data with metadata
+            return NextResponse.json({
+              ...data,
+              metadata: {
+                subject,
+                level,
+                difficulty,
+                paper,
+                sections,
+                topic,
+                subtopic
+              }
+            });
+          } catch (parseError) {
+            console.error("JSON parse error:", parseError, "Content:", content);
+            return NextResponse.json(
+              { error: "Failed to parse response", content },
+              { status: 500 }
+            );
+          }
+        } catch (error: any) {
+          lastError = error;
+          
+          // Check if error is a timeout or server error
+          const isRetryableError = 
+            error.name === 'AbortError' || 
+            error.status === 429 || 
+            error.status === 500 || 
+            error.status === 503 ||
+            error.status === 504;
+          
+          if (!isRetryableError) {
+            throw error;
+          }
+          
+          retryCount++;
+          
+          if (retryCount > maxRetries) {
+            break;
+          }
+        }
       }
-    } catch (openaiError) {
+      
+      // If we got here, we exhausted all retries
+      console.error("OpenAI request failed after multiple attempts:", lastError);
+      return NextResponse.json(
+        { error: "The AI model couldn't generate questions after multiple attempts. Please try again with a simpler request." },
+        { status: 503 }
+      );
+    } catch (openaiError: any) {
       console.error("OpenAI request error:", openaiError);
       return NextResponse.json(
         { error: "The AI model took too long to respond. Please try again." },
