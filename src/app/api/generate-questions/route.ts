@@ -31,18 +31,8 @@ export async function POST(req: Request) {
 
 let baseInstructions = `
 You are an exam creator for the Leaving Certificate in Ireland.
-
-IMPORTANT: This must be valid JSON.
-- Double-escape any backslashes in LaTeX.
-  For example, LaTeX inline math should appear as: \\( x^2 \\)
-  becomes \\\\( x^2 \\\\) in the raw JSON.
-
-If special characters are used in maths make sure to escape before: e.g.
-  $$
-  \$2000
-  $$
-  
-Return JSON with "questions" and "solutions" keys, for example:
+Return valid JSON with "questions" and "solutions" keys. Double-escape LaTeX backslashes (\\\\).
+No text outside JSON. Example structure:
 {
   "questions": [
     {
@@ -50,10 +40,7 @@ Return JSON with "questions" and "solutions" keys, for example:
       "geogebraCommands": "ZoomIn(0,6,-10,20)",
       "diagram": {
         "type": "coordinate",
-        "xMin": 0,
-        "xMax": 6,
-        "yMin": -10,
-        "yMax": 20
+        "xMin": 0, "xMax": 6, "yMin": -10, "yMax": 20
       }
     }
   ],
@@ -62,26 +49,16 @@ Return JSON with "questions" and "solutions" keys, for example:
       "questionIndex": 1,
       "solution": "Rearrange to get \\\\(x=2\\\\).",
       "notes": "One step solution",
-      "markingScheme": "0,4,7,10 Marks\\\\nLow partial credit: Finds at least 2 points\\\\nHigh partial credit: Plots points correctly but doesn't connect",
+      "markingScheme": "0,4,7,10 Marks\\\\nLow: Finds 2+ points\\\\nHigh: Plots correctly",
       "geogebraCommands": "f(x)=3x^2-20x+10;ZoomIn(0,6,-10,20)",
       "diagram": {
         "type": "coordinate",
-        "xMin": 0,
-        "xMax": 6,
-        "yMin": -10,
-        "yMax": 20,
-        "functions": [
-          {
-            "equation": "3x^2-20x+10",
-            "color": "blue"
-          }
-        ]
+        "xMin": 0, "xMax": 6, "yMin": -10, "yMax": 20,
+        "functions": [{ "equation": "3x^2-20x+10", "color": "blue" }]
       }
     }
   ]
-}
-No extra text outside JSON.
-`;
+}`;
     
     // Build the user prompt with all available parameters
     let userPrompt = `
@@ -93,21 +70,7 @@ No extra text outside JSON.
     - For solutions, provide the full plotting command with function and limits
     - Provide detailed marking schemes with partial credit breakdown
     
-    Also for any graph questions:
-    - Include a "diagram" object in both questions and solutions with the following structure:
-      {
-        "type": "coordinate",
-        "xMin": xmin,
-        "xMax": xmax, 
-        "yMin": ymin,
-        "yMax": ymax
-      }
-    - For solution diagrams, also include a "functions" array with objects like:
-      {
-        "equation": "3x^2-20x+10",
-        "color": "blue"
-      }
-    - The diagram data should match the coordinates in geogebraCommands
+   
 `;
     
 // Add paper information if provided
