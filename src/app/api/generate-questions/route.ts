@@ -28,39 +28,60 @@ export async function POST(req: Request) {
     const topic = requestData.topic || requestData.topics || "Random";
     
     // Build the base instructions
-    let baseInstructions = `
-    You are an exam creator for the Leaving Certificate in Ireland.
-    
-    IMPORTANT: This must be valid JSON.
-    - Double-escape any backslashes in LaTeX.
-      For example, LaTeX inline math should appear as: \\( x^2 \\)
-      becomes \\\\( x^2 \\\\) in the raw JSON.
-    
-    If special characters are used in maths make sure to escape before: e.g.
-      $$
-      \$2000
-      $$
-      
-    Return JSON with "questions" and "solutions" keys, for example:
+
+let baseInstructions = `
+You are an exam creator for the Leaving Certificate in Ireland.
+
+IMPORTANT: This must be valid JSON.
+- Double-escape any backslashes in LaTeX.
+  For example, LaTeX inline math should appear as: \\( x^2 \\)
+  becomes \\\\( x^2 \\\\) in the raw JSON.
+
+If special characters are used in maths make sure to escape before: e.g.
+  $$
+  \$2000
+  $$
+  
+Return JSON with "questions" and "solutions" keys, for example:
+{
+  "questions": [
     {
-      "questions": [
-        {
-          "question": "Solve \\\\(2x + 3 = 7\\\\).",
-          "geogebraCommands": "ZoomIn(0,6,-10,20)"
-        }
-      ],
-      "solutions": [
-        {
-          "questionIndex": 1,
-          "solution": "Rearrange to get \\\\(x=2\\\\).",
-          "notes": "One step solution",
-          "markingScheme": "0,4,7,10 Marks\\\\nLow partial credit: Finds at least 2 points\\\\nHigh partial credit: Plots points correctly but doesn't connect",
-          "geogebraCommands": "f(x)=3x^2-20x+10;ZoomIn(0,6,-10,20)"
-        }
-      ]
+      "question": "Solve \\\\(2x + 3 = 7\\\\).",
+      "geogebraCommands": "ZoomIn(0,6,-10,20)",
+      "diagram": {
+        "type": "coordinate",
+        "xMin": 0,
+        "xMax": 6,
+        "yMin": -10,
+        "yMax": 20
+      }
     }
-    No extra text outside JSON.
-    `;
+  ],
+  "solutions": [
+    {
+      "questionIndex": 1,
+      "solution": "Rearrange to get \\\\(x=2\\\\).",
+      "notes": "One step solution",
+      "markingScheme": "0,4,7,10 Marks\\\\nLow partial credit: Finds at least 2 points\\\\nHigh partial credit: Plots points correctly but doesn't connect",
+      "geogebraCommands": "f(x)=3x^2-20x+10;ZoomIn(0,6,-10,20)",
+      "diagram": {
+        "type": "coordinate",
+        "xMin": 0,
+        "xMax": 6,
+        "yMin": -10,
+        "yMax": 20,
+        "functions": [
+          {
+            "equation": "3x^2-20x+10",
+            "color": "blue"
+          }
+        ]
+      }
+    }
+  ]
+}
+No extra text outside JSON.
+`;
     
     // Build the user prompt with all available parameters
     let userPrompt = `
@@ -71,25 +92,41 @@ export async function POST(req: Request) {
     - For questions, only provide axis limits with "ZoomIn(xmin,xmax,ymin,ymax)"
     - For solutions, provide the full plotting command with function and limits
     - Provide detailed marking schemes with partial credit breakdown
-    `;
     
-    // Add paper information if provided
-    if (paper && paper !== "Both") {
-      userPrompt += ` Focus on ${paper} content.`;
-    }
+    Also for any graph questions:
+    - Include a "diagram" object in both questions and solutions with the following structure:
+      {
+        "type": "coordinate",
+        "xMin": xmin,
+        "xMax": xmax, 
+        "yMin": ymin,
+        "yMax": ymax
+      }
+    - For solution diagrams, also include a "functions" array with objects like:
+      {
+        "equation": "3x^2-20x+10",
+        "color": "blue"
+      }
+    - The diagram data should match the coordinates in geogebraCommands
+`;
     
-    // Add section information if provided
-    if (sections) {
-      userPrompt += ` Include ${sections} type questions.`;
-    }
-    
-    // Add subtopic information if provided
-    if (subtopic) {
-      userPrompt += ` Specifically focus on the subtopic: ${subtopic}.`;
-    }
-    
-    // Final instructions
-    userPrompt += `
+// Add paper information if provided
+if (paper && paper !== "Both") {
+  userPrompt += ` Focus on ${paper} content.`;
+}
+
+// Add section information if provided
+if (sections) {
+  userPrompt += ` Include ${sections} type questions.`;
+}
+
+// Add subtopic information if provided
+if (subtopic) {
+  userPrompt += ` Specifically focus on the subtopic: ${subtopic}.`;
+}
+
+// Final instructions
+userPrompt += `
     All math must be double-escaped LaTeX.
     
     Return JSON only, with keys "questions" and "solutions".

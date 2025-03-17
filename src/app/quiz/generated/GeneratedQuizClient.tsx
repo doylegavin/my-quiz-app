@@ -5,6 +5,64 @@
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import DiagramRenderer from "@/components/DiagramRenderer";
+
+
+function isGraphQuestion(question: string): boolean {
+  // Keywords that likely indicate a graphing question
+  const graphKeywords = [
+    "graph", "plot", "sketch", "draw",  
+  ];
+  
+  // Check if any of the keywords are present in the question
+  return graphKeywords.some(keyword => 
+    question.toLowerCase().includes(keyword)
+  );
+}
+
+// Add this function to GeneratedQuizClient.tsx
+function parseGeogebraCommand(command: string): any {
+  // Parse ZoomIn command for coordinates
+  const zoomMatch = command.match(/ZoomIn\(([^,]+),([^,]+),([^,]+),([^,)]+)\)/);
+  
+  // Basic diagram data
+  const diagData = {
+    type: "coordinate",
+    xMin: 0,
+    xMax: 10,
+    yMin: -10,
+    yMax: 10
+  };
+  
+  if (zoomMatch) {
+    diagData.xMin = parseFloat(zoomMatch[1]);
+    diagData.xMax = parseFloat(zoomMatch[2]);
+    diagData.yMin = parseFloat(zoomMatch[3]);
+    diagData.yMax = parseFloat(zoomMatch[4]);
+  }
+  
+  // Check if there's a function definition
+  if (command.includes("f(x)=")) {
+    const parts = command.split(';');
+    const funcPart = parts[0];
+    const funcMatch = funcPart.match(/f\(x\)=(.*)/);
+    
+    if (funcMatch && funcMatch[1]) {
+      return {
+        ...diagData,
+        functions: [
+          {
+            equation: funcMatch[1],
+            color: "blue"
+          }
+        ]
+      };
+    }
+  }
+  
+  return diagData;
+}
+
 
 export default function GeneratedQuizClient() {
   const searchParams = useSearchParams();
@@ -67,27 +125,31 @@ export default function GeneratedQuizClient() {
               <div dangerouslySetInnerHTML={{ __html: q.question }} />
               
               {/* Graph Paper Placeholder */}
-              {q.geogebraCommands && (
-                <div className="mt-4">
-                  <div className="border rounded overflow-hidden bg-gray-50 p-4">
-                    <div className="text-center mb-2 text-gray-700 font-medium">Graph Area</div>
-                    <div className="w-full h-64 border border-gray-300 bg-white grid" 
-                         style={{ 
-                           backgroundImage: "linear-gradient(to right, #ddd 1px, transparent 1px), linear-gradient(to bottom, #ddd 1px, transparent 1px)",
-                           backgroundSize: "20px 20px" 
-                         }}>
-                      <div className="flex items-center justify-center h-full text-gray-500">
-                        Use grid paper to sketch your answer
-                      </div>
-                    </div>
-                    {q.geogebraCommands && (
-                      <div className="mt-2 text-xs text-gray-500">
-                        <span className="font-medium">Coordinate bounds:</span> {q.geogebraCommands.replace("ZoomIn", "")}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+             {/* Graph Paper with Diagram */}
+             {q.geogebraCommands && (
+  <div className="mt-4">
+    <div className="border rounded overflow-hidden bg-gray-50 p-4">
+      <div className="text-center mb-2 text-gray-700 font-medium"></div>
+      {isGraphQuestion(q.question) ? (
+        <DiagramRenderer 
+          diagramData={q.diagram || parseGeogebraCommand(q.geogebraCommands)} 
+          showSolution={false}
+          width={600}
+          height={400}
+        />
+      ) : (
+        <div 
+          className="w-full h-64 border border-gray-300 bg-white" 
+          style={{ 
+            backgroundImage: "linear-gradient(to right, #ddd 1px, transparent 1px), linear-gradient(to bottom, #ddd 1px, transparent 1px)",
+            backgroundSize: "20px 20px" 
+          }}
+        />
+      )}
+    </div>
+  </div>
+)}
+
             </li>
           ))}
         </ul>
@@ -127,24 +189,19 @@ export default function GeneratedQuizClient() {
                   />
                   
                   {/* Solution Diagram */}
-                  {sol.geogebraCommands && (
-                    <div className="my-4">
-                      <div className="border rounded overflow-hidden bg-gray-50 p-4">
-                        <div className="text-center mb-2 text-gray-700 font-medium">Solution Graph</div>
-                        <div className="w-full h-64 border border-gray-300 bg-white grid" 
-                             style={{ 
-                               backgroundImage: "linear-gradient(to right, #ddd 1px, transparent 1px), linear-gradient(to bottom, #ddd 1px, transparent 1px)",
-                               backgroundSize: "20px 20px" 
-                             }}>
-                          <div className="flex flex-col items-center justify-center h-full text-gray-700">
-                            <p className="font-medium mb-2">Graph of function:</p>
-                            <p className="text-blue-600">{sol.geogebraCommands.split(";")[0]}</p>
-                            <p className="mt-4 text-sm text-gray-500">Refer to solution details above</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  {sol.geogebraCommands && isGraphQuestion(sol.solution || questionsArray[sol.questionIndex - 1]?.question || "") && (
+              <div className="my-4">
+                <div className="border rounded overflow-hidden bg-gray-50 p-4">
+                  <div className="text-center mb-2 text-gray-700 font-medium">Solution</div>
+                  <DiagramRenderer 
+                    diagramData={sol.diagram || parseGeogebraCommand(sol.geogebraCommands)} 
+                    showSolution={true}
+                    width={600}
+                    height={400}
+                  />
+                </div>
+              </div>
+            )}
                   
                   {sol.notes && (
                     <div className="mb-2">

@@ -1,3 +1,5 @@
+//src/components/UniversalDiagram.tsx
+
 "use client";
 
 import React, { useMemo } from 'react';
