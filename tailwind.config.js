@@ -18,7 +18,7 @@ module.exports = {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
 			 // Add your brand color here
-			 brand: '#4CBB17',
+			 brand: '#db0573',
 			 // You can also add variations if needed
 			 'brand-light': '#f73a9e',
 			 'brand-dark': '#a7045a',
