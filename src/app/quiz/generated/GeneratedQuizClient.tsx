@@ -5,12 +5,17 @@
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from 'next/dynamic';
 import DiagramRenderer from "@/components/DiagramRenderer";
-import QuizPDFDocument from "@/components/QuizPDFDocument";
-import html2canvas from "html2canvas";
-// Remove the PDFDownloadLink import which is causing issues
 
-function isGraphQuestion(question: string): boolean {
+// Import PDFButton with no SSR to avoid hydration issues
+const PDFButton = dynamic(
+  () => import('@/components/PDFButton'),
+  { ssr: false }
+);
+
+// Export this function so it can be used in PDFButton
+export function isGraphQuestion(question: string): boolean {
   const graphKeywords = ["graph", "plot", "sketch", "draw"];
   return graphKeywords.some((keyword) =>
     question.toLowerCase().includes(keyword)
@@ -92,61 +97,6 @@ export default function GeneratedQuizClient() {
     }
   }, [questionsArray, showSolutions]);
 
-  // Function to prepare PDF data with graph images
-  const preparePDFData = async () => {
-    try {
-      const enrichedQuestions = await Promise.all(
-        questionsArray.map(async (q: any, index: number) => {
-          const ref = graphRefs.current[index];
-          if (ref && isGraphQuestion(q.question)) {
-            // Find the actual diagram element (one level deeper than the container)
-            const diagramElement = ref.querySelector('.bg-white') as HTMLElement;
-            const targetElement = diagramElement || ref;
-            
-            const canvas = await html2canvas(targetElement, {
-              backgroundColor: "white",
-              scale: 2, // Higher resolution
-              logging: false,
-              useCORS: true
-            });
-            
-            const imageData = canvas.toDataURL("image/png");
-            return { ...q, diagramImage: imageData };
-          }
-          return q;
-        })
-      );
-
-      const enrichedSolutions = await Promise.all(
-        solutionsArray.map(async (sol: any) => {
-          const questionIndex = sol.questionIndex - 1;
-          const ref = solutionGraphRefs.current[questionIndex];
-          if (ref && isGraphQuestion(sol.solution || questionsArray[questionIndex]?.question || "")) {
-            // Find the actual diagram element (one level deeper than the container)
-            const diagramElement = ref.querySelector('.bg-white') as HTMLElement;
-            const targetElement = diagramElement || ref;
-            
-            const canvas = await html2canvas(targetElement, {
-              backgroundColor: "white",
-              scale: 2, // Higher resolution
-              logging: false,
-              useCORS: true
-            });
-            
-            const imageData = canvas.toDataURL("image/png");
-            return { ...sol, diagramImage: imageData };
-          }
-          return sol;
-        })
-      );
-
-      return { enrichedQuestions, enrichedSolutions };
-    } catch (error) {
-      console.error("Error preparing PDF data:", error);
-      return { enrichedQuestions: questionsArray, enrichedSolutions: solutionsArray };
-    }
-  };
-
   // Function to handle refs correctly
   const setGraphRef = (index: number) => (el: HTMLDivElement | null) => {
     graphRefs.current[index] = el;
@@ -218,87 +168,16 @@ export default function GeneratedQuizClient() {
           Generate Another
         </button>
         
-        <button
-          className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md font-medium shadow-md transition-colors flex items-center justify-center min-w-[150px]"
-          onClick={async () => {
-            if (isPreparingPDF) return;
-            
-            setIsPreparingPDF(true);
-            try {
-              // Temporarily show solutions if they're hidden (to capture solution graphs)
-              const solutionsWereHidden = !showSolutions;
-              if (solutionsWereHidden) {
-                setShowSolutions(true);
-                // Wait for solutions to render
-                await new Promise(resolve => setTimeout(resolve, 500));
-              }
-              
-              // Prepare the enhanced data with graphs
-              const { enrichedQuestions, enrichedSolutions } = await preparePDFData();
-              
-              // Hide solutions again if they were initially hidden
-              if (solutionsWereHidden) {
-                setShowSolutions(false);
-              }
-              
-              // Create a PDF download link component temporarily
-              const pdfContainer = document.createElement('div');
-              document.body.appendChild(pdfContainer);
-              
-              // Handle PDF generation with proper error catching
-              try {
-                // Dynamically import all needed components from react-pdf
-                const ReactPDF = await import('@react-pdf/renderer');
-                
-                // Generate the PDF document and convert to blob
-                const blob = await ReactPDF.pdf(
-                  <QuizPDFDocument
-                    questions={enrichedQuestions}
-                    solutions={enrichedSolutions}
-                    selectedFields={selectedFields}
-                  />
-                ).toBlob();
-                
-                // Create download link for the blob and trigger click
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = generatedFilename;
-                document.body.appendChild(link);
-                link.click();
-                
-                // Clean up
-                setTimeout(() => {
-                  URL.revokeObjectURL(url);
-                  document.body.removeChild(link);
-                  if (document.body.contains(pdfContainer)) {
-                    document.body.removeChild(pdfContainer);
-                  }
-                }, 100);
-              } catch (pdfError) {
-                console.error("PDF generation error:", pdfError);
-                alert("Could not generate the PDF. Please try again.");
-              }
-            } catch (err) {
-              console.error("Error generating PDF:", err);
-              alert("There was an error generating the PDF. Please try again.");
-            } finally {
-              setIsPreparingPDF(false);
-            }
-          }}
-        >
-          {isPreparingPDF ? (
-            <>
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Preparing PDF...
-            </> 
-          ) : (
-            "Download PDF"
-          )}
-        </button>
+        <PDFButton 
+          questionsArray={questionsArray}
+          solutionsArray={solutionsArray}
+          selectedFields={selectedFields}
+          generatedFilename={generatedFilename}
+          graphRefs={graphRefs}
+          solutionGraphRefs={solutionGraphRefs}
+          showSolutions={showSolutions}
+          setShowSolutions={setShowSolutions}
+        />
       </div>
 
       {showSolutions && solutionsArray.length > 0 && (
