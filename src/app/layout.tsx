@@ -3,16 +3,18 @@ import "./globals.css";
 import { ReactQueryProvider } from "@/lib/ReactQueryProvider"
 import { Inter } from 'next/font/google'
 import Script from "next/script";
-import Sidebar from "@/components/sidebar";
-import SessionProviderWrapper from "@/components/SessionProviderWrapper";
+import Sidebar from "@/components/layout/Sidebar";
 import FeedbackButton from "@/components/FeedbackButton";
+import SessionProvider from '@/lib/SessionProvider';
+import type { Metadata } from 'next';
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
 })
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Examinaite",
   description: "AI-powered exam preparation for Leaving Cert students.",
   icons: "/favicon.ico",
@@ -57,17 +59,42 @@ export default function RootLayout({
         <link rel="shortcut icon" href="/favicon.ico" />
       </head>
       <body className={`min-h-screen bg-background font-sans antialiased ${inter.variable}`}>
-        <SessionProviderWrapper>
-          <div className="flex min-h-screen">
-            <Sidebar />
-            <main className="flex-1 p-6 overflow-x-hidden">
-              <div className="max-w-full">
-                <ReactQueryProvider>{children}</ReactQueryProvider>
-                <FeedbackButton/>
-              </div>
-            </main>
-          </div>
-        </SessionProviderWrapper>
+        <ReactQueryProvider>
+          <SessionProvider>
+            <div className="flex min-h-screen">
+              <Sidebar />
+              <main className="flex-1 p-6 overflow-x-hidden">
+                <div className="max-w-full">
+                  {children}
+                  <FeedbackButton/>
+                </div>
+              </main>
+            </div>
+            <Toaster />
+            
+            {/* Facebook SDK */}
+            <Script id="facebook-jssdk" strategy="lazyOnload">
+              {`
+                window.fbAsyncInit = function() {
+                  FB.init({
+                    appId      : '502569479278560',
+                    cookie     : true,
+                    xfbml      : true,
+                    version    : 'v18.0'
+                  });
+                };
+
+                (function(d, s, id){
+                  var js, fjs = d.getElementsByTagName(s)[0];
+                  if (d.getElementById(id)) {return;}
+                  js = d.createElement(s); js.id = id;
+                  js.src = "https://connect.facebook.net/en_US/sdk.js";
+                  fjs.parentNode.insertBefore(js, fjs);
+                }(document, 'script', 'facebook-jssdk'));
+              `}
+            </Script>
+          </SessionProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   );

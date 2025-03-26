@@ -423,7 +423,7 @@ export function QuizForm() {
   const [selectedSubject, setSelectedSubject] = useState<string>("mathematics");
   const [selectedPaper, setSelectedPaper] = useState<string>("Both");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("Random");
-  const [selectedLevel, setSelectedLevel] = useState<string>("");
+  const [selectedLevel, setSelectedLevel] = useState<string>("Higher Level");
   const [selectedSection, setSelectedSection] = useState<string>("Short Questions");
   const [selectedTopic, setSelectedTopic] = useState<string>("Random");
   const [selectedSubtopic, setSelectedSubtopic] = useState<string>("");

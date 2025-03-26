@@ -1,4 +1,7 @@
-// lib/prisma.ts
+/**
+ * Prisma client configuration
+ * Central database connection handlers with pooled and direct connections
+ */
 import { PrismaClient } from '@prisma/client'
 
 // Prevent multiple instances of Prisma Client in development
@@ -42,3 +45,6 @@ if (process.env.NODE_ENV !== 'production') {
   global.prisma = prisma
   global.directPrisma = directPrisma
 }
+
+// Export a default instance for convenience
+export default prisma; 

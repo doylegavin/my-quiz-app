@@ -1,11 +1,12 @@
 // src/app/page.tsx
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, Hourglass, Circle } from "lucide-react";
 import Image from "next/image";
 import WaitlistSection from "@/components/WaitlistSection";
-
 
 export default function Home() {
   return (
@@ -23,9 +24,8 @@ export default function Home() {
         </p>
       </section>
 
-            {/* Join Waitlist Section - Now using the new component */}
-            <WaitlistSection />
-
+      {/* Join Waitlist Section - Now using the new component */}
+      <WaitlistSection />
 
       {/* How It Works Section */}
       <section className="container mx-auto px-4 py-16 text-center">
@@ -82,92 +82,91 @@ export default function Home() {
         </div>
       </section>
 
-        {/* Testimonials Section */}
-<section className="container mx-auto px-4 py-16 text-center">
-  <h2 className="text-3xl font-bold mb-8">What Teachers Are Saying</h2>
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-    
-    {/* Testimonial 1 */}
-    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
-      <p className="text-gray-800 italic">
-        "Has the potential to be really good, and the bones of it already look excellent."
-      </p>
-      <p className="mt-4 text-gray-600 font-semibold">— Teacher, Institute of Education</p>
-    </div>
+      {/* Testimonials Section */}
+      <section className="container mx-auto px-4 py-16 text-center">
+        <h2 className="text-3xl font-bold mb-8">What Teachers Are Saying</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          
+          {/* Testimonial 1 */}
+          <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
+            <p className="text-gray-800 italic">
+              "Has the potential to be really good, and the bones of it already look excellent."
+            </p>
+            <p className="mt-4 text-gray-600 font-semibold">— Teacher, Institute of Education</p>
+          </div>
 
-    {/* Testimonial 2 */}
-    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
-      <p className="text-gray-800 italic">
-        "A tool that personalises learning would be a game-changer."
-      </p>
-      <p className="mt-4 text-gray-600 font-semibold">— SEN Co-Ordinator </p>
-    </div>
+          {/* Testimonial 2 */}
+          <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
+            <p className="text-gray-800 italic">
+              "A tool that personalises learning would be a game-changer."
+            </p>
+            <p className="mt-4 text-gray-600 font-semibold">— SEN Co-Ordinator </p>
+          </div>
 
-    {/* Testimonial 3 */}
-    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
-      <p className="text-gray-800 italic">
-        "The potential of this is huge, like, HUGE."
-      </p>
-      <p className="mt-4 text-gray-600 font-semibold">— Seán McWeeney, 10+ years Maths Teacher, Founder NW StemFest</p>
-    </div>
+          {/* Testimonial 3 */}
+          <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
+            <p className="text-gray-800 italic">
+              "The potential of this is huge, like, HUGE."
+            </p>
+            <p className="mt-4 text-gray-600 font-semibold">— Seán McWeeney, 10+ years Maths Teacher, Founder NW StemFest</p>
+          </div>
 
-    {/* Testimonial 4 */}
-    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
-      <p className="text-gray-800 italic">
-        "I've been using this with my Leaving Certs, and it has really improved weaker students' ability and confidence."
-      </p>
-      <p className="mt-4 text-gray-600 font-semibold">—  Maths & Science Teacher</p>
-    </div>
+          {/* Testimonial 4 */}
+          <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
+            <p className="text-gray-800 italic">
+              "I've been using this with my Leaving Certs, and it has really improved weaker students' ability and confidence."
+            </p>
+            <p className="mt-4 text-gray-600 font-semibold">—  Maths & Science Teacher</p>
+          </div>
 
-    {/* Testimonial 5 */}
-    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
-      <p className="text-gray-800 italic">
-        "Chef's kiss, everything StudyClix is missing."
-      </p>
-      <p className="mt-4 text-gray-600 font-semibold">—  Former StudyClix Employee, Maths & Science Teacher</p>
-    </div>
+          {/* Testimonial 5 */}
+          <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
+            <p className="text-gray-800 italic">
+              "Chef's kiss, everything StudyClix is missing."
+            </p>
+            <p className="mt-4 text-gray-600 font-semibold">—  Former StudyClix Employee, Maths & Science Teacher</p>
+          </div>
 
-    {/* Testimonial 6 */}
-    <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
-      <p className="text-gray-800 italic">
-        "The Irish education system is seriously missing out on tools like this. An app like your proposal would be game-changing for teachers to facilitate revision in an interactive way."
-      </p>
-      <p className="mt-4 text-gray-600 font-semibold">— 6+ Years Teacher, Ireland & UK</p>
-    </div>
-    <div className="flex gap-4 justify-center pt-16">
-    <Link href="/quiz/create">
-      <Button size="lg" className="bg-brand hover:bg-brand py-3 md:py-4">
-         <strong>Give it a Go 💪</strong>
-      </Button>
-    </Link>
-    </div>
-    </div>
-    </section>
-
+          {/* Testimonial 6 */}
+          <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
+            <p className="text-gray-800 italic">
+              "The Irish education system is seriously missing out on tools like this. An app like your proposal would be game-changing for teachers to facilitate revision in an interactive way."
+            </p>
+            <p className="mt-4 text-gray-600 font-semibold">— 6+ Years Teacher, Ireland & UK</p>
+          </div>
+          <div className="flex gap-4 justify-center pt-16">
+          <Link href="/quiz/create">
+            <Button size="lg" className="bg-brand hover:bg-brand py-3 md:py-4">
+               <strong>Give it a Go 💪</strong>
+            </Button>
+          </Link>
+          </div>
+        </div>
+      </section>
 
       {/* Embedded YouTube Video */}
       <section className="container mx-auto px-4 py-16 text-center">
-  <h2 className="text-3xl font-bold mb-6">See Examinaite in Action</h2>
-  
-  {/* Video container with aspect ratio */}
-  <div className="w-full max-w-3xl mx-auto aspect-video relative">
-    <iframe
-      src="https://www.youtube.com/embed/8xGoWuRCyws"
-      title="Examinaite Demo Video"
-      frameBorder="0"
-      allowFullScreen
-      className="rounded-lg shadow-lg absolute inset-0 w-full h-full"
-    ></iframe>
-  </div>
-  
-  <div className="flex gap-4 justify-center pt-16">
-    <Link href="/quiz/create">
-      <Button size="lg" className="bg-brand hover:bg-brand py-3 md:py-4">
-        🟢 <strong>TRY FOR FREE</strong>
-      </Button>
-    </Link>
-  </div>
-</section>
+        <h2 className="text-3xl font-bold mb-6">See Examinaite in Action</h2>
+        
+        {/* Video container with aspect ratio */}
+        <div className="w-full max-w-3xl mx-auto aspect-video relative">
+          <iframe
+            src="https://www.youtube.com/embed/8xGoWuRCyws"
+            title="Examinaite Demo Video"
+            frameBorder="0"
+            allowFullScreen
+            className="rounded-lg shadow-lg absolute inset-0 w-full h-full"
+          ></iframe>
+        </div>
+        
+        <div className="flex gap-4 justify-center pt-16">
+          <Link href="/quiz/create">
+            <Button size="lg" className="bg-brand hover:bg-brand py-3 md:py-4">
+              🟢 <strong>TRY FOR FREE</strong>
+            </Button>
+          </Link>
+        </div>
+      </section>
 
       {/* Why Examinaite? */}
       <section className="container mx-auto px-4 pb-16 text-center">
@@ -186,63 +185,63 @@ export default function Home() {
           📢 Join <strong>Hundreds of Leaving Cert students & teachers</strong> already using Examinaite!
         </p>
         <Link href="/quiz/create">
-  <Button 
-    size="lg" 
-    className="mt-6 bg-brand hover:bg-brand"
-  >
-    🔹 Start Generating Questions Now →
-  </Button>
-</Link>
+          <Button 
+            size="lg" 
+            className="mt-6 bg-brand hover:bg-brand"
+          >
+            🔹 Start Generating Questions Now →
+          </Button>
+        </Link>
       </section>
 
-   {/* Backed By Section */}
-<section className="container mx-auto px-4 py-16 text-center">
-  <h2 className="text-3xl font-bold mb-8">Backed By</h2>
-  <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
-    <Link 
-      href="https://www.newfrontiers.ie/" 
-      target="_blank" 
-      rel="noopener noreferrer" 
-      className="w-40 md:w-48 h-24 relative flex items-center justify-center transform hover:scale-110 transition-all duration-300"
-    >
-      <Image 
-        src="/images/backedby/enterprise-ireland.png" 
-        alt="Enterprise Ireland"
-        fill
-        className="object-contain"
-      />
-    </Link>
-    <Link 
-      href="https://dogpatchlabs.com/" 
-      target="_blank" 
-      rel="noopener noreferrer" 
-      className="w-40 md:w-48 h-24 relative flex items-center justify-center transform hover:scale-110 transition-all duration-300"
-    >
-      <Image 
-        src="/images/backedby/dogpatch-labs.png" 
-        alt="Dogpatch Labs"
-        fill
-        className="object-contain"
-      />
-    </Link>
-    <Link 
-      href="https://www.ndrc.ie/" 
-      target="_blank" 
-      rel="noopener noreferrer" 
-      className="w-40 md:w-48 h-24 relative flex items-center justify-center transform hover:scale-110 transition-all duration-300"
-    >
-      <Image 
-        src="/images/backedby/ndrc.png" 
-        alt="NDRC"
-        fill
-        className="object-contain"
-      />
-    </Link>
-  </div>
-  <p className="text-gray-600 mt-8">
-    Proudly supported by Ireland's leading innovation partners
-  </p>
-</section>    
+      {/* Backed By Section */}
+      <section className="container mx-auto px-4 py-16 text-center">
+        <h2 className="text-3xl font-bold mb-8">Backed By</h2>
+        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
+          <Link 
+            href="https://www.newfrontiers.ie/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="w-40 md:w-48 h-24 relative flex items-center justify-center transform hover:scale-110 transition-all duration-300"
+          >
+            <Image 
+              src="/images/backedby/enterprise-ireland.png" 
+              alt="Enterprise Ireland"
+              fill
+              className="object-contain"
+            />
+          </Link>
+          <Link 
+            href="https://dogpatchlabs.com/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="w-40 md:w-48 h-24 relative flex items-center justify-center transform hover:scale-110 transition-all duration-300"
+          >
+            <Image 
+              src="/images/backedby/dogpatch-labs.png" 
+              alt="Dogpatch Labs"
+              fill
+              className="object-contain"
+            />
+          </Link>
+          <Link 
+            href="https://www.ndrc.ie/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="w-40 md:w-48 h-24 relative flex items-center justify-center transform hover:scale-110 transition-all duration-300"
+          >
+            <Image 
+              src="/images/backedby/ndrc.png" 
+              alt="NDRC"
+              fill
+              className="object-contain"
+            />
+          </Link>
+        </div>
+        <p className="text-gray-600 mt-8">
+          Proudly supported by Ireland's leading innovation partners
+        </p>
+      </section>   
     </div>
   );
 }

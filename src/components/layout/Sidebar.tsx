@@ -2,10 +2,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FiMenu, FiX, FiHome, FiEdit, FiInfo, FiSend, FiUser, FiLogOut, FiLogIn } from "react-icons/fi";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import emailjs from "@emailjs/browser";
 import { useRouter } from "next/navigation";
 
+/**
+ * Main sidebar navigation component
+ */
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false); // Default to closed
   const { data: session, status } = useSession();
@@ -45,12 +48,26 @@ export default function Sidebar() {
   };
 
   const handleSignOut = async () => {
-    await signOut({ redirect: false });
-    router.push("/");
+    try {
+      console.log("Starting sign out process");
+      // First clear client-side session
+      const result = await signOut({ 
+        redirect: false,
+        callbackUrl: '/'
+      });
+      console.log("Sign out completed:", result);
+      
+      // Force a hard refresh after sign out to ensure all state is cleared
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Error signing out:', error);
+      // Fallback approach
+      window.location.href = '/api/auth/signout';
+    }
   };
 
   const handleSignIn = () => {
-    // Explicitly navigate to the sign-in page instead of using the API endpoint
+    // Use the new route naming
     router.push("/signin?callbackUrl=/");
   };
 
@@ -110,11 +127,11 @@ export default function Sidebar() {
           <div className="flex justify-center">
             <div className="animate-pulse h-10 w-full bg-brand-dark rounded"></div>
           </div>
-        ) : session ? (
+        ) : session?.user ? (
           <div className="flex items-center justify-between">
             <Link href="/profile" className="flex items-center gap-3">
               <img 
-                src={session.user?.image || "/default-avatar.png"} 
+                src={session.user.image || "/default-avatar.png"} 
                 alt="Profile" 
                 className="w-10 h-10 rounded-full"
                 onError={(e) => {
@@ -122,7 +139,7 @@ export default function Sidebar() {
                   (e.target as HTMLImageElement).src = "/default-avatar.png";
                 }}
               />
-              {isOpen && <span className="text-lg truncate max-w-[120px]">{session.user?.name}</span>}
+              {isOpen && <span className="text-lg truncate max-w-[120px]">{session.user.name}</span>}
             </Link>
             <button
               onClick={handleSignOut}
@@ -150,4 +167,4 @@ export default function Sidebar() {
       </div>
     </div>
   );
-}
+} 

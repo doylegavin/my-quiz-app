@@ -6,11 +6,10 @@ import {
   type DefaultSession,
 } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import GithubProvider from "next-auth/providers/github";
 import InstagramProvider from "next-auth/providers/instagram";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { directPrisma } from "@/lib/prisma";
+import { directPrisma } from "@/lib/db/prisma";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
@@ -49,7 +48,7 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    jwt: async ({ token }) => {
+    jwt: async ({ token, account, profile }) => {
       const db_user = await directPrisma.user.findFirst({
         where: {
           email: token?.email,
@@ -58,6 +57,7 @@ export const authOptions: NextAuthOptions = {
       if (db_user) {
         token.id = db_user.id;
       }
+      
       return token;
     },
     session: ({ session, token }) => {
@@ -72,32 +72,48 @@ export const authOptions: NextAuthOptions = {
   },
   adapter: PrismaAdapter(directPrisma),
   providers: [
-    // Only enable providers if their credentials are configured
-    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
-      ? [
-          GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-          }),
-        ]
-      : []),
-    ...(process.env.GITHUB_ID && process.env.GITHUB_SECRET
-      ? [
-          GithubProvider({
-            clientId: process.env.GITHUB_ID,
-            clientSecret: process.env.GITHUB_SECRET,
-          }),
-        ]
-      : []),
-    ...(process.env.INSTAGRAM_CLIENT_ID && process.env.INSTAGRAM_CLIENT_SECRET
-      ? [
-          InstagramProvider({
-            clientId: process.env.INSTAGRAM_CLIENT_ID,
-            clientSecret: process.env.INSTAGRAM_CLIENT_SECRET,
-          }),
-        ]
-      : []),
-    // Always enable credentials provider
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+        }
+      },
+    }),
+    // Custom TikTok provider
+    {
+      id: "tiktok",
+      name: "TikTok",
+      type: "oauth",
+      clientId: process.env.TIKTOK_CLIENT_ID as string,
+      clientSecret: process.env.TIKTOK_CLIENT_SECRET as string,
+      wellKnown: "https://open.tiktokapis.com/.well-known/openid-configuration",
+      authorization: { params: { scope: "user.info.basic" } },
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.display_name || profile.username,
+          email: profile.email,
+          image: profile.avatar_url,
+        }
+      },
+    },
+    InstagramProvider({
+      clientId: process.env.INSTAGRAM_CLIENT_ID as string,
+      clientSecret: process.env.INSTAGRAM_CLIENT_SECRET as string,
+      profile(profile) {
+        return {
+          id: profile.id,
+          name: profile.username,
+          email: profile.email || `${profile.username}@instagram.user`,
+          image: profile.profile_picture,
+        }
+      },
+    }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -111,7 +127,7 @@ export const authOptions: NextAuthOptions = {
         
         const user = await directPrisma.user.findUnique({
           where: { email: credentials.email },
-          select: { id: true, email: true, password: true, name: true },
+          select: { id: true, email: true, password: true, name: true, image: true },
         });
 
         if (!user || !user.password) {
@@ -127,11 +143,12 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  // Update paths to match the new route structure
   pages: {
-    signIn: `/auth/signin`,
-    signOut: `/auth/signout`,
-    error: `/auth/error`,
-    newUser: `/auth/signup`,
+    signIn: `/signin`,
+    signOut: `/signout`,
+    error: `/error`,
+    newUser: `/signup`,
   },
   useSecureCookies: process.env.NODE_ENV === "production",
   cookies: {
@@ -149,4 +166,4 @@ export const authOptions: NextAuthOptions = {
 
 export const getAuthSession = () => {
   return getServerSession(authOptions);
-};
+}; 

@@ -1,57 +1,46 @@
-// Prisma schema for the Leaving Cert Revision App
-// Learn more at: https://pris.ly/d/prisma-schema
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  
-  // Uncomment the next line **only if** you use Prisma <5.10
-  //directUrl = env("DATABASE_URL_UNPOOLED")
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
-// User model for authentication and roles
 model User {
-  id            String      @id @default(cuid())
+  id            String     @id @default(cuid())
   name          String?
-  email         String?     @unique
+  email         String?    @unique
   password      String?
   emailVerified DateTime?
   image         String?
-  role          Role        @default(STUDENT)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  role          Role       @default(STUDENT)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
   accounts      Account[]
-  sessions      Session[]
-  quizzes       Quiz[]
   progress      Progress[]
+  quizzes       Quiz[]
+  sessions      Session[]
 }
 
-enum Role {
-  STUDENT
-  TEACHER
-}
-
-// Account model for OAuth providers
 model Account {
   id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
   expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?  @db.Text
+  session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
-// Session model for session management
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
@@ -60,63 +49,65 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// Quiz model for storing quiz details
 model Quiz {
-  id          String     @id @default(cuid())
-  userId      String
-  topic       String
-  score       Int
-  createdAt   DateTime   @default(now())
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  questions   Question[]
+  id        String     @id @default(cuid())
+  userId    String
+  topic     String
+  score     Int
+  createdAt DateTime   @default(now())
+  questions Question[]
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Question {
-  id          String   @id @default(cuid())
-  quizId      String
-  question    String
-  options     Json?    // For MCQs
-  answer      String
-  userAnswer  String?
-  isCorrect   Boolean?
-  gameId      String
-  game        Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  quizId       String
+  question     String
+  options      Json?
+  answer       String
+  userAnswer   String?
+  isCorrect    Boolean?
+  gameId       String
   questionType String
-  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  game         Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  quiz         Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
 }
 
-// Progress model for tracking learning
 model Progress {
-  id        String   @id @default(cuid())
-  userId    String
-  topic     String
-  completed Boolean  @default(false)
+  id          String    @id @default(cuid())
+  userId      String
+  topic       String
+  completed   Boolean   @default(false)
   lastStudied DateTime?
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// Exam structure model for mathematics
 model ExamStructure {
-  id          String   @id @default(cuid())
-  subject     String   @default("mathematics")
-  papers      Paper[]
-  difficulty  String[] @default(["Easy", "Medium", "Hard"])
-  levels      String[] @default(["Higher Level", "Ordinary Level", "Foundation Level"])
+  id         String   @id @default(cuid())
+  subject    String   @default("mathematics")
+  difficulty String[] @default(["Easy", "Medium", "Hard"])
+  levels     String[] @default(["Higher Level", "Ordinary Level", "Foundation Level"])
+  papers     Paper[]
 }
 
 model Paper {
-  id          String   @id @default(cuid())
-  name        String
-  sections    String[] @default(["Short Questions", "Long Questions"])
-  topics      String[]
-  exam        ExamStructure @relation(fields: [examStructureId], references: [id], onDelete: Cascade)
+  id              String        @id @default(cuid())
+  name            String
+  sections        String[]      @default(["Short Questions", "Long Questions"])
+  topics          String[]
   examStructureId String
+  exam            ExamStructure @relation(fields: [examStructureId], references: [id], onDelete: Cascade)
 }
+
 model Game {
-  id          String    @id @default(uuid())
+  id          String     @id @default(uuid())
   gameType    String
-  timeStarted DateTime @default(now())
+  timeStarted DateTime   @default(now())
   topic       String
   questions   Question[]
 }
 
+enum Role {
+  STUDENT
+  TEACHER
+}
