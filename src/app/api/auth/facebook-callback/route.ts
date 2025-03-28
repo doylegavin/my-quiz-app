@@ -1,16 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { createHash } from "crypto";
 import { encode } from "next-auth/jwt";
-
-// Use PrismaClient as a singleton to avoid connection issues
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
-};
-
-const prisma = globalForPrisma.prisma ?? new PrismaClient();
-
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+import prisma from "@/lib/prisma"; // Import the singleton prisma client
 
 // Generate a secure user ID
 function generateUserId() {
