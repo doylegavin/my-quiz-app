@@ -3,7 +3,14 @@ import { PrismaClient } from "@prisma/client";
 import { createHash } from "crypto";
 import { encode } from "next-auth/jwt";
 
-const prisma = new PrismaClient();
+// Use PrismaClient as a singleton to avoid connection issues
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined
+};
+
+const prisma = globalForPrisma.prisma ?? new PrismaClient();
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
 // Generate a secure user ID
 function generateUserId() {
@@ -70,9 +77,10 @@ export async function POST(req: NextRequest) {
 
     const token = await encode({
       token: {
+        id: user.id,
         name: user.name,
         email: user.email,
-        picture: null,
+        picture: user.image || null,
         sub: user.id,
       },
       secret,
