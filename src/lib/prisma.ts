@@ -1,11 +1,13 @@
 // lib/prisma.ts
 import { PrismaClient } from '@prisma/client'
 
-// Prevent multiple instances of Prisma Client in development
-declare global {
-  var prisma: PrismaClient | undefined
-  var directPrisma: PrismaClient | undefined
-}
+// PrismaClient is attached to the `global` object in development to prevent
+// exhausting your database connection limit.
+//
+// Learn more:
+// https://pris.ly/d/help/next-js-best-practices
+
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 // Helper function to determine if an operation should use direct connection
 // Certain operations work better with direct connections, especially in Neon
@@ -20,11 +22,13 @@ const getDatasourceUrl = (operation?: string) => {
 };
 
 // Standard pooled connection for general operations
-export const prisma = global.prisma || new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
-  // Better error handling for database connection issues
-  errorFormat: 'pretty',
-})
+export const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    // Better error handling for database connection issues
+    errorFormat: 'pretty',
+  })
 
 // Direct connection for auth operations
 export const directPrisma = global.directPrisma || new PrismaClient({
@@ -39,6 +43,8 @@ export const directPrisma = global.directPrisma || new PrismaClient({
 
 // Avoid recreating the prisma client each time in development
 if (process.env.NODE_ENV !== 'production') {
-  global.prisma = prisma
+  globalForPrisma.prisma = prisma
   global.directPrisma = directPrisma
 }
+
+export default prisma;

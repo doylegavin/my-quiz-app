@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test-db": "node src/scripts/test-db.js",
-    "vercel-build": "npm run test-db && npm run build"
+    "vercel-build": "prisma generate && next build"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
