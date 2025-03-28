@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
-import AuthModal from '@/components/AuthModal';
+import AuthModal from '@/components/auth/AuthModal';
 
 export default function useProtectedPage() {
   const { data: session, status } = useSession();
@@ -25,7 +25,8 @@ export default function useProtectedPage() {
     }
   }, [status]);
 
-  const closeAuthModal = () => {
+  // Handle successful authentication
+  const handleAuthenticated = () => {
     setShowAuthModal(false);
   };
 
@@ -38,8 +39,7 @@ export default function useProtectedPage() {
       {/* Auth modal */}
       <AuthModal 
         isOpen={true} 
-        onClose={closeAuthModal} 
-        returnUrl={pathname} 
+        onAuthenticated={handleAuthenticated}
       />
     </>
   );
@@ -48,7 +48,7 @@ export default function useProtectedPage() {
     session,
     status,
     showAuthModal,
-    closeAuthModal,
+    closeAuthModal: handleAuthenticated,
     returnUrl: pathname,
     isAuthenticated: status === 'authenticated',
     isLoading: status === 'loading',
