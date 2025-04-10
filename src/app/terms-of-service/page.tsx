@@ -1,7 +1,3 @@
-"use client";
-
-import React from 'react';
-
 export default function TermsOfService() {
   return (
     <div className="container mx-auto py-8 max-w-4xl">
