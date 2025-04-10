@@ -10,6 +10,7 @@ import InstagramProvider from "next-auth/providers/instagram";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { directPrisma } from "@/lib/db/prisma";
+import TikTokProvider from "next-auth/providers/tiktok";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
@@ -40,6 +41,15 @@ function getBaseUrl() {
   }
   // In server-side, use the environment variable without port or default to localhost:3000
   return process.env.NEXTAUTH_URL || "http://localhost:3000";
+}
+
+// Define interface types for provider profiles
+interface InstagramProfile {
+  id: string;
+  username?: string;
+  email?: string;
+  profile_picture?: string;
+  [key: string]: any;
 }
 
 export const authOptions: NextAuthOptions = {
@@ -84,14 +94,9 @@ export const authOptions: NextAuthOptions = {
         }
       },
     }),
-    // Custom TikTok provider
-    {
-      id: "tiktok",
-      name: "TikTok",
-      type: "oauth",
+    TikTokProvider({
       clientId: process.env.TIKTOK_CLIENT_ID as string,
       clientSecret: process.env.TIKTOK_CLIENT_SECRET as string,
-      wellKnown: "https://open.tiktokapis.com/.well-known/openid-configuration",
       authorization: { params: { scope: "user.info.basic" } },
       profile(profile) {
         return {
@@ -101,11 +106,11 @@ export const authOptions: NextAuthOptions = {
           image: profile.avatar_url,
         }
       },
-    },
+    }),
     InstagramProvider({
       clientId: process.env.INSTAGRAM_CLIENT_ID as string,
       clientSecret: process.env.INSTAGRAM_CLIENT_SECRET as string,
-      profile(profile) {
+      profile(profile: InstagramProfile) {
         return {
           id: profile.id,
           name: profile.username,
