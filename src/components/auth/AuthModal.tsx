@@ -4,9 +4,7 @@ import { useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { FcGoogle } from 'react-icons/fc';
-import { FaGithub, FaInstagram } from 'react-icons/fa';
 import { useSearchParams } from 'next/navigation';
-import { FacebookLoginButton } from '@/components/FacebookLoginButton';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -173,34 +171,18 @@ export default function AuthModal({ isOpen, onAuthenticated }: AuthModalProps) {
             </div>
           </div>
 
-          <div className="mt-6 grid grid-cols-3 gap-3">
+          <div className="mt-6">
             <button
               onClick={() => handleOAuthSignIn('google')}
               className="flex w-full items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
               disabled={isLoading}
             >
-              <FcGoogle className="h-5 w-5" />
+              <FcGoogle className="h-5 w-5" /> Sign in with Google
             </button>
-            <button
-              onClick={() => handleOAuthSignIn('github')}
-              className="flex w-full items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-              disabled={isLoading}
-            >
-              <FaGithub className="h-5 w-5" />
-            </button>
-            <button
-              onClick={() => handleOAuthSignIn('instagram')}
-              className="flex w-full items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-              disabled={isLoading}
-            >
-              <FaInstagram className="h-5 w-5" />
-            </button>
+            
           </div>
           
-          {/* Facebook SDK Button */}
-          <div className="mt-4">
-            <FacebookLoginButton />
-          </div>
+          
         </div>
         
         <div className="mt-6 text-center text-sm">

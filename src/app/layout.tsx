@@ -4,6 +4,10 @@ import React from 'react';
 import { Inter } from 'next/font/google'
 import Script from "next/script";
 import type { Metadata } from 'next';
+import { NextAuthSessionProvider } from "@/lib/NextAuthSessionProvider";
+import dynamic from "next/dynamic";
+
+const Sidebar = dynamic(() => import('@/components/layout/Sidebar'), { ssr: false });
 
 const inter = Inter({
   subsets: ['latin'],
@@ -50,13 +54,16 @@ export default function RootLayout({
           strategy="beforeInteractive"
         />
         
-        <div className="flex min-h-screen">
-          <main className="flex-1 p-6 overflow-x-hidden">
-            <div className="max-w-full">
-              {children}
-            </div>
-          </main>
-        </div>
+        <NextAuthSessionProvider>
+          <div className="flex min-h-screen">
+            <Sidebar />
+            <main className="flex-1 p-6 overflow-x-hidden">
+              <div className="max-w-full">
+                {children}
+              </div>
+            </main>
+          </div>
+        </NextAuthSessionProvider>
       </body>
     </html>
   );

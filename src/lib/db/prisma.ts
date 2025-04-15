@@ -1,50 +1,83 @@
-/**
- * Prisma client configuration
- * Central database connection handlers with pooled and direct connections
- */
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 
-// Prevent multiple instances of Prisma Client in development
-declare global {
-  var prisma: PrismaClient | undefined
-  var directPrisma: PrismaClient | undefined
+// PrismaClient is attached to the `global` object in development to prevent
+// exhausting your database connection limit.
+// Learn more: https://pris.ly/d/help/next-js-best-practices
+
+interface CustomNodeJsGlobal extends Global {
+  prisma: PrismaClient;
+  directPrisma: PrismaClient;
 }
 
-// Helper function to determine if an operation should use direct connection
-// Certain operations work better with direct connections, especially in Neon
-const getDatasourceUrl = (operation?: string) => {
-  // Auth operations often need direct connections to avoid pooling issues
-  const authOperations = ['findUnique', 'create', 'update', 'delete'];
-  const isDirect = operation && authOperations.includes(operation);
+// Add prisma to the NodeJS global type
+declare const global: CustomNodeJsGlobal;
+
+// Function to get correct database URL based on context
+const getDatasourceUrl = () => {
+  const url = process.env.DATABASE_URL;
   
-  return isDirect && process.env.DATABASE_URL_UNPOOLED 
-    ? process.env.DATABASE_URL_UNPOOLED 
-    : process.env.DATABASE_URL;
+  if (!url) {
+    throw new Error("DATABASE_URL environment variable is not set");
+  }
+  
+  return url;
 };
 
-// Standard pooled connection for general operations
-export const prisma = global.prisma || new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
-  // Better error handling for database connection issues
-  errorFormat: 'pretty',
-})
+// Get direct (unpooled) database URL for auth operations if available
+const getDirectDatasourceUrl = () => {
+  return process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL;
+};
 
-// Direct connection for auth operations
-export const directPrisma = global.directPrisma || new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
-  errorFormat: 'pretty',
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL_UNPOOLED
-    }
+// Define the database URLs
+const dbUrl = getDatasourceUrl();
+const directDbUrl = getDirectDatasourceUrl();
+
+// Create Prisma clients
+let prisma: PrismaClient;
+let directPrisma: PrismaClient;
+
+if (process.env.NODE_ENV === 'production') {
+  // In production, create new clients
+  prisma = new PrismaClient({
+    datasources: {
+      db: {
+        url: dbUrl,
+      },
+    },
+  });
+  
+  directPrisma = new PrismaClient({
+    datasources: {
+      db: {
+        url: directDbUrl,
+      },
+    },
+  });
+} else {
+  // In development, reuse existing clients or create new ones
+  if (!global.prisma) {
+    global.prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: dbUrl,
+        },
+      },
+    });
   }
-})
-
-// Avoid recreating the prisma client each time in development
-if (process.env.NODE_ENV !== 'production') {
-  global.prisma = prisma
-  global.directPrisma = directPrisma
+  
+  if (!global.directPrisma) {
+    global.directPrisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: directDbUrl,
+        },
+      },
+    });
+  }
+  
+  prisma = global.prisma;
+  directPrisma = global.directPrisma;
 }
 
-// Export a default instance for convenience
+export { prisma, directPrisma };
 export default prisma; 

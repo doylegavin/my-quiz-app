@@ -6,11 +6,10 @@ import {
   type DefaultSession,
 } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import InstagramProvider from "next-auth/providers/instagram";
+import FacebookProvider from "next-auth/providers/facebook";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { directPrisma } from "@/lib/db/prisma";
-import TikTokProvider from "next-auth/providers/tiktok";
+import { prisma } from "../db";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
@@ -35,11 +34,26 @@ declare module "next-auth/jwt" {
 
 // Improve the getBaseUrl function
 function getBaseUrl() {
+  // For local development, explicitly use localhost
+  if (process.env.NODE_ENV === "development") {
+    console.log("Using development URL:", process.env.NEXTAUTH_URL_DEVELOPMENT || "http://localhost:3000");
+    return process.env.NEXTAUTH_URL_DEVELOPMENT || "http://localhost:3000";
+  }
+  
+  // For production, use the production URL
+  if (process.env.NODE_ENV === "production") {
+    console.log("Using production URL:", process.env.NEXTAUTH_URL);
+    return process.env.NEXTAUTH_URL || "";
+  }
+  
+  // Fallback to window location in browser
   if (typeof window !== "undefined") {
-    // In the browser, use the current window location
+    console.log("Using browser URL:", window.location.origin);
     return window.location.origin;
   }
-  // In server-side, use the environment variable without port or default to localhost:3000
+  
+  // Final fallback
+  console.log("Using fallback URL:", process.env.NEXTAUTH_URL || "http://localhost:3000");
   return process.env.NEXTAUTH_URL || "http://localhost:3000";
 }
 
@@ -53,71 +67,31 @@ interface InstagramProfile {
 }
 
 export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
   },
-  secret: process.env.NEXTAUTH_SECRET,
-  callbacks: {
-    jwt: async ({ token, account, profile }) => {
-      const db_user = await directPrisma.user.findFirst({
-        where: {
-          email: token?.email,
-        },
-      });
-      if (db_user) {
-        token.id = db_user.id;
-      }
-      
-      return token;
-    },
-    session: ({ session, token }) => {
-      if (token) {
-        session.user.id = token.id;
-        session.user.name = token.name;
-        session.user.email = token.email;
-        session.user.image = token.picture;
-      }
-      return session;
-    },
+  pages: {
+    signIn: "/signin",
+    signOut: `/signout`,
+    error: `/error`,
+    newUser: `/signup`,
   },
-  adapter: PrismaAdapter(directPrisma),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-      profile(profile) {
-        return {
-          id: profile.sub,
-          name: profile.name,
-          email: profile.email,
-          image: profile.picture,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code"
         }
-      },
+      }
     }),
-    TikTokProvider({
-      clientId: process.env.TIKTOK_CLIENT_ID as string,
-      clientSecret: process.env.TIKTOK_CLIENT_SECRET as string,
-      authorization: { params: { scope: "user.info.basic" } },
-      profile(profile) {
-        return {
-          id: profile.sub,
-          name: profile.display_name || profile.username,
-          email: profile.email,
-          image: profile.avatar_url,
-        }
-      },
-    }),
-    InstagramProvider({
-      clientId: process.env.INSTAGRAM_CLIENT_ID as string,
-      clientSecret: process.env.INSTAGRAM_CLIENT_SECRET as string,
-      profile(profile: InstagramProfile) {
-        return {
-          id: profile.id,
-          name: profile.username,
-          email: profile.email || `${profile.username}@instagram.user`,
-          image: profile.profile_picture,
-        }
-      },
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_CLIENT_ID as string,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -130,7 +104,7 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Missing credentials");
         }
         
-        const user = await directPrisma.user.findUnique({
+        const user = await prisma.user.findUnique({
           where: { email: credentials.email },
           select: { id: true, email: true, password: true, name: true, image: true },
         });
@@ -148,13 +122,6 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-  // Update paths to match the new route structure
-  pages: {
-    signIn: `/signin`,
-    signOut: `/signout`,
-    error: `/error`,
-    newUser: `/signup`,
-  },
   useSecureCookies: process.env.NODE_ENV === "production",
   cookies: {
     sessionToken: {
