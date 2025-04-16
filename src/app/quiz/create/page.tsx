@@ -20,7 +20,7 @@ export default function CreateQuizPage() {
 
   return (
     <>
-      <div className="mx-auto max-w-2xl pb-16 pl-9 pt-8">
+      <div className="mx-auto max-w-2xl pb-16  pt-12">
         <h1 className="text-center text-3xl font-bold md:text-4xl">Create New Quiz</h1>
         {isAuthenticated ? (
           <QuizForm />

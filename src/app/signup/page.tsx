@@ -52,7 +52,8 @@ export default function SignupPage() {
 
   // Environment flags for OAuth providers
   const hasGoogleAuth = process.env.NEXT_PUBLIC_HAS_GOOGLE_AUTH !== "false";
-  const hasFacebookAuth = process.env.NEXT_PUBLIC_HAS_FACEBOOK_AUTH === "true";
+  // Facebook auth is disabled
+  const hasFacebookAuth = false;
 
   const validateForm = () => {
     const newErrors: any = {};
@@ -156,10 +157,6 @@ export default function SignupPage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleFacebookSignup = () => {
-    signIn('facebook', { callbackUrl: '/' });
   };
 
   return (
@@ -328,21 +325,6 @@ export default function SignupPage() {
                     fill="currentColor" />
                 </svg>
                 Sign up with Google
-              </Button>
-            )}
-            
-            {hasFacebookAuth && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => signIn('facebook', { callbackUrl: '/' })}
-                className="w-full"
-              >
-                <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" 
-                    fill="currentColor" />
-                </svg>
-                Sign up with Facebook
               </Button>
             )}
           </div>

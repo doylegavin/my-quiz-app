@@ -9,6 +9,10 @@ module.exports = {
 	  ],
   theme: {
   	extend: {
+      fontFamily: {
+        // Add OpenDyslexic as a font family
+        'dyslexic': ['OpenDyslexic', 'Arial', 'sans-serif'],
+      },
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',

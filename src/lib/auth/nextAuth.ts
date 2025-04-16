@@ -34,26 +34,17 @@ declare module "next-auth/jwt" {
 
 // Improve the getBaseUrl function
 function getBaseUrl() {
-  // For local development, explicitly use localhost
+  // For local development, explicitly use localhost:3000
   if (process.env.NODE_ENV === "development") {
-    console.log("Using development URL:", process.env.NEXTAUTH_URL_DEVELOPMENT || "http://localhost:3000");
-    return process.env.NEXTAUTH_URL_DEVELOPMENT || "http://localhost:3000";
+    return "http://localhost:3000";
   }
   
-  // For production, use the production URL
+  // For production, explicitly use examinaite.ie
   if (process.env.NODE_ENV === "production") {
-    console.log("Using production URL:", process.env.NEXTAUTH_URL);
-    return process.env.NEXTAUTH_URL || "";
+    return "https://examinaite.ie";
   }
   
-  // Fallback to window location in browser
-  if (typeof window !== "undefined") {
-    console.log("Using browser URL:", window.location.origin);
-    return window.location.origin;
-  }
-  
-  // Final fallback
-  console.log("Using fallback URL:", process.env.NEXTAUTH_URL || "http://localhost:3000");
+  // Fallback to environment variable or default
   return process.env.NEXTAUTH_URL || "http://localhost:3000";
 }
 
@@ -89,10 +80,11 @@ export const authOptions: NextAuthOptions = {
         }
       }
     }),
-    FacebookProvider({
-      clientId: process.env.FACEBOOK_CLIENT_ID as string,
-      clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
-    }),
+    // Facebook provider is disabled for now
+    // FacebookProvider({
+    //   clientId: process.env.FACEBOOK_CLIENT_ID as string,
+    //   clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
+    // }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {

@@ -4,149 +4,230 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, Hourglass, Circle } from "lucide-react";
+import { CheckCircle, ArrowRight } from "lucide-react";
 import Image from "next/image";
-import WaitlistSection from "@/components/WaitlistSection";
+import { motion } from "framer-motion";
+
+// Define animation variants
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+};
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pl-16 w-full max-w-[100vw] overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 w-full max-w-[100vw] overflow-x-hidden">
       {/* Hero Section */}
-      <section className="container mx-auto px-4 pt-10 text-center">
-        <h1 className="text-4xl md:text-7xl lg:text-7xl font-bold tracking-tight mb-4 bg-gradient-to-r from-brand to-brand bg-clip-text text-transparent text-center drop-shadow-lg">
-          Examinaite
+      <motion.section 
+        className="container mx-auto px-4 pt-16 pb-8 text-center"
+        initial="hidden"
+        animate="visible"
+        variants={fadeIn}
+      >
+        <h1 className="text-4xl md:text-7xl font-bold tracking-tight mb-4 bg-gradient-to-r from-brand to-brand bg-clip-text text-transparent">
+          Exam prep, for everyone
         </h1>
-        <h1 className="text-lg md:text-4xl font-bold tracking-tight mb-6 bg-gradient-to-r from-brand to-brand bg-clip-text text-transparent">
-          🚀 Personalised Exam-Style Questions So You Can Ace the Leaving Cert
-        </h1>
-        <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-8">
-          Generate exam-style questions instantly, just like the real thing—saving students and teachers hours of prep time
+        <p className="text-lg md:text-2xl text-gray-700 max-w-3xl mx-auto mb-8">
+          Join Hundreds of Students & Teachers Saving Hours on Exam Revision
         </p>
-      </section>
-
-      {/* Join Waitlist Section - Now using the new component */}
-      <WaitlistSection />
-
-      {/* How It Works Section */}
-      <section className="container mx-auto px-4 py-16 text-center">
-        <h2 className="text-3xl font-bold mb-8">How It Works</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-left">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl md:text-2xl font-bold">🔍 1. Select a Topic & Level</CardTitle>
-            </CardHeader>
-            <CardContent>Pick your subject, topic, and difficulty—tailored for Higher, Ordinary, or Foundation Level</CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl md:text-2xl font-bold">📝 2. Generate Realistic Exam Questions</CardTitle>
-            </CardHeader>
-            <CardContent>AI creates Leaving Cert-style questions with detailed solutions & marking schemes in seconds</CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl md:text-2xl font-bold">📄 3. Practice (Exporting coming soon!)</CardTitle>
-            </CardHeader>
-            <CardContent>Test yourself instantly</CardContent>
-          </Card>
-        </div>
         <Link href="/quiz/create">
-          <Button size="lg" className="mt-6 bg-brand hover:bg-brand">
-            🎯 Generate Your First Question →
+          <Button size="lg" className="mt-2 bg-brand hover:bg-brand/90 py-6 px-8 text-lg">
+            Start Free Now
           </Button>
         </Link>
-      </section>
+        <p className="text-sm text-gray-500 mt-3">No card needed. Takes seconds to start.</p>
+      </motion.section>
+
+      {/* How It Works Section */}
+      <motion.section 
+        className="container mx-auto px-4 py-20 text-center"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeIn}
+      >
+        <h2 className="text-3xl font-bold mb-12 text-center" style={{textAlign: 'center'}}>How It Works</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 text-center">
+          <motion.div whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }}>
+            <Card className="h-full shadow-md">
+              <CardHeader className="text-center" style={{textAlign: 'center'}}>
+                <CardTitle className="text-xl md:text-2xl font-bold text-center" style={{textAlign: 'center'}}>🔍 Choose Your Topic & Difficulty</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center" style={{textAlign: 'center'}}>
+                <p className="text-center" style={{textAlign: 'center'}}>AI-powered questions tailored to Higher, Ordinary, or Foundation Level. Prep effortlessly.</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+          
+          <motion.div whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }}>
+            <Card className="h-full shadow-md">
+              <CardHeader className="text-center" style={{textAlign: 'center'}}>
+                <CardTitle className="text-xl md:text-2xl font-bold text-center" style={{textAlign: 'center'}}>📝 Instant Exam-Style Questions & Solutions</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center" style={{textAlign: 'center'}}>
+                <p className="text-center" style={{textAlign: 'center'}}>Generate realistic questions with detailed solutions & marking schemes instantly.</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+          
+          <motion.div whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }}>
+            <Card className="h-full shadow-md">
+              <CardHeader className="text-center" style={{textAlign: 'center'}}>
+                <CardTitle className="text-xl md:text-2xl font-bold text-center" style={{textAlign: 'center'}}>📄 Practice and Track Your Progress</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center" style={{textAlign: 'center'}}>
+                <p className="text-center" style={{textAlign: 'center'}}>Test yourself and see improvements right away.</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+        <Link href="/quiz/create">
+          <Button size="lg" className="mt-10 bg-brand hover:bg-brand/90 py-6 px-8 text-lg">
+            Generate Your First Question <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
+        </Link>
+      </motion.section>
 
       {/* Who is it for? */}
-      <section className="container mx-auto px-4 py-16 text-center">
-        <h2 className="text-3xl font-bold mb-6">Who Is It For?</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-left">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl md:text-2xl font-bold">🧑‍🎓 Students</CardTitle>
-            </CardHeader>
-            <CardContent>Ace your exams with personalised questions & solutions</CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl md:text-2xl font-bold">👩‍🏫 Teachers</CardTitle>
-            </CardHeader>
-            <CardContent>Create exam papers & quizzes in seconds</CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl md:text-2xl font-bold">📚 Tutors & Schools</CardTitle>
-            </CardHeader>
-            <CardContent>Automate assessments & focus on teaching</CardContent>
-          </Card>
+      <motion.section 
+        className="container mx-auto px-4 py-20 text-center"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeIn}
+      >
+        <h2 className="text-3xl font-bold mb-12 text-center" style={{textAlign: 'center'}}>Who Is It For?</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 text-center">
+          <motion.div whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }}>
+            <Card className="h-full shadow-md">
+              <CardHeader className="text-center" style={{textAlign: 'center'}}>
+                <CardTitle className="text-xl md:text-2xl font-bold text-center" style={{textAlign: 'center'}}>🧑‍🎓 Students</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center" style={{textAlign: 'center'}}>
+                <p className="text-center" style={{textAlign: 'center'}}>Boost your grades with personalised revision questions and step-by-step solutions.</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+          
+          <motion.div whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }}>
+            <Card className="h-full shadow-md">
+              <CardHeader className="text-center" style={{textAlign: 'center'}}>
+                <CardTitle className="text-xl md:text-2xl font-bold text-center" style={{textAlign: 'center'}}>👩‍🏫 Teachers</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center" style={{textAlign: 'center'}}>
+                <p className="text-center" style={{textAlign: 'center'}}>Create customised exam papers in minutes, not hours.</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+          
+          <motion.div whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }}>
+            <Card className="h-full shadow-md">
+              <CardHeader className="text-center" style={{textAlign: 'center'}}>
+                <CardTitle className="text-xl md:text-2xl font-bold text-center" style={{textAlign: 'center'}}>📚 Tutors & Schools</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center" style={{textAlign: 'center'}}>
+                <p className="text-center" style={{textAlign: 'center'}}>Streamline assessments and track student progress effortlessly.</p>
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
-      {/* Testimonials Section */}
-      <section className="container mx-auto px-4 py-16 text-center">
-        <h2 className="text-3xl font-bold mb-8">What Teachers Are Saying</h2>
+      {/* Testimonials Section - Kept unchanged as instructed */}
+      <motion.section 
+        className="container mx-auto px-4 py-20 text-center"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeIn}
+      >
+        <h2 className="text-3xl font-bold mb-12">What Teachers Are Saying</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           
           {/* Testimonial 1 */}
-          <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
+          <motion.div 
+            whileHover={{ y: -5 }}
+            className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand"
+          >
             <p className="text-gray-800 italic">
               "Has the potential to be really good, and the bones of it already look excellent."
             </p>
             <p className="mt-4 text-gray-600 font-semibold">— Teacher, Institute of Education</p>
-          </div>
+          </motion.div>
 
           {/* Testimonial 2 */}
-          <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
+          <motion.div 
+            whileHover={{ y: -5 }}
+            className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand"
+          >
             <p className="text-gray-800 italic">
               "A tool that personalises learning would be a game-changer."
             </p>
             <p className="mt-4 text-gray-600 font-semibold">— SEN Co-Ordinator </p>
-          </div>
+          </motion.div>
 
           {/* Testimonial 3 */}
-          <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
+          <motion.div 
+            whileHover={{ y: -5 }}
+            className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand"
+          >
             <p className="text-gray-800 italic">
               "The potential of this is huge, like, HUGE."
             </p>
             <p className="mt-4 text-gray-600 font-semibold">— Seán McWeeney, 10+ years Maths Teacher, Founder NW StemFest</p>
-          </div>
+          </motion.div>
 
           {/* Testimonial 4 */}
-          <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
+          <motion.div 
+            whileHover={{ y: -5 }}
+            className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand"
+          >
             <p className="text-gray-800 italic">
               "I've been using this with my Leaving Certs, and it has really improved weaker students' ability and confidence."
             </p>
             <p className="mt-4 text-gray-600 font-semibold">—  Maths & Science Teacher</p>
-          </div>
+          </motion.div>
 
           {/* Testimonial 5 */}
-          <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
+          <motion.div 
+            whileHover={{ y: -5 }}
+            className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand"
+          >
             <p className="text-gray-800 italic">
               "Chef's kiss, everything StudyClix is missing."
             </p>
             <p className="mt-4 text-gray-600 font-semibold">—  Former StudyClix Employee, Maths & Science Teacher</p>
-          </div>
+          </motion.div>
 
           {/* Testimonial 6 */}
-          <div className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand">
+          <motion.div 
+            whileHover={{ y: -5 }}
+            className="bg-white shadow-lg rounded-lg p-6 border-l-4 border-brand"
+          >
             <p className="text-gray-800 italic">
               "The Irish education system is seriously missing out on tools like this. An app like your proposal would be game-changing for teachers to facilitate revision in an interactive way."
             </p>
             <p className="mt-4 text-gray-600 font-semibold">— 6+ Years Teacher, Ireland & UK</p>
-          </div>
-          <div className="flex gap-4 justify-center pt-16">
+          </motion.div>
+        </div>
+        <div className="flex gap-4 justify-center pt-16">
           <Link href="/quiz/create">
-            <Button size="lg" className="bg-brand hover:bg-brand py-3 md:py-4">
+            <Button size="lg" className="bg-brand hover:bg-brand/90 py-3 md:py-6 px-8 text-lg">
                <strong>Give it a Go 💪</strong>
             </Button>
           </Link>
-          </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Embedded YouTube Video */}
-      <section className="container mx-auto px-4 py-16 text-center">
-        <h2 className="text-3xl font-bold mb-6">See Examinaite in Action</h2>
+      <motion.section 
+        className="container mx-auto px-4 py-20 text-center"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeIn}
+      >
+        <h2 className="text-3xl font-bold mb-12">See Examinaite in Action</h2>
         
         {/* Video container with aspect ratio */}
         <div className="w-full max-w-3xl mx-auto aspect-video relative">
@@ -159,45 +240,115 @@ export default function Home() {
           ></iframe>
         </div>
         
-        <div className="flex gap-4 justify-center pt-16">
+        <p className="text-gray-600 mt-6 text-lg">
+          See how Examinaite simplifies exam preparation in 90 seconds.
+        </p>
+        
+        <div className="flex gap-4 justify-center pt-12">
           <Link href="/quiz/create">
-            <Button size="lg" className="bg-brand hover:bg-brand py-3 md:py-4">
+            <Button size="lg" className="bg-brand hover:bg-brand/90 py-6 px-8 text-lg">
               🟢 <strong>TRY FOR FREE</strong>
             </Button>
           </Link>
         </div>
-      </section>
+      </motion.section>
 
       {/* Why Examinaite? */}
-      <section className="container mx-auto px-4 pb-16 text-center">
-        <h2 className="text-3xl font-bold mb-6">Why Examinaite?</h2>
-        <ul className="text-lg text-gray-600 max-w-2xl mx-auto space-y-3">
-          <li>✅ Saves Time – No more hours spent crafting exam questions</li>
-          <li>✅ Real Exam Format – Every question follows official Leaving Cert standards</li>
-          <li>✅ Boosts Learning – Step-by-step solutions help students understand, not just memorize</li>
-          <li>✅ Perfect for Teachers & Students – Use for classroom prep, revision, or mock exams</li>
+      <motion.section 
+        className="container mx-auto px-4 py-20 text-center"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeIn}
+      >
+        <h2 className="text-3xl font-bold mb-12">Why Examinaite?</h2>
+        <ul className="text-lg text-gray-600 max-w-2xl mx-auto space-y-6">
+          <li className="flex items-start justify-center text-center">
+            <div className="flex flex-col items-center">
+              <CheckCircle className="text-green-500 mb-2 h-6 w-6" />
+              <div>
+                <strong className="text-xl text-gray-800">Instant Question Generation</strong>
+                <p className="mt-1">Save hours creating custom, Leaving Cert-standard questions.</p>
+              </div>
+            </div>
+          </li>
+          <li className="flex items-start justify-center text-center">
+            <div className="flex flex-col items-center">
+              <CheckCircle className="text-green-500 mb-2 h-6 w-6" />
+              <div>
+                <strong className="text-xl text-gray-800">Step-by-Step Solutions</strong>
+                <p className="mt-1">Enhance real understanding, not just memorisation.</p>
+              </div>
+            </div>
+          </li>
+          <li className="flex items-start justify-center text-center">
+            <div className="flex flex-col items-center">
+              <CheckCircle className="text-green-500 mb-2 h-6 w-6" />
+              <div>
+                <strong className="text-xl text-gray-800">Exam-Ready Format</strong>
+                <p className="mt-1">Practise confidently with officially formatted questions.</p>
+              </div>
+            </div>
+          </li>
         </ul>
-      </section>
+      </motion.section>
 
-      {/* Call to Action */}
-      <section className="container mx-auto px-4 py-16 text-center">
-        <p className="text-xl text-gray-600 mt-8">
-          📢 Join <strong>Hundreds of Leaving Cert students & teachers</strong> already using Examinaite!
-        </p>
-        <Link href="/quiz/create">
-          <Button 
-            size="lg" 
-            className="mt-6 bg-brand hover:bg-brand"
+      {/* Easy Onboarding Section (New Section) */}
+      <motion.section 
+        className="container mx-auto px-4 py-20 text-center bg-gray-50 rounded-xl shadow-inner"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeIn}
+      >
+        <h2 className="text-3xl font-bold mb-12">Get Started in 3 Easy Steps:</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <motion.div 
+            whileHover={{ scale: 1.05 }}
+            className="bg-white p-6 rounded-xl shadow-md"
           >
-            🔹 Start Generating Questions Now →
+            <div className="w-12 h-12 bg-brand text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto">1</div>
+            <h3 className="text-xl font-bold mt-4 mb-2">Sign Up for Free</h3>
+            <p className="text-gray-600">Create your account in seconds—no card required.</p>
+          </motion.div>
+          
+          <motion.div 
+            whileHover={{ scale: 1.05 }}
+            className="bg-white p-6 rounded-xl shadow-md"
+          >
+            <div className="w-12 h-12 bg-brand text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto">2</div>
+            <h3 className="text-xl font-bold mt-4 mb-2">Choose Your Subjects</h3>
+            <p className="text-gray-600">Pick the Leaving Cert topics you need most.</p>
+          </motion.div>
+          
+          <motion.div 
+            whileHover={{ scale: 1.05 }}
+            className="bg-white p-6 rounded-xl shadow-md"
+          >
+            <div className="w-12 h-12 bg-brand text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto">3</div>
+            <h3 className="text-xl font-bold mt-4 mb-2">Start Practising Instantly</h3>
+            <p className="text-gray-600">Immediate access to personalised questions and solutions.</p>
+          </motion.div>
+        </div>
+        
+        <Link href="/quiz/create">
+          <Button size="lg" className="mt-12 bg-brand hover:bg-brand/90 py-6 px-8 text-lg">
+            Start Free Now
           </Button>
         </Link>
-      </section>
+      </motion.section>
 
       {/* Backed By Section */}
-      <section className="container mx-auto px-4 py-16 text-center">
-        <h2 className="text-3xl font-bold mb-8">Backed By</h2>
-        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
+      <motion.section 
+        className="container mx-auto px-4 py-20 text-center"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeIn}
+      >
+        <h2 className="text-3xl font-bold mb-12">Backed By</h2>
+        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 mb-8">
           <Link 
             href="https://www.newfrontiers.ie/" 
             target="_blank" 
@@ -206,7 +357,7 @@ export default function Home() {
           >
             <Image 
               src="/images/backedby/enterprise-ireland.png" 
-              alt="Enterprise Ireland"
+              alt="Enterprise Ireland - Supporting Examinaite exam preparation platform"
               fill
               className="object-contain"
             />
@@ -219,7 +370,7 @@ export default function Home() {
           >
             <Image 
               src="/images/backedby/dogpatch-labs.png" 
-              alt="Dogpatch Labs"
+              alt="Dogpatch Labs - Backing Examinaite's innovative education solutions"
               fill
               className="object-contain"
             />
@@ -232,16 +383,40 @@ export default function Home() {
           >
             <Image 
               src="/images/backedby/ndrc.png" 
-              alt="NDRC"
+              alt="NDRC - Supporting Examinaite's growth in education technology"
               fill
               className="object-contain"
             />
           </Link>
         </div>
-        <p className="text-gray-600 mt-8">
-          Proudly supported by Ireland's leading innovation partners
+        <p className="text-gray-700 text-lg">
+          Trusted by Ireland's top innovation programmes—Enterprise Ireland, Dogpatch Labs, and NDRC.
         </p>
-      </section>   
+      </motion.section>
+      
+      {/* Final CTA */}
+      <motion.section 
+        className="container mx-auto px-4 py-16 text-center"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeIn}
+      >
+        <h2 className="text-3xl font-bold mb-6">Ready to Transform Your Exam Preparation?</h2>
+        <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+          Join hundreds of students and teachers who are already saving hours on exam preparation.
+        </p>
+        <Link href="/quiz/create">
+          <Button 
+            size="lg" 
+            className="bg-brand hover:bg-brand/90 py-6 px-10 text-xl"
+          >
+            Start Free Now <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
+        </Link>
+        <p className="text-sm text-gray-500 mt-3">No card needed. Takes seconds to start.</p>
+      </motion.section>
+
     </div>
   );
 }
