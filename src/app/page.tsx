@@ -24,7 +24,21 @@ export default function Home() {
         animate="visible"
         variants={fadeIn}
       >
-        <h1 className="text-4xl md:text-7xl font-bold tracking-tight mb-4 bg-gradient-to-r from-brand to-brand bg-clip-text text-transparent">
+        {/* Logo */}
+        <div className="flex justify-center mb-8 w-full">
+          <div className="w-[85%]">
+            <Image 
+              src="/images/logo/ExaminaiteLogo3.jpg"
+              alt="Examinaite Logo"
+              width={1200}
+              height={400}
+              className="rounded-md w-full h-auto"
+              priority
+            />
+          </div>
+        </div>
+
+        <h1 className="text-4xl md:text-7xl font-bold tracking-tight mb-4 pb-4 bg-gradient-to-r from-brand to-brand bg-clip-text text-transparent">
           Exam prep, for everyone
         </h1>
         <p className="text-lg md:text-2xl text-gray-700 max-w-3xl mx-auto mb-8">
