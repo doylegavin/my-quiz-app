@@ -13,6 +13,9 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
+import subjectData from "@/data/subjects";
+import { mathsHigherLevel, mathsOrdinaryLevel, mathsFoundationLevel } from "@/data/subjects/mathematics";
+import { physicalEducationHigherLevel } from "@/data/subjects/physical-education";
 
 type Paper = {
   name: string;
@@ -30,395 +33,25 @@ type Subject = {
 
 type SubjectStructure = Record<string, Subject>; // ✅ Ensures correct key usage
 
-
-
-
+// Replace hardcoded structures with imports
 const ExamStructureHL: SubjectStructure = {
-  mathematics: {
-    papers: {
-      Both: {
-        name: "Both",
-        sections: ["Short Questions", "Long Questions"],
-        topics: {
-          "Algebra": [],
-          "Complex Numbers": [],
-          "Sequences and Series": [],
-          "Functions": [],
-          "Differential Calculus": [],
-          "Integral Calculus": [],
-          "Financial Maths": [],
-          "Proof by Induction": [],
-          "Geometry": [],
-          "Trigonometry": [],
-          "Coordinate Geometry The Line": [],
-          "Coordinate Geometry The Circle": [],
-          "Probability": [],
-          "Statistics": [],
-          "Constructions": [],
-        },
-      },
-      paper1: {
-        name: "Paper 1",
-        sections: ["Short Questions", "Long Questions"],
-        topics: {
-          "Algebra": [
-            "Expressions, Notation & Substitution",
-            "Factorising",
-            "Expanding & Re-Grouping Expressions",
-            "Algebraic Fractions",
-            "Laws of Indices & Surds",
-            "Logarithms & Exponential Functions",
-            "Equations",
-            "Inequalities",
-            "Absolute Value (Modulus)",
-            "Functions & Graphing",
-            "Polynomials & The Factor Theorem",
-            "Solving Higher-Order Equations",
-            "Algebraic Manipulation",
-            "Problem Solving Using Algebra",
-          ],
-          "Complex Numbers": [
-            "Introduction to Complex Numbers",
-            "Argand Diagram",
-            "Addition & Subtraction of Complex Numbers",
-            "Multiplication & Division of Complex Numbers",
-            "Conjugates & Modulus",
-            "Polar Form",
-            "De Moivre's Theorem",
-          ],
-          "Sequences and Series": [
-            "Arithmetic Sequences",
-            "Arithmetic Series",
-            "Geometric Sequences",
-            "Geometric Series",
-            "Summation Notation",
-            "Limits of Sequences",
-            "Infinite Series",
-          ],
-          "Functions": [
-            "Linear Functions",
-            "Quadratic Functions",
-            "Cubic Functions",
-            "Exponential Functions",
-            "Logarithmic Functions",
-            "Transformations of Functions",
-            "Graphing Functions",
-          ],
-          "Differential Calculus": [
-            "Limits and Continuity",
-            "First Derivatives",
-            "Second Derivatives",
-            "Maxima and Minima",
-            "Slopes of Tangents",
-            "Differentiation from First Principles",
-            "Applications of Differentiation",
-          ],
-          "Integral Calculus": [
-            "Integration and Indefinite Integrals",
-            "Definite Integrals and Areas",
-            "Trapezoidal Rule",
-          ],
-          "Financial Maths": [
-            "Compound Interest",
-            "Depreciation",
-            "Loans and Investments",
-            "Annuities",
-            "Present Value",
-            "Future Value",
-          ],
-          "Proof by Induction": [
-            "Introduction to Induction",
-            "Summation Proofs",
-            "Divisibility Proofs",
-            "Inequality Proofs",
-          ],
-        },
-      },
-      paper2: {
-        name: "Paper 2",
-        sections: ["Short Questions", "Long Questions"],
-        topics: {
-          "Geometry": [
-            "Basic Geometric Concepts",
-            "Angles & Lines",
-            "Triangles & Congruence",
-            "Quadrilaterals",
-            "Circles & Theorems",
-            "Proofs in Geometry",
-          ],
-          "Trigonometry": [
-            "Right-Angled Triangles & Pythagoras",
-            "Trigonometric Ratios",
-            "Special Angles (30°, 45°, 60°)",
-            "The Unit Circle",
-            "Graphing Trigonometric Functions",
-            "Solving Trigonometric Equations",
-            "The Sine Rule",
-            "The Cosine Rule",
-            "Area of a Triangle",
-            "3D Trigonometry Problems",
-          ],
-          "Coordinate Geometry The Line": [
-            "Distance Between Two Points",
-            "Midpoint of a Line Segment",
-            "Slope of a Line",
-            "Equation of a Line",
-            "Intersection of Lines",
-            "Further Equations",
-          ],
-          "Coordinate Geometry The Circle": [
-            "Equations of Circles",
-            "Lines and Circles",
-            "Points Inside, Outside, or On a Circle",
-            "Tangents and Chords",
-          ],
-          "Probability": [
-            "Fundamental Principle of Counting",
-            "Permutations & Combinations",
-            "Probability Theory",
-            "Independent & Dependent Events",
-            "Tree Diagrams",
-            "Expected Value",
-            "The Binomial Distribution",
-            "The Normal Distribution",
-          ],
-          "Statistics": [
-            "Measures of Central Tendency",
-            "Measures of Variation",
-            "Probability Distributions",
-            "The Normal Distribution",
-            "Confidence Intervals",
-            "Hypothesis Testing",
-            "Linear Regression",
-          ],
-          "Constructions": [
-            "Basic Constructions",
-            "Higher-Level Constructions",
-            "Loci",
-          ],
-        },
-      },
-    },
-    difficulty: ["Random", "Easy", "Medium", "Hard"],
-    levels: ["Higher Level"],
-  },
+  mathematics: mathsHigherLevel.mathematics,
+  physicalEducation: physicalEducationHigherLevel.physicalEducation
 };
-
 
 const ExamStructureOL: SubjectStructure = {
-  mathematics: {
-    papers: {
-      Both: {
-        name: "Both",
-        sections: ["Short Questions", "Long Questions"],
-        topics: {
-          "Algebra": [],
-          "Complex Numbers": [],
-          "Sequences and Series": [],
-          "Functions": [],
-          "Differential Calculus": [],
-          "Financial Maths": [],
-          "Geometry": [],
-          "Trigonometry": [],
-          "Coordinate Geometry The Line": [],
-          "Coordinate Geometry The Circle": [],
-          "Probability": [],
-          "Statistics": [],
-          "Constructions": [],
-        },
-      },
-      paper1: {
-        name: "Paper 1",
-        sections: ["Short Questions", "Long Questions"],
-        topics: {
-          "Algebra": [
-            "Expressions, Notation & Substitution",
-            "Factorising",
-            "Expanding & Re-Grouping Expressions",
-            "Algebraic Fractions",
-            "Equations",
-            "Inequalities",
-            "Absolute Value (Modulus)",
-            "Algebraic Manipulation",
-            "Problem Solving Using Algebra",
-          ],
-          "Complex Numbers": [
-            "Introduction to Complex Numbers",
-            "Addition & Subtraction",
-            "Multiplication & Division",
-            "Conjugates & Modulus",
-            "Argand Diagram",
-          ],
-          "Sequences and Series": [
-            "Arithmetic Sequences",
-            "Arithmetic Series",
-            "Geometric Sequences",
-            "Geometric Series",
-          ],
-          "Functions": [
-            "Linear Functions",
-            "Quadratic Functions",
-            "Graphing Functions",
-          ],
-          "Differential Calculus": [
-            "First Derivatives",
-            "Second Derivatives",
-            "Slopes of Tangents",
-            "Maxima and Minima",
-          ],
-          "Financial Maths": [
-            "Compound Interest",
-            "Depreciation",
-            "Loans and Investments",
-          ],
-        },
-      },
-      paper2: {
-        name: "Paper 2",
-        sections: ["Short Questions", "Long Questions"],
-        topics: {
-          "Geometry": [
-            "Basic Geometric Concepts",
-            "Angles & Lines",
-            "Triangles & Congruence",
-            "Quadrilaterals",
-            "Circles & Theorems",
-          ],
-          "Trigonometry": [
-            "Right-Angled Triangles & Pythagoras",
-            "Trigonometric Ratios",
-            "Special Angles (30°, 45°, 60°)",
-            "The Sine Rule",
-            "The Cosine Rule",
-            "Area of a Triangle",
-          ],
-          "Coordinate Geometry The Line": [
-            "Distance Between Two Points",
-            "Midpoint of a Line Segment",
-            "Slope of a Line",
-            "Equation of a Line",
-            "Intersection of Lines",
-          ],
-          "Coordinate Geometry The Circle": [
-            "Equations of Circles",
-            "Lines and Circles",
-            "Points Inside, Outside, or On a Circle",
-            "Tangents and Chords",
-          ],
-          "Probability": [
-            "Fundamental Principle of Counting",
-            "Permutations & Combinations",
-            "Probability Theory",
-            "Tree Diagrams",
-            "Expected Value",
-          ],
-          "Statistics": [
-            "Measures of Central Tendency",
-            "Measures of Variation",
-            "Probability Distributions",
-            "The Normal Distribution",
-          ],
-          "Constructions": [
-            "Basic Constructions",
-            "Higher-Level Constructions",
-          ],
-        },
-      },
-    },
-    difficulty: ["Random", "Easy", "Medium", "Hard"],
-    levels: ["Ordinary Level"],
-  },
+  mathematics: mathsOrdinaryLevel.mathematics
 };
-
-
 
 const ExamStructureFL: SubjectStructure = {
-  mathematics: {
-    papers: {
-      Both: {
-        name: "Both",
-        sections: ["Short Questions", "Long Questions"],
-        topics: {
-          "Number Theory": [],
-          "Algebra": [],
-          "Functions": [],
-          "Geometry": [],
-          "Trigonometry": [],
-          "Statistics": [],
-          "Probability": [],
-        },
-      },
-    },
-    difficulty: ["Random", "Easy", "Medium"],
-    levels: ["Foundation Level"],
-  },
+  mathematics: mathsFoundationLevel.mathematics
 };
 
-
-/* 
-const examStructure: SubjectStructure = {
-  mathematics: {
-    
-    papers: {
-
-      Both: {
-        name: "Both",
-        sections: ["Short Questions", "Long Questions"],
-        topics: [
-          "Random",
-          "Algebra",
-          "Complex Numbers",
-          "Sequences and Series",
-          "Functions",
-          "Calculus",
-          "Financial Maths",
-          "Proof by Induction",
-          "Geometry",
-          "Trigonometry",
-          "Coordinate Geometry The Line",
-           "Coordinate Geometry The Circle",
-          "Probability",
-          "Statistics",
-          "Constructions"
-        ]
-      },
-
-      paper1: {
-        name: "Paper 1",
-        sections: [ "Short Questions", "Long Questions"],
-        topics: [
-          "Random",
-          "Algebra",
-          "Complex Numbers",
-          "Sequences and Series",
-          "Functions",
-          "Calculus",
-          "Financial Maths",
-          "Proof by Induction"
-          
-        ]
-      },
-      paper2: {
-        name: "Paper 2",
-        sections: ["Short Questions", "Long Questions"],
-        topics: [
-          "Random",
-          "Geometry",
-          "Trigonometry",
-          "Coordinate Geometry The Line",
-           "Coordinate Geometry The Circle",
-          "Probability",
-          "Statistics",
-          "Constructions"
-        ]
-      }
-    },
-    difficulty: ["Random", "Easy", "Medium", "Hard"],
-    levels: ["Higher Level", "Ordinary Level", "Foundation Level"]
-  },
+// Update this to use the imported physical education data
+const ExamStructureLCPE: SubjectStructure = {
+  physicalEducation: physicalEducationHigherLevel.physicalEducation
 };
- */
-  
+
 export function QuizForm() {
   const [selectedSubject, setSelectedSubject] = useState<string>("mathematics");
   const [selectedPaper, setSelectedPaper] = useState<string>("Both");
@@ -432,13 +65,49 @@ export function QuizForm() {
   const [progress, setProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Define all available levels separately - this breaks the circular dependency
-  const allLevels = ["Higher Level", "Ordinary Level", "Foundation Level"];
+  // Define levels for each subject
+  const getAvailableLevels = (subject: string) => {
+    if (subject === "mathematics") {
+      return ["Higher Level", "Ordinary Level", "Foundation Level"];
+    } else if (subject === "physicalEducation") {
+      return ["Higher Level"];
+    }
+    return ["Higher Level", "Ordinary Level"];
+  };
+
+  // Get available levels based on current subject
+  const allLevels = getAvailableLevels(selectedSubject);
+
+  // Set a valid level when subject changes
+  useEffect(() => {
+    const levels = getAvailableLevels(selectedSubject);
+    if (!levels.includes(selectedLevel)) {
+      setSelectedLevel(levels[0]);
+    }
+    
+    // Reset paper selection when subject changes to prevent undefined errors
+    // Get the first available paper for the selected subject
+    const currentExamStructure = getExamStructure();
+    if (currentExamStructure && currentExamStructure[selectedSubject]) {
+      const availablePapers = Object.keys(currentExamStructure[selectedSubject].papers || {});
+      if (availablePapers.length > 0 && !availablePapers.includes(selectedPaper)) {
+        setSelectedPaper(availablePapers[0]);
+      }
+    }
+  }, [selectedSubject, selectedLevel]);
 
   const getExamStructure = () => {
-    if (selectedLevel === "Higher Level") return ExamStructureHL;
-    if (selectedLevel === "Ordinary Level") return ExamStructureOL;
-    return ExamStructureFL;
+    if (selectedLevel === "Higher Level") {
+      return ExamStructureHL;
+    } 
+    if (selectedLevel === "Ordinary Level") {
+      // Check if the selected subject is available in OL
+      if (selectedSubject === "physicalEducation") {
+        return ExamStructureLCPE; // Physical Education is only in HL and LCPE structures
+      }
+      return ExamStructureOL;
+    }
+    return ExamStructureFL; // Foundation Level
   };
   
   // Get the exam structure AFTER a level has been selected
@@ -447,21 +116,30 @@ export function QuizForm() {
   // Update available subtopics when selectedTopic changes
   useEffect(() => {
     if (selectedLevel !== "Foundation Level" && selectedTopic !== "Random") {
-      const currentExamStructure = getExamStructure();
-      
-      // Type assert that selectedPaper is a key of the papers object
-      const paperKey = selectedPaper as keyof typeof currentExamStructure[typeof selectedSubject]['papers'];
-      const selectedPaperData = currentExamStructure[selectedSubject].papers[paperKey];
-      
-      if (selectedPaperData && 'topics' in selectedPaperData) {
-        // Check if topics is an object and if selectedTopic exists in it
-        if (typeof selectedPaperData.topics === 'object' && selectedTopic in selectedPaperData.topics) {
-          const subtopics = selectedPaperData.topics[selectedTopic] || [];
-          setAvailableSubtopics(subtopics);
+      try {
+        const currentExamStructure = getExamStructure();
+        if (!currentExamStructure || !currentExamStructure[selectedSubject]) {
+          setAvailableSubtopics([]);
+          return;
+        }
+        
+        // Type assert that selectedPaper is a key of the papers object
+        const paperKey = selectedPaper as keyof typeof currentExamStructure[typeof selectedSubject]['papers'];
+        const selectedPaperData = currentExamStructure[selectedSubject]?.papers[paperKey];
+        
+        if (selectedPaperData && 'topics' in selectedPaperData) {
+          // Check if topics is an object and if selectedTopic exists in it
+          if (typeof selectedPaperData.topics === 'object' && selectedTopic in selectedPaperData.topics) {
+            const subtopics = selectedPaperData.topics[selectedTopic] || [];
+            setAvailableSubtopics(subtopics);
+          } else {
+            setAvailableSubtopics([]);
+          }
         } else {
           setAvailableSubtopics([]);
         }
-      } else {
+      } catch (error) {
+        console.error("Error updating subtopics:", error);
         setAvailableSubtopics([]);
       }
 
@@ -471,6 +149,43 @@ export function QuizForm() {
       setSelectedSubtopic("");
     }
   }, [selectedTopic, selectedPaper, selectedLevel, selectedSubject]);
+
+  // Reset default selections when subject changes
+  useEffect(() => {
+    const currentExamStructure = getExamStructure();
+    if (currentExamStructure && currentExamStructure[selectedSubject]) {
+      // Set default difficulty
+      const availableDifficulties = currentExamStructure[selectedSubject].difficulty || [];
+      if (availableDifficulties.length > 0 && !availableDifficulties.includes(selectedDifficulty)) {
+        setSelectedDifficulty(availableDifficulties[0]);
+      }
+      
+      // Set default paper if not already set
+      const availablePapers = Object.keys(currentExamStructure[selectedSubject].papers || {});
+      if (availablePapers.length > 0 && !availablePapers.includes(selectedPaper)) {
+        const newPaper = availablePapers[0];
+        setSelectedPaper(newPaper);
+        
+        // Set default section for the new paper
+        const sections = currentExamStructure[selectedSubject]?.papers[newPaper]?.sections || [];
+        if (sections.length > 0) {
+          setSelectedSection(sections[0]);
+        } else {
+          // Reset to default if no sections available
+          setSelectedSection("Short Questions");
+        }
+        
+        // Set default topic for the new paper
+        const topics = Object.keys(currentExamStructure[selectedSubject]?.papers[newPaper]?.topics || {});
+        if (topics.length > 0) {
+          setSelectedTopic(topics[0]);
+        } else {
+          // Reset to default if no topics available
+          setSelectedTopic("Random");
+        }
+      }
+    }
+  }, [selectedSubject]);
 
   const errorMessages = [
     "Oops! Question was too hard! Try again",
@@ -509,15 +224,24 @@ const handleSubmit = async (e: React.FormEvent) => {
     setLoading(false);
     return;
   }
+  
+  // Check for placeholder values
+  if (selectedSection === "no-sections-available" || selectedTopic === "no-topics-available") {
+    alert("Please select valid sections and topics.");
+    setLoading(false);
+    return;
+  }
+  
   simulateProgress();
   
   // Prepare the data to send to the API
   const requestData = {
     subject: selectedSubject,
     difficulty: selectedDifficulty,
-    topics: selectedTopic, // Changed from 'topic' to 'topics'
+    topics: selectedTopic,
     level: selectedLevel,
     paper: selectedPaper,
+    paperType: selectedSubject === "physicalEducation" ? "strand" : "paper",
     sections: selectedSection,
     // Add subtopic if it exists in your form
     ...(selectedSubtopic && { subtopic: selectedSubtopic })
@@ -582,7 +306,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     <SelectValue placeholder="Select subject" />
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.keys(examStructure).map((subject) => (
+                    {Object.keys(subjectData).map((subject) => (
                       <SelectItem key={subject} value={subject}>
                         {subject.charAt(0).toUpperCase() + subject.slice(1)}
                       </SelectItem>
@@ -618,7 +342,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                           <SelectValue placeholder="Select difficulty" />
                         </SelectTrigger>
                         <SelectContent>
-                          {examStructure[selectedSubject].difficulty.map((difficulty) => (
+                          {(examStructure[selectedSubject]?.difficulty || []).map((difficulty) => (
                             <SelectItem key={difficulty} value={difficulty}>
                               {difficulty}
                             </SelectItem>
@@ -628,13 +352,13 @@ const handleSubmit = async (e: React.FormEvent) => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label>Paper</Label>
+                      <Label>{selectedSubject === "physicalEducation" ? "Strand" : "Paper"}</Label>
                       <Select onValueChange={setSelectedPaper}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select paper" />
+                          <SelectValue placeholder={selectedSubject === "physicalEducation" ? "Select strand" : "Select paper"} />
                         </SelectTrigger>
                         <SelectContent>
-                          {Object.entries(examStructure[selectedSubject].papers).map(
+                          {Object.entries(examStructure[selectedSubject]?.papers || {}).map(
                             ([key, paper]) => (
                               <SelectItem key={key} value={key}>
                                 {paper.name}
@@ -647,36 +371,52 @@ const handleSubmit = async (e: React.FormEvent) => {
 
                     <div className="space-y-2">
                       <Label>Section</Label>
-                      <Select onValueChange={setSelectedSection}>
+                      <Select onValueChange={(value) => {
+                        // Skip setting the value if it's the placeholder
+                        if (value !== "no-sections-available") {
+                          setSelectedSection(value);
+                        }
+                      }}>
                         <SelectTrigger>
                           <SelectValue placeholder="Short Questions" />
                         </SelectTrigger>
                         <SelectContent>
-                          {examStructure[selectedSubject].papers[selectedPaper].sections.map(
-                            (section) => (
-                              <SelectItem key={section} value={section}>
-                                {section}
-                              </SelectItem>
-                            )
-                          )}
+                          {examStructure[selectedSubject]?.papers[selectedPaper]?.sections?.length > 0 ? 
+                            examStructure[selectedSubject]?.papers[selectedPaper]?.sections?.map(
+                              (section) => (
+                                <SelectItem key={section} value={section}>
+                                  {section}
+                                </SelectItem>
+                              )
+                            ) : 
+                            <SelectItem value="no-sections-available">No sections available</SelectItem>
+                          }
                         </SelectContent>
                       </Select>
                     </div>
 
                     <div className="space-y-2">
                       <Label>Topic</Label>
-                      <Select onValueChange={setSelectedTopic}>
+                      <Select onValueChange={(value) => {
+                        // Skip setting the value if it's the placeholder
+                        if (value !== "no-topics-available") {
+                          setSelectedTopic(value);
+                        }
+                      }}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select topic" />
                         </SelectTrigger>
                         <SelectContent>
-                          {Object.keys(examStructure[selectedSubject].papers[selectedPaper].topics).map(
-                            (topics) => (
-                              <SelectItem key={topics} value={topics}>
-                                {topics}
-                              </SelectItem>
-                            )
-                          )}
+                          {Object.keys(examStructure[selectedSubject]?.papers[selectedPaper]?.topics || {}).length > 0 ? 
+                            Object.keys(examStructure[selectedSubject]?.papers[selectedPaper]?.topics || {}).map(
+                              (topics) => (
+                                <SelectItem key={topics} value={topics}>
+                                  {topics}
+                                </SelectItem>
+                              )
+                            ) : 
+                            <SelectItem value="no-topics-available">No topics available</SelectItem>
+                          }
                         </SelectContent>
                       </Select>
                     </div>

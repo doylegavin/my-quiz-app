@@ -89,7 +89,7 @@ export default function GeneratedQuizClient() {
     .filter(Boolean)
     .join(" • ");
 
-  const generatedFilename = `Maths${level === "higher" ? "HL" : "OL"}${(subtopic || topic).replace(/\s+/g, "")}P${paper === "paper1" ? "1" : "2"}${difficulty !== "Random" ? difficulty : ""}LongQs.pdf`;
+  const generatedFilename = `${formattedSubject}${level.includes("Higher") ? "HL" : level.includes("Ordinary") ? "OL" : level.includes("Foundation") ? "FL" : ""}${(subtopic || topic).replace(/\s+/g, "")}${paper && paper !== "Both" ? (paper.includes("paper") ? `P${paper === "paper1" ? "1" : "2"}` : paper.replace(/\s+/g, "")) : ""}${difficulty !== "Random" ? difficulty : ""}${sections ? sections.replace(/\s+/g, "") : ""}.pdf`;
 
   useEffect(() => {
     if (typeof window !== "undefined" && (window as any).MathJax) {
