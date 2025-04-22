@@ -11,8 +11,7 @@ import Autocomplete from "./Autocomplete";
 import Select from "./Select";
 import PaperList from "./PaperList";
 import data from '@/data/data.json';
-import FormulaBook from "./FormulaBook";
-import SlicePapers from "./SlicePapers";
+import dynamic from 'next/dynamic';
 import Link from "next/link";
 
 // Available exam types
@@ -46,6 +45,52 @@ const examTypeMapping = {
   'jc': 'Junior Cert',
   'lb': 'Leaving Cert Applied'
 };
+
+// Dynamically import FormulaBook with a fallback
+const FormulaBook = dynamic(
+  () => import('./FormulaBook').catch(() => {
+    // Return a simple component if FormulaBook fails to load
+    return () => (
+      <a 
+        href="https://www.examinations.ie/misc-doc/BI-EX-22184417.pdf"
+        target="_blank"
+        rel="noreferrer"
+        className="block w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white text-center py-4 px-6 rounded-lg shadow-md hover:shadow-lg transition-all hover:scale-105 font-medium"
+      >
+        <div className="flex items-center justify-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+          </svg>
+          <span>Formula and Tables Book</span>
+        </div>
+      </a>
+    );
+  }),
+  { ssr: false, loading: () => <div className="h-14 bg-orange-500 rounded-lg animate-pulse"></div> }
+);
+
+// Add the SlicePapers dynamic import
+const SlicePapers = dynamic(
+  () => import('./SlicePapers').catch(() => {
+    // Return a simple component if SlicePapers fails to load
+    return () => (
+      <div className="w-full max-w-md mx-auto border border-gray-200 rounded-lg shadow-sm bg-white">
+        <div className="w-full p-4 text-center text-white bg-gray-800 rounded-t-lg">
+          Slice Papers
+        </div>
+        <div className="p-4">
+          <p className="text-sm text-center text-gray-500 mb-4">
+            Get a range of pages from a range of years
+          </p>
+          <div className="p-4 bg-gray-100 rounded text-center">
+            Component loading failed. Please refresh the page.
+          </div>
+        </div>
+      </div>
+    );
+  }),
+  { ssr: false, loading: () => <div className="h-40 bg-gray-300 rounded-lg animate-pulse"></div> }
+);
 
 export default function ExamPaperExplorer() {
   // State for search parameters
