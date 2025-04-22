@@ -5,8 +5,8 @@ import { ExamPaper, getFavoriteSubjects, toggleFavoriteSubject } from "@/lib/uti
 import { getPapersFromStaticData, getSubjectsForExamType } from "@/lib/utils/examDataAccess";
 import { cn } from "@/lib/utils";
 import { FiFilter } from "react-icons/fi";
-import { StarIcon } from '@heroicons/react/24/solid';
-import { StarIcon as StarIconOutline } from 'lucide-react';
+import { FiStar } from 'react-icons/fi';
+import { FiStar as StarOutline } from 'react-icons/fi';
 import Autocomplete from "./Autocomplete";
 import Select from "./Select";
 import PaperList from "./PaperList";
@@ -419,9 +419,9 @@ export default function ExamPaperExplorer() {
                         }}
                       >
                         {favoriteSubjects.includes(option) ? (
-                          <StarIcon className="h-full w-full text-yellow-400" />
+                          <FiStar className="h-full w-full text-yellow-400 fill-current" />
                         ) : (
-                          <StarIconOutline className="h-full w-full text-gray-400" />
+                          <StarOutline className="h-full w-full text-gray-400" />
                         )}
                       </button>
                     </div>
