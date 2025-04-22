@@ -1,8 +1,25 @@
 import data from '@/data/data.json';
 import { ExamPaper } from './examinations';
 
+// Define interface for the data structure
+interface ExamData {
+  [examType: string]: {
+    [subject: string]: {
+      [year: string]: Array<{
+        url: string;
+        type: string;
+        details: string;
+      }>
+    }
+  }
+}
+
+interface SubjectMapping {
+  [id: string]: string;
+}
+
 // Mapping between internal codes and UI labels
-const examTypeMapping = {
+const examTypeMapping: {[key: string]: string} = {
   'lc': 'Leaving Cert',
   'jc': 'Junior Cert',
   'lb': 'Leaving Cert Applied'
@@ -10,7 +27,7 @@ const examTypeMapping = {
 
 // Get the subject name from subNumsToNames mapping or use the ID if not found
 function getSubjectName(id: string): string {
-  const subNumsToNames = (data as any).subNumsToNames || {};
+  const subNumsToNames = (data as any).subNumsToNames as SubjectMapping || {};
   return subNumsToNames[id] || id;
 }
 
@@ -26,13 +43,13 @@ export function getPapersFromStaticData(
   
   try {
     // Get the exam section of the data
-    const examData = data[examType as keyof typeof data];
+    const examData = (data as unknown as ExamData)[examType];
     if (!examData) return [];
     
     // Find numeric ID for the given subject name
     let subjectId: string | undefined;
     if (subject) {
-      const subNumsToNames = (data as any).subNumsToNames || {};
+      const subNumsToNames = (data as any).subNumsToNames as SubjectMapping || {};
       for (const [id, name] of Object.entries(subNumsToNames)) {
         if (name === subject) {
           subjectId = id;
@@ -74,7 +91,7 @@ export function getPapersFromStaticData(
           if (language && paperLanguage !== language) continue;
           
           // Extract level from URL
-          const levelMatch = {
+          const levelMatch: {[key: string]: string} = {
             'AL': 'Higher',
             'GL': 'Ordinary',
             'BL': 'Foundation',
@@ -121,10 +138,10 @@ export function getPapersFromStaticData(
 export function getSubjectsForExamType(examType: string): string[] {
   try {
     // Get the subject ID mapping
-    const subNumsToNames = (data as any).subNumsToNames || {};
+    const subNumsToNames = (data as any).subNumsToNames as SubjectMapping || {};
     
     // Get subject IDs for this exam type
-    const examData = data[examType as keyof typeof data];
+    const examData = (data as unknown as ExamData)[examType];
     if (!examData) return [];
     
     // Map IDs to names and sort alphabetically
