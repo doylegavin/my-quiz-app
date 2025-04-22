@@ -52,7 +52,7 @@ const FormulaBook = dynamic(
     // Return a simple component if FormulaBook fails to load
     return () => (
       <a 
-        href="https://www.examinations.ie/misc-doc/BI-EX-22184417.pdf"
+        href="https://www.examinations.ie/misc-doc/BI-EX-7266997.pdf"
         target="_blank"
         rel="noreferrer"
         className="block w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white text-center py-4 px-6 rounded-lg shadow-md hover:shadow-lg transition-all hover:scale-105 font-medium"
