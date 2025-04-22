@@ -58,11 +58,16 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
+// Configure matcher to include certain paths and exclude others
 export const config = {
   matcher: [
-    '/api/auth/:path*',
-    '/quiz/create',
-    '/profile',
-    '/profile/:path*'
+    /*
+     * Match all paths except for:
+     * 1. /api routes
+     * 2. /_next (Next.js internals)
+     * 3. /_static (static files)
+     * 4. /favicon.ico, /manifest.json, etc.
+     */
+    '/((?!api|_next|_static|_vercel|[\\w-]+\\.\\w+).*)',
   ],
 }; 
