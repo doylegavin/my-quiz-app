@@ -1,16 +1,30 @@
-import physicalEducationHigherLevel from './higher-level';
-import { LevelData } from '../types';
+import higherLevel from './higher-level';
 
-// For now, we only have Higher Level, but we can add more levels later
-const physicalEducation: LevelData = {
-  physicalEducation: {
-    papers: {
-      ...physicalEducationHigherLevel.physicalEducation.papers,
+export const physicalEducation = {
+  papers: {
+    "Both": {
+      name: "All Components",
+      sections: ["Written Examination", "Physical Activity Project", "Performance Assessment"],
+      topics: {}
     },
-    difficulty: ["Random", "Easy", "Medium", "Hard"],
-    levels: ["Higher Level"]
-  }
+    "Written": {
+      name: "Written Examination",
+      sections: ["Physical Activity", "Sport Science", "Contemporary Issues"],
+      topics: {}
+    },
+    "Project": {
+      name: "Physical Activity Project",
+      sections: ["Planning", "Performance", "Analysis"],
+      topics: {}
+    },
+    "Practical": {
+      name: "Performance Assessment",
+      sections: ["Physical Competencies", "Performance Skills", "Applied Techniques"],
+      topics: {}
+    }
+  },
+  difficulty: ["Random", "Easy", "Medium", "Hard"],
+  levels: ["Higher Level"]
 };
 
-export { physicalEducationHigherLevel };
-export default physicalEducation; 
+export { higherLevel }; 

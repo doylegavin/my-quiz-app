@@ -1,16 +1,26 @@
-import biologyHigherLevel from './higher-level';
-import biologyOrdinaryLevel from './ordinary-level';
-import { LevelData } from '../types';
+import higherLevel from './higher-level';
+import ordinaryLevel from './ordinary-level';
 
-const biology: LevelData = {
-  biology: {
-    papers: {
-      ...biologyHigherLevel.biology.papers,
+export const biology = {
+  papers: {
+    "Both": {
+      name: "All Papers",
+      sections: ["Cell Biology", "Human Biology", "Plant Biology", "Microbiology & Genetics", "Ecology"],
+      topics: {}
     },
-    difficulty: ["Random", "Easy", "Medium", "Hard"],
-    levels: ["Higher Level", "Ordinary Level"]
-  }
+    "Section A": {
+      name: "Short Questions",
+      sections: ["Cell Biology", "Human Biology", "Plant Biology"],
+      topics: {}
+    },
+    "Section B": {
+      name: "Long Questions",
+      sections: ["Microbiology & Genetics", "Ecology", "Applied Biology"],
+      topics: {}
+    }
+  },
+  difficulty: ["Random", "Easy", "Medium", "Hard"],
+  levels: ["Higher Level", "Ordinary Level"]
 };
 
-export { biologyHigherLevel, biologyOrdinaryLevel };
-export default biology;
+export { higherLevel, ordinaryLevel };

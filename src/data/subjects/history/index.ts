@@ -1,16 +1,31 @@
-import historyHigherLevel from './higher-level';
-import historyOrdinaryLevel from './ordinary-level';
-import { LevelData } from '../types';
+import higherLevel from './higher-level';
+import ordinaryLevel from './ordinary-level';
 
-const history: LevelData = {
-  history: {
-    papers: {
-      ...historyHigherLevel.history.papers,
+export const history = {
+  papers: {
+    "Both": {
+      name: "All Papers",
+      sections: ["Irish History", "European History", "World History", "Research Study"],
+      topics: {}
     },
-    difficulty: ["Random", "Easy", "Medium", "Hard"],
-    levels: ["Higher Level", "Ordinary Level"]
-  }
+    "Paper 1": {
+      name: "Documents Question",
+      sections: ["Irish History", "European History", "Document Analysis"],
+      topics: {}
+    },
+    "Paper 2": {
+      name: "Essays",
+      sections: ["Irish History", "European History", "World History"],
+      topics: {}
+    },
+    "Research": {
+      name: "Research Study Report",
+      sections: ["Historical Research", "Document Analysis", "Extended Essay"],
+      topics: {}
+    }
+  },
+  difficulty: ["Random", "Easy", "Medium", "Hard"],
+  levels: ["Higher Level", "Ordinary Level"]
 };
 
-export { historyHigherLevel, historyOrdinaryLevel };
-export default history;
+export { higherLevel, ordinaryLevel };

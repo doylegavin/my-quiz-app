@@ -10,8 +10,29 @@ import DiagramRenderer from "@/components/DiagramRenderer";
 
 // Import PDFButton with no SSR to avoid hydration issues
 const PDFButton = dynamic(
-  () => import('@/components/PDFButton'),
-  { ssr: false }
+  () => import('@/components/PDFButton').catch(err => {
+    console.error("Error loading PDFButton:", err);
+    // Return a minimal fallback component
+    return () => (
+      <button
+        className="px-6 py-2 bg-gray-500 text-white rounded-md font-medium shadow-md cursor-not-allowed opacity-60"
+        disabled
+      >
+        PDF Generation Unavailable
+      </button>
+    );
+  }),
+  { 
+    ssr: false,
+    loading: () => (
+      <button
+        className="px-6 py-2 bg-gray-400 text-white rounded-md font-medium shadow-md cursor-wait"
+        disabled
+      >
+        Loading PDF Button...
+      </button>
+    )
+  }
 );
 
 // Export this function so it can be used in PDFButton

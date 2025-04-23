@@ -1,16 +1,26 @@
-import physicsHigherLevel from './higher-level';
-import physicsOrdinaryLevel from './ordinary-level';
-import { LevelData } from '../types';
+import higherLevel from './higher-level';
+import ordinaryLevel from './ordinary-level';
 
-const physics: LevelData = {
-  physics: {
-    papers: {
-      ...physicsHigherLevel.physics.papers,
+export const physics = {
+  papers: {
+    "Both": {
+      name: "All Papers",
+      sections: ["Mechanics", "Heat", "Waves", "Electricity & Magnetism", "Modern Physics"],
+      topics: {}
     },
-    difficulty: ["Random", "Easy", "Medium", "Hard"],
-    levels: ["Higher Level", "Ordinary Level"]
-  }
+    "Section A": {
+      name: "Short Questions",
+      sections: ["Mechanics", "Heat", "Waves"],
+      topics: {}
+    },
+    "Section B": {
+      name: "Long Questions",
+      sections: ["Electricity & Magnetism", "Modern Physics", "Applied Physics"],
+      topics: {}
+    }
+  },
+  difficulty: ["Random", "Easy", "Medium", "Hard"],
+  levels: ["Higher Level", "Ordinary Level"]
 };
 
-export { physicsHigherLevel, physicsOrdinaryLevel };
-export default physics;
+export { higherLevel, ordinaryLevel };

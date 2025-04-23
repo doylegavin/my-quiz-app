@@ -1,17 +1,27 @@
-import englishHigherLevel from './higher-level';
-import englishOrdinaryLevel from './ordinary-level';
-import englishFoundationLevel from './foundation-level';
-import { LevelData } from '../types';
+import higherLevel from './higher-level';
+import ordinaryLevel from './ordinary-level';
+import foundationLevel from './foundation-level';
 
-const english: LevelData = {
-  english: {
-    papers: {
-      ...englishHigherLevel.english.papers,
+export const english = {
+  papers: {
+    "Both": {
+      name: "All Papers",
+      sections: ["Comprehending", "Composing", "Literary Genres", "Poetry"],
+      topics: {}
     },
-    difficulty: ["Random", "Easy", "Medium", "Hard"],
-    levels: ["Higher Level", "Ordinary Level", "Foundation Level"]
-  }
+    "Paper 1": {
+      name: "Language and Comprehension",
+      sections: ["Comprehending", "Composing"],
+      topics: {}
+    },
+    "Paper 2": {
+      name: "Literature",
+      sections: ["Single Text", "Comparative Study", "Poetry"],
+      topics: {}
+    }
+  },
+  difficulty: ["Random", "Easy", "Medium", "Hard"],
+  levels: ["Higher Level", "Ordinary Level", "Foundation Level"]
 };
 
-export { englishHigherLevel, englishOrdinaryLevel, englishFoundationLevel };
-export default english; 
+export { higherLevel, ordinaryLevel, foundationLevel }; 

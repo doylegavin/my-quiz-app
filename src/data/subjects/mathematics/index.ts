@@ -1,17 +1,27 @@
-import mathsHigherLevel from './higher-level';
-import mathsOrdinaryLevel from './ordinary-level';
-import mathsFoundationLevel from './foundation-level';
-import { LevelData } from '../types';
+import higherLevel from './higher-level';
+import ordinaryLevel from './ordinary-level';
+import foundationLevel from './foundation-level';
 
-const mathematics: LevelData = {
-  mathematics: {
-    papers: {
-      ...mathsHigherLevel.mathematics.papers,
+export const mathematics = {
+  papers: {
+    "Both": {
+      name: "All Papers",
+      sections: ["Algebra", "Geometry", "Trigonometry", "Calculus", "Statistics", "Probability"],
+      topics: {}
     },
-    difficulty: ["Random", "Easy", "Medium", "Hard"],
-    levels: ["Higher Level", "Ordinary Level", "Foundation Level"]
-  }
+    "Paper 1": {
+      name: "Paper 1",
+      sections: ["Algebra", "Complex Numbers", "Calculus"],
+      topics: {}
+    },
+    "Paper 2": {
+      name: "Paper 2",
+      sections: ["Geometry", "Trigonometry", "Statistics", "Probability"],
+      topics: {}
+    }
+  },
+  difficulty: ["Random", "Easy", "Medium", "Hard"],
+  levels: ["Higher Level", "Ordinary Level", "Foundation Level"]
 };
 
-export { mathsHigherLevel, mathsOrdinaryLevel, mathsFoundationLevel };
-export default mathematics; 
+export { higherLevel, ordinaryLevel, foundationLevel }; 

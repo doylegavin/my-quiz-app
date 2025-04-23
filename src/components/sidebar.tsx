@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { FiMenu, FiX, FiHome, FiEdit, FiInfo, FiSend, FiUser, FiLogOut, FiLogIn } from "react-icons/fi";
+import { FiMenu, FiX, FiHome, FiEdit, FiInfo, FiSend, FiUser, FiLogOut, FiLogIn, FiFileText } from "react-icons/fi";
 import { useSession, signIn, signOut } from "next-auth/react";
 import emailjs from "@emailjs/browser";
 import { useRouter } from "next/navigation";
@@ -74,6 +74,9 @@ export default function Sidebar() {
         </Link>
         <Link href="/quiz/create" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-brand-dark transition">
           <FiEdit size={20} /> {isOpen && "Create Quiz"}
+        </Link>
+        <Link href="/exams" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-brand-dark transition">
+          <FiFileText size={20} /> {isOpen && "Exam Papers"}
         </Link>
         <Link href="/about" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-brand-dark transition">
           <FiInfo size={20} /> {isOpen && "About"}

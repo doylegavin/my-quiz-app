@@ -5,13 +5,30 @@ import { ExamPaper } from './examinations';
 interface ExamData {
   [examType: string]: {
     [subject: string]: {
-      [year: string]: Array<{
-        url: string;
-        type: string;
-        details: string;
-      }>
+      [year: string]: {
+        exampapers?: Array<{
+          url: string;
+          details: string;
+          type?: string;
+        }>,
+        markingschemes?: Array<{
+          url: string;
+          details: string;
+          type?: string;
+        }>
+      }
     }
   }
+}
+
+// Extended structure for the data.json file
+interface FullExamData extends ExamData {
+  subNumsToNames: {
+    [id: string]: string;
+  };
+  subNamesToNums: {
+    [name: string]: string[];
+  };
 }
 
 interface SubjectMapping {
@@ -27,8 +44,66 @@ const examTypeMapping: {[key: string]: string} = {
 
 // Get the subject name from subNumsToNames mapping or use the ID if not found
 function getSubjectName(id: string): string {
-  const subNumsToNames = (data as any).subNumsToNames as SubjectMapping || {};
+  const subNumsToNames = (data as FullExamData).subNumsToNames || {};
   return subNumsToNames[id] || id;
+}
+
+// Helper function to process exam papers and marking schemes
+function processPapers(
+  papers: Array<{url: string; details: string; type?: string}>,
+  type: string,
+  subjectName: string,
+  yr: string, 
+  level?: string, 
+  language?: string,
+  examType?: string
+): ExamPaper[] {
+  const results: ExamPaper[] = [];
+  
+  for (const paper of papers) {
+    // Extract paper details
+    const paperUrl = paper.url;
+    
+    // Extract language from URL
+    const paperLanguage = paperUrl.includes('IV') ? 'Irish' : 'English';
+    if (language && paperLanguage !== language) continue;
+    
+    // Extract level from URL
+    const levelMatch: {[key: string]: string} = {
+      'AL': 'Higher',
+      'GL': 'Ordinary',
+      'BL': 'Foundation',
+      'CL': 'Common'
+    };
+    
+    // Try to determine level from URL
+    let paperLevel = 'Higher'; // Default
+    for (const [code, name] of Object.entries(levelMatch)) {
+      if (paperUrl.includes(code)) {
+        paperLevel = name;
+        break;
+      }
+    }
+    
+    // Skip if level doesn't match filter
+    if (level && paperLevel !== level) continue;
+    
+    // Create ExamPaper object
+    results.push({
+      id: `${yr}-${subjectName}-${paperLevel}-${paperLanguage}-${type}`,
+      year: yr,
+      subject: subjectName,
+      level: paperLevel,
+      language: paperLanguage,
+      type: type,
+      title: paper.details,
+      details: paper.details,
+      url: `https://www.examinations.ie/archive/${type === 'Marking Scheme' ? 'markingschemes' : 'exampapers'}/${yr}/${paperUrl}`,
+      examType: examType || 'Other'
+    });
+  }
+  
+  return results;
 }
 
 // Convert data.json format to our ExamPaper interface
@@ -43,13 +118,13 @@ export function getPapersFromStaticData(
   
   try {
     // Get the exam section of the data
-    const examData = (data as unknown as ExamData)[examType];
+    const examData = (data as FullExamData)[examType];
     if (!examData) return [];
     
     // Find numeric ID for the given subject name
     let subjectId: string | undefined;
     if (subject) {
-      const subNumsToNames = (data as any).subNumsToNames as SubjectMapping || {};
+      const subNumsToNames = (data as FullExamData).subNumsToNames || {};
       for (const [id, name] of Object.entries(subNumsToNames)) {
         if (name === subject) {
           subjectId = id;
@@ -79,50 +154,36 @@ export function getPapersFromStaticData(
       for (const yr of yearsToProcess) {
         if (!examData[subj][yr]) continue;
         
-        // Process papers for this subject and year
-        const papers = examData[subj][yr];
+        const yearData = examData[subj][yr];
         
-        for (const paper of papers) {
-          // Extract paper details
-          const paperUrl = paper.url;
-          
-          // Extract language from URL
-          const paperLanguage = paperUrl.includes('IV') ? 'Irish' : 'English';
-          if (language && paperLanguage !== language) continue;
-          
-          // Extract level from URL
-          const levelMatch: {[key: string]: string} = {
-            'AL': 'Higher',
-            'GL': 'Ordinary',
-            'BL': 'Foundation',
-            'CL': 'Common'
-          };
-          
-          // Try to determine level from URL
-          let paperLevel = 'Higher'; // Default
-          for (const [code, name] of Object.entries(levelMatch)) {
-            if (paperUrl.includes(code)) {
-              paperLevel = name;
-              break;
-            }
-          }
-          
-          // Skip if level doesn't match filter
-          if (level && paperLevel !== level) continue;
-          
-          // Create ExamPaper object
-          results.push({
-            id: `${yr}-${subjectName}-${paperLevel}-${paperLanguage}-${paper.type}`,
-            year: yr,
-            subject: subjectName,
-            level: paperLevel,
-            language: paperLanguage,
-            type: paper.type,
-            title: paper.details,
-            details: paper.details,
-            url: `https://www.examinations.ie/archive/${paper.type.includes('Marking') ? 'markingschemes' : 'exampapers'}/${yr}/${paperUrl}`,
-            examType: examTypeMapping[examType] || 'Other'
-          });
+        // Process exam papers
+        if (yearData.exampapers) {
+          const mappedExamType = examTypeMapping[examType] || 'Other';
+          const examPapers = processPapers(
+            yearData.exampapers.map(p => ({ ...p, type: 'Exam Paper' })),
+            'Exam Paper',
+            subjectName,
+            yr,
+            level,
+            language,
+            mappedExamType
+          );
+          results.push(...examPapers);
+        }
+        
+        // Process marking schemes
+        if (yearData.markingschemes) {
+          const mappedExamType = examTypeMapping[examType] || 'Other';
+          const markingSchemes = processPapers(
+            yearData.markingschemes.map(p => ({ ...p, type: 'Marking Scheme' })),
+            'Marking Scheme',
+            subjectName,
+            yr,
+            level,
+            language,
+            mappedExamType
+          );
+          results.push(...markingSchemes);
         }
       }
     }
@@ -138,10 +199,10 @@ export function getPapersFromStaticData(
 export function getSubjectsForExamType(examType: string): string[] {
   try {
     // Get the subject ID mapping
-    const subNumsToNames = (data as any).subNumsToNames as SubjectMapping || {};
+    const subNumsToNames = (data as FullExamData).subNumsToNames || {};
     
     // Get subject IDs for this exam type
-    const examData = (data as unknown as ExamData)[examType];
+    const examData = (data as FullExamData)[examType];
     if (!examData) return [];
     
     // Map IDs to names and sort alphabetically
