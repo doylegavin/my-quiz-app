@@ -83,7 +83,10 @@ export default function AuthModal({ isOpen, onAuthenticated }: AuthModalProps) {
 
   const handleOAuthSignIn = (provider: string) => {
     setIsLoading(true);
-    signIn(provider, { redirect: false })
+    signIn(provider, { 
+      redirect: false,
+      callbackUrl: "https://www.examinaite.ie" 
+    })
       .then((result) => {
         if (result?.error) {
           setErrorMsg(result.error);

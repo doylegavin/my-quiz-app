@@ -185,7 +185,7 @@ function SignInContent() {
             <div className="mt-6 flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0 justify-center">
               {hasGoogleAuth && (
                 <button
-                  onClick={() => signIn('google', { callbackUrl })}
+                  onClick={() => signIn('google', { callbackUrl: "https://www.examinaite.ie" })}
                   className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                 >
                   <svg className="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">

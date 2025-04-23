@@ -317,7 +317,7 @@ export default function SignupPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => signIn('google', { callbackUrl: '/' })}
+                onClick={() => signIn('google', { callbackUrl: "https://www.examinaite.ie" })}
                 className="w-full"
               >
                 <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" aria-hidden="true">
