@@ -21,14 +21,64 @@ interface ExamData {
   }
 }
 
-// Extended structure for the data.json file
-interface FullExamData extends ExamData {
+// Rather than extending ExamData, create a complete interface
+// This avoids conflicts with string index signatures
+interface FullExamData {
+  lc?: {
+    [subject: string]: {
+      [year: string]: {
+        exampapers?: Array<{
+          url: string;
+          details: string;
+          type?: string;
+        }>,
+        markingschemes?: Array<{
+          url: string;
+          details: string;
+          type?: string;
+        }>
+      }
+    }
+  };
+  jc?: {
+    [subject: string]: {
+      [year: string]: {
+        exampapers?: Array<{
+          url: string;
+          details: string;
+          type?: string;
+        }>,
+        markingschemes?: Array<{
+          url: string;
+          details: string;
+          type?: string;
+        }>
+      }
+    }
+  };
+  lb?: {
+    [subject: string]: {
+      [year: string]: {
+        exampapers?: Array<{
+          url: string;
+          details: string;
+          type?: string;
+        }>,
+        markingschemes?: Array<{
+          url: string;
+          details: string;
+          type?: string;
+        }>
+      }
+    }
+  };
   subNumsToNames: {
     [id: string]: string;
   };
   subNamesToNums: {
     [name: string]: string[];
   };
+  [examType: string]: any; // Allow other exam types
 }
 
 interface SubjectMapping {
