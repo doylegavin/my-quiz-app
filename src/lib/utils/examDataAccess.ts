@@ -210,7 +210,7 @@ export function getPapersFromStaticData(
         if (yearData.exampapers) {
           const mappedExamType = examTypeMapping[examType] || 'Other';
           const examPapers = processPapers(
-            yearData.exampapers.map(p => ({ ...p, type: 'Exam Paper' })),
+            yearData.exampapers.map((p: { url: string; details: string; type?: string }) => ({ ...p, type: 'Exam Paper' })),
             'Exam Paper',
             subjectName,
             yr,
@@ -225,7 +225,7 @@ export function getPapersFromStaticData(
         if (yearData.markingschemes) {
           const mappedExamType = examTypeMapping[examType] || 'Other';
           const markingSchemes = processPapers(
-            yearData.markingschemes.map(p => ({ ...p, type: 'Marking Scheme' })),
+            yearData.markingschemes.map((p: { url: string; details: string; type?: string }) => ({ ...p, type: 'Marking Scheme' })),
             'Marking Scheme',
             subjectName,
             yr,
@@ -257,9 +257,9 @@ export function getSubjectsForExamType(examType: string): string[] {
     
     // Map IDs to names and sort alphabetically
     return Object.keys(examData)
-      .map(id => subNumsToNames[id] || id)
-      .filter(name => name && name.trim() !== '')
-      .sort((a, b) => a.localeCompare(b));
+      .map((id: string) => subNumsToNames[id] || id)
+      .filter((name: string) => name && name.trim() !== '')
+      .sort((a: string, b: string) => a.localeCompare(b));
   } catch (error) {
     console.error('Error getting subjects:', error);
     return [];
