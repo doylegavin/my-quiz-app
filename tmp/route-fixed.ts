@@ -62,17 +62,6 @@ export async function POST(req: Request) {
     // Allow either topic or topics for backward compatibility
     const topic = requestData.topic || requestData.topics || "Random";
     
-    console.log("Request data received:", {
-      subject,
-      level,
-      paper,
-      sections,
-      topic,
-      subtopic,
-      difficulty,
-      paperType
-    });
-    
     // Check if this is a calculation-based subject
     const requiresLatex = calculationSubjects.includes(subject);
     const isLanguageSubject = languageSubjects.includes(subject);
@@ -174,27 +163,21 @@ For life science subjects, ensure:
     // If no subject-specific prompt is available, use the existing generic approach
     if (!userPrompt.includes("difficulty") && !userPrompt.includes("subject")) {
       userPrompt = `
-Generate ${level} ${subject} questions with ${difficulty} difficulty.`;
-
-      // Add topic information
-      if (topic && topic !== "Random") {
-        userPrompt += `\nFOCUS SPECIFICALLY on the topic: "${topic}".`;
-      }
+Generate ${level} ${subject} questions with ${difficulty} difficulty on the topic: ${topic}.`;
 
       // Add paper information if provided
       if (paper && paper !== "Both") {
-        userPrompt += `\nFocus on ${paperType || "paper"}: "${paper}".`;
+        userPrompt += `\nFocus on ${paper} content.`;
       }
 
       // Add section information if provided
       if (sections) {
-        userPrompt += `\nFocus on ${sections} type questions.`;
+        userPrompt += `\nInclude ${sections} type questions.`;
       }
 
       // Add subtopic information if provided
-      if (subtopic && subtopic !== "any") {
-        userPrompt += `\nSPECIFICALLY focus on the subtopic: "${subtopic}" within the ${topic} topic.`;
-        userPrompt += `\nEnsure ALL questions are directly related to "${subtopic}".`;
+      if (subtopic) {
+        userPrompt += `\nSpecifically focus on the subtopic: ${subtopic}.`;
       }
 
       // Subject-specific prompt additions for the generic case
@@ -231,24 +214,23 @@ For essay or extended response questions:
 - Include primary source analysis where appropriate`;
       }
     } else {
-      // For subject-specific prompts, add topic and subtopic details
-      if (topic && topic !== "Random" && !userPrompt.includes(topic)) {
-        userPrompt += `\n\nIMPORTANT: Focus SPECIFICALLY on the topic: "${topic}".`;
-      }
+      // Append specific parameters to subject-specific prompt
+      userPrompt += `\n\n${difficulty} difficulty on the topic: ${topic}.`;
       
-      if (subtopic && subtopic !== "any" && !userPrompt.includes(subtopic)) {
-        userPrompt += `\n\nCRITICAL: ONLY generate questions on the subtopic: "${subtopic}" within the ${topic} topic.`;
-        userPrompt += `\nEnsure ALL questions are directly related to "${subtopic}".`;
+      // Add paper information if provided
+      if (paper && paper !== "Both") {
+        userPrompt += `\nFocus on ${paper} content.`;
       }
-      
-      if (sections && !userPrompt.includes(sections)) {
-        userPrompt += `\n\nUse ${sections} question style.`;
-      }
-    }
 
-    // Add a final reminder about topic/subtopic specificity
-    if ((topic && topic !== "Random") || (subtopic && subtopic !== "any")) {
-      userPrompt += `\n\nFINAL REMINDER: Your questions MUST directly relate to ${subtopic && subtopic !== "any" ? `the subtopic "${subtopic}"` : `the topic "${topic}"`}. Do not generate questions on unrelated topics or subtopics.`;
+      // Add section information if provided
+      if (sections) {
+        userPrompt += `\nInclude ${sections} type questions.`;
+      }
+
+      // Add subtopic information if provided
+      if (subtopic) {
+        userPrompt += `\nSpecifically focus on the subtopic: ${subtopic}.`;
+      }
     }
 
     // Final instructions

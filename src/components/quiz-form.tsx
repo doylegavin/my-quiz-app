@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -30,6 +30,8 @@ export function QuizForm() {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
+  const [showDebug, setShowDebug] = useState(false);
 
   // Define levels for each subject
   const getAvailableLevels = (subject: string): string[] => {
@@ -242,14 +244,29 @@ export function QuizForm() {
             `/quiz/generated?questions=${encodeURIComponent(JSON.stringify(data))}`
           );
         } else {
-          setErrorMessage(errorMessages[Math.floor(Math.random() * errorMessages.length)]);
+          // Get error from data if available or use random message
+          const errorMsg = data.error || errorMessages[Math.floor(Math.random() * errorMessages.length)];
+          setErrorMessage(errorMsg);
+          setDebugInfo(data);
         }
       } else {
-        setErrorMessage(errorMessages[Math.floor(Math.random() * errorMessages.length)]);
+        // Parse error response
+        const errorData = await response.json();
+        console.error("API Error:", errorData);
+        setDebugInfo(errorData);
+        
+        // Show detailed error message in development
+        if (process.env.NODE_ENV === 'development') {
+          setErrorMessage(`Error: ${errorData.error}${errorData.details ? ` - ${errorData.details}` : ''} (${errorData.errorType || 'Unknown'})`);
+        } else {
+          // In production, show user-friendly message but include error type
+          setErrorMessage(`${errorData.error || errorMessages[Math.floor(Math.random() * errorMessages.length)]} (${errorData.errorType || 'Unknown'})`);
+        }
       }
     } catch (error) {
       console.error("Fetch error:", error);
-      setErrorMessage(errorMessages[Math.floor(Math.random() * errorMessages.length)]);
+      setErrorMessage(`Network error: ${error instanceof Error ? error.message : 'Unknown'}`);
+      setDebugInfo({ networkError: error instanceof Error ? error.message : 'Unknown error' });
     } finally {
       setLoading(false);
     }
@@ -848,30 +865,54 @@ export function QuizForm() {
             </div>
            
         </CardContent>
+        <CardFooter>
+          <Button type="submit" disabled={loading} className="w-full">
+            {loading ? (
+              <div className="flex items-center justify-center">
+                <div className="mr-2">Generating...</div>
+                <div className="w-20 bg-gray-300 rounded-full h-2">
+                  <div
+                    className="bg-primary h-2 rounded-full transition-all duration-300 ease-in-out"
+                    style={{ width: `${progress}%` }}
+                  ></div>
+                </div>
+              </div>
+            ) : (
+              <>Generate Questions</>
+            )}
+          </Button>
+        </CardFooter>
       </Card>
 
-      <div className="flex justify-end mt-8 pb-16">
-        <Button type="submit" className="btn-primary" >{loading ? "Generating..." : "Generate Questions"}</Button>
-      </div>
-
       {errorMessage && (
-        <div className="fixed bottom-16 left-3/4 transform -translate-x-1/2 z-50 md:bottom-12 md:left-auto md:right-8 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2">
-        <span>{errorMessage}</span>
-    <button
-      onClick={() => setErrorMessage(null)}
-      className="ml-2 text-white font-bold text-lg leading-none"
-      >
-      ✖
-    </button>
-  </div>
-)}
-
-
-      {loading && (
-        <div className="w-full mb-4">
-            <Progress value={progress} />
-          </div>
-        )}
+        <div className="mt-6 mx-auto max-w-2xl px-4 md:px-8">
+          <Card className="bg-red-50">
+            <CardContent className="pt-6">
+              <div className="text-red-600 mb-2">{errorMessage}</div>
+              
+              {/* Debug toggle - only in development */}
+              {process.env.NODE_ENV === 'development' && (
+                <>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-2"
+                    onClick={() => setShowDebug(!showDebug)}
+                  >
+                    {showDebug ? 'Hide Debug Info' : 'Show Debug Info'}
+                  </Button>
+                  
+                  {showDebug && debugInfo && (
+                    <div className="mt-4 p-4 bg-gray-900 text-gray-100 rounded-md overflow-x-auto">
+                      <pre className="text-xs">{JSON.stringify(debugInfo, null, 2)}</pre>
+                    </div>
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </form></>
     
   );

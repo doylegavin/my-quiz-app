@@ -127,55 +127,61 @@ export default function GeneratedQuizClient() {
     solutionGraphRefs.current[index] = el;
   };
 
+  // Check if questions appear to match the requested topic
+  const validateTopicMatch = () => {
+    if (!topic || topic === "Random") return null;
+    
+    // Keywords to look for based on topic (add more as needed)
+    const topicKeywords: Record<string, string[]> = {
+      "Coordinate Geometry": ["coordinate", "line", "point", "equation of", "slope", "parallel", "perpendicular", "midpoint", "distance"],
+      "The Line": ["slope", "gradient", "line", "parallel", "perpendicular", "equation of", "y=mx+c", "ax+by+c=0"],
+      "Algebra": ["equation", "expression", "factor", "solve", "polynomial", "quadratic", "cubic"],
+      "Statistics": ["mean", "median", "mode", "standard deviation", "probability", "distribution"],
+      "Calculus": ["derivative", "differentiate", "integrate", "integral", "maximum", "minimum"]
+    };
+    
+    // Find which keywords match our topic
+    let keywordsToCheck: string[] = [];
+    const normalizedTopic = topic.toLowerCase();
+    
+    for (const [topicName, keywords] of Object.entries(topicKeywords)) {
+      if (normalizedTopic.includes(topicName.toLowerCase())) {
+        keywordsToCheck.push(...keywords);
+      }
+    }
+    
+    if (keywordsToCheck.length === 0) return null;
+    
+    // Count how many questions contain topic keywords
+    let matchingQuestions = 0;
+    questionsArray.forEach((q: any) => {
+      const questionText = q.question.toLowerCase();
+      if (keywordsToCheck.some(keyword => questionText.includes(keyword.toLowerCase()))) {
+        matchingQuestions++;
+      }
+    });
+    
+    // If less than half the questions match the topic, show a warning
+    if (matchingQuestions < questionsArray.length / 2) {
+      return (
+        <div className="mb-6 p-3 bg-yellow-50 border border-yellow-300 rounded-md text-yellow-800">
+          <p className="font-medium">⚠️ Some questions may not match the requested topic: {topic}</p>
+          <p className="text-sm mt-1">Only {matchingQuestions} out of {questionsArray.length} questions appear to be related to this topic.</p>
+        </div>
+      );
+    }
+    
+    return null;
+  };
+
   return (
     <div className="container mx-auto p-6 pl-16">
       <h1 className="text-2xl font-bold mb-4">Generated Questions</h1>
-      <p className="text-gray-600 mb-8">{selectedFields}</p>
+      <p className="text-gray-600 mb-4">{selectedFields}</p>
+      
+      {validateTopicMatch()}
 
-      {questionsArray.length > 0 ? (
-        <ul className="space-y-8">
-          {questionsArray.map((q: any, index: number) => (
-            <li key={index} className="border p-4 rounded bg-white shadow">
-              <strong className="block mb-2 text-lg">Question {index + 1}</strong>
-              <div dangerouslySetInnerHTML={{ __html: q.question }} />
-              {q.geogebraCommands && (
-                <div 
-                  ref={setGraphRef(index)}
-                  className="mt-4"
-                >
-                  <div className="border rounded overflow-hidden p-2">
-                    {isGraphQuestion(q.question) ? (
-                      <div className="bg-white">
-                        <DiagramRenderer
-                          diagramData={q.diagram || parseGeogebraCommand(q.geogebraCommands)}
-                          showSolution={false}
-                          width={680}
-                          height={450}
-                        />
-                      </div>
-                    ) : (
-                      <div
-                        className="w-full h-64 border border-gray-300 bg-white"
-                        style={{
-                          backgroundImage:
-                            "linear-gradient(to right, #ddd 1px, transparent 1px), linear-gradient(to bottom, #ddd 1px, transparent 1px)",
-                          backgroundSize: "20px 20px",
-                        }}
-                      />
-                    )}
-                  </div>
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <div className="bg-yellow-50 border border-yellow-200 p-4 rounded">
-          <p>No questions generated yet.</p>
-        </div>
-      )}
-
-      <div className="mt-8 flex flex-wrap gap-3 items-center justify-start">
+      <div className="mb-8 flex flex-wrap gap-3 items-center justify-start">
         <button
           className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium shadow-md transition-colors"
           onClick={() => setShowSolutions((prev) => !prev)}
@@ -201,53 +207,96 @@ export default function GeneratedQuizClient() {
         />
       </div>
 
-      {showSolutions && solutionsArray.length > 0 && (
-        <div className="mt-8">
-          <h2 className="text-xl font-bold mb-4">Solutions</h2>
-          <ul className="space-y-8">
-            {solutionsArray.map((sol: any, idx: number) => {
-              const questionIndex = sol.questionIndex - 1;
-              return (
-                <li key={idx} className="border p-5 rounded bg-gray-50 shadow-sm">
-                  <strong className="block mb-3 text-lg">Solution for Question {sol.questionIndex}</strong>
-                  <div className="mb-3" dangerouslySetInnerHTML={{ __html: sol.solution }} />
-                  {sol.geogebraCommands &&
-                    isGraphQuestion(sol.solution || questionsArray[questionIndex]?.question || "") && (
-                      <div 
-                        ref={setSolutionGraphRef(questionIndex)}
-                        className="my-4"
-                      >
-                        <div className="border rounded overflow-hidden p-2">
-                          <div className="text-center mb-2 text-gray-700 font-medium">Solution</div>
+      {questionsArray.length > 0 ? (
+        <div className="space-y-8">
+          {questionsArray.map((q: any, index: number) => {
+            // Find the corresponding solution by questionIndex
+            const solution = solutionsArray.find((sol: any) => sol.questionIndex === index + 1);
+            const questionIndex = index;
+            
+            return (
+              <div key={index} className="space-y-4">
+                {/* Question */}
+                <div className="border p-4 rounded bg-white shadow">
+                  <strong className="block mb-2 text-lg">Question {index + 1}</strong>
+                  <div dangerouslySetInnerHTML={{ __html: q.question }} />
+                  {q.geogebraCommands && (
+                    <div 
+                      ref={setGraphRef(index)}
+                      className="mt-4"
+                    >
+                      <div className="border rounded overflow-hidden p-2">
+                        {isGraphQuestion(q.question) ? (
                           <div className="bg-white">
                             <DiagramRenderer
-                              diagramData={sol.diagram || parseGeogebraCommand(sol.geogebraCommands)}
-                              showSolution={true}
+                              diagramData={q.diagram || parseGeogebraCommand(q.geogebraCommands)}
+                              showSolution={false}
                               width={680}
                               height={450}
                             />
                           </div>
+                        ) : (
+                          <div
+                            className="w-full h-64 border border-gray-300 bg-white"
+                            style={{
+                              backgroundImage:
+                                "linear-gradient(to right, #ddd 1px, transparent 1px), linear-gradient(to bottom, #ddd 1px, transparent 1px)",
+                              backgroundSize: "20px 20px",
+                            }}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Solution - only shown when showSolutions is true */}
+                {showSolutions && solution && (
+                  <div className="border p-5 rounded bg-gray-50 shadow-sm ml-8">
+                    <strong className="block mb-3 text-lg">Solution for Question {index + 1}</strong>
+                    <div className="mb-3" dangerouslySetInnerHTML={{ __html: solution.solution }} />
+                    {solution.geogebraCommands &&
+                      isGraphQuestion(solution.solution || q.question || "") && (
+                        <div 
+                          ref={setSolutionGraphRef(questionIndex)}
+                          className="my-4"
+                        >
+                          <div className="border rounded overflow-hidden p-2">
+                            <div className="text-center mb-2 text-gray-700 font-medium">Solution</div>
+                            <div className="bg-white">
+                              <DiagramRenderer
+                                diagramData={solution.diagram || parseGeogebraCommand(solution.geogebraCommands)}
+                                showSolution={true}
+                                width={680}
+                                height={450}
+                              />
+                            </div>
+                          </div>
                         </div>
+                      )}
+                    {solution.notes && (
+                      <div className="mb-2">
+                        <em className="font-medium text-gray-700">Notes:</em>{" "}
+                        <span className="text-gray-800">{solution.notes}</span>
                       </div>
                     )}
-                  {sol.notes && (
-                    <div className="mb-2">
-                      <em className="font-medium text-gray-700">Notes:</em>{" "}
-                      <span className="text-gray-800">{sol.notes}</span>
-                    </div>
-                  )}
-                  {sol.markingScheme && (
-                    <div>
-                      <em className="font-medium text-gray-700">Marking Scheme:</em>{" "}
-                      <span className="text-gray-800 whitespace-pre-line">
-                        {sol.markingScheme.replace(/\\n/g, "\n")}
-                      </span>
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+                    {solution.markingScheme && (
+                      <div>
+                        <em className="font-medium text-gray-700">Marking Scheme:</em>{" "}
+                        <span className="text-gray-800 whitespace-pre-line">
+                          {solution.markingScheme.replace(/\\n/g, "\n")}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="bg-yellow-50 border border-yellow-200 p-4 rounded">
+          <p>No questions generated yet.</p>
         </div>
       )}
     </div>
