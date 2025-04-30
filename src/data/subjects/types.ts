@@ -6,10 +6,20 @@ export type Paper = {
 
 export type PaperOptions = Record<string, Paper>;
 
+export type Section = {
+  name: string;
+  type: string;
+  topics: { [topic: string]: string[] };
+};
+
+export type SectionOptions = Record<string, Section>;
+
 export type Subject = {
   difficulty: string[];
-  papers: PaperOptions;
   levels: string[];
+  // Allow either papers or sections structure
+  papers?: PaperOptions;
+  sections?: SectionOptions;
 };
 
 export type SubjectStructure = Record<string, Subject>;
