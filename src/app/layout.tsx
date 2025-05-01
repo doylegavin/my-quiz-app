@@ -5,6 +5,7 @@ import Script from "next/script";
 import type { Metadata } from 'next';
 import { NextAuthSessionProvider } from "@/lib/NextAuthSessionProvider";
 import dynamic from "next/dynamic";
+import EnhancedSubjectsInitializer from "@/components/EnhancedSubjectsInitializer";
 
 const Sidebar = dynamic(() => import('@/components/layout/Sidebar'), { ssr: false });
 
@@ -46,7 +47,7 @@ export default function RootLayout({
         <link 
           rel="stylesheet" 
           href="https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-regular.css" 
-          integrity="sha256-zx3wUmxQs7upzWzWXz8CRwtl0TdSFGeLLXE4LEhMNhk=" 
+          integrity="sha256-zx3wUmxQs7upzWzWXz8CRwtl0TdSFGeLLXz4LEhMNhk=" 
           crossOrigin="anonymous" 
         />
       </head>
@@ -79,6 +80,8 @@ export default function RootLayout({
         
         <NextAuthSessionProvider>
           <div className="flex min-h-screen">
+            {/* Initialize enhanced subjects */}
+            <EnhancedSubjectsInitializer />
             <Sidebar />
             {/* Main content area - flex-1 ensures it takes up remaining space */}
             <main className="flex-1 p-4 md:p-6 overflow-x-hidden w-full">

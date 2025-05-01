@@ -14,11 +14,31 @@ import { useRouter } from "next/navigation";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
 import subjectData from "@/data/subjects";
-import { getSubjectData } from "@/lib/utils/subjectUtils";
-// Import mathematics data
-import { higherLevel as mathsHigherLevel, ordinaryLevel as mathsOrdinaryLevel, foundationLevel as mathsFoundationLevel } from "@/data/subjects/mathematics";
+// Import all functions from the compatibility layer
+import * as subjectUtils from '@/lib/utils/subjectCompatibility';
+// Import for UUID generation
+import { v4 as uuidv4 } from "uuid";
+// Import Zustand store
+import { useFormattedQuizStore } from "@/stores/useFormattedQuizStore";
+// Add direct imports for mathematics data
+import mathsHigherLevel from '@/data/subjects/mathematics/higher-level';
+import mathsOrdinaryLevel from '@/data/subjects/mathematics/ordinary-level';
+
+// Direct imports for English data
+import englishHigherLevel from '@/data/subjects/english/higher-level';
+import englishOrdinaryLevel from '@/data/subjects/english/ordinary-level';
+
+// Direct imports for Irish data
+import irishHigherLevel from '@/data/subjects/irish/higher-level';
+import irishOrdinaryLevel from '@/data/subjects/irish/ordinary-level';
+
+// Define core subjects that need special handling
+const CORE_SUBJECTS = ['mathematics', 'english', 'irish'];
 
 export function QuizForm() {
+  // Add reference to Zustand store
+  const { setFormattedQuiz, saveQuizToDatabase } = useFormattedQuizStore();
+  
   const [selectedSubject, setSelectedSubject] = useState<string>("mathematics");
   const [selectedPaper, setSelectedPaper] = useState<string>("Both");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("Random");
@@ -32,87 +52,327 @@ export function QuizForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<any>(null);
   const [showDebug, setShowDebug] = useState(false);
+  const [quizTitle, setQuizTitle] = useState<string>("");
+  const [quizDescription, setQuizDescription] = useState<string>("");
+  const [availableSubjects, setAvailableSubjects] = useState<string[]>([]);
 
-  // Define levels for each subject
-  const getAvailableLevels = (subject: string): string[] => {
-    const currentSubject = subjectData[subject];
-    if (currentSubject && Array.isArray(currentSubject.levels)) {
-      return currentSubject.levels;
-    }
-    return ["Higher Level", "Ordinary Level"];
+  // Initialize available subjects
+  useEffect(() => {
+    // Get all subjects dynamically from the data files
+    const subjects = Object.keys(subjectData);
+    setAvailableSubjects(subjects);
+    
+    // Simple logging without hardcoded values
+    console.log("Available subjects:", subjects);
+  }, []);
+
+  // Helper function to check if a subject is a core subject
+  const isCoreSubject = (subject: string): boolean => {
+    return CORE_SUBJECTS.includes(subject);
   };
 
-  // Get available levels based on current subject
-  const allLevels = getAvailableLevels(selectedSubject);
-
-  // Set a valid level when subject changes
-  useEffect(() => {
-    const levels = getAvailableLevels(selectedSubject);
-    if (!levels.includes(selectedLevel)) {
-      setSelectedLevel(levels[0]);
+  // Add a function to directly get level data
+  const getDirectLevelData = (subject: string, level: string) => {
+    console.log(`Getting direct level data for ${subject}/${level}`);
+    
+    // Direct mapping for mathematics files
+    if (subject === 'mathematics') {
+      if (level === 'Higher Level') return mathsHigherLevel.mathematics;
+      if (level === 'Ordinary Level') return mathsOrdinaryLevel.mathematics;
     }
     
-    // Reset paper selection when subject changes to prevent undefined errors
-    const currentSubject = subjectData[selectedSubject];
-    if (currentSubject && currentSubject.papers) {
-      const availablePapers = Object.keys(currentSubject.papers);
-      if (availablePapers.length > 0 && !availablePapers.includes(selectedPaper)) {
-        setSelectedPaper(availablePapers[0]);
+    // Direct mapping for english files
+    if (subject === 'english') {
+      if (level === 'Higher Level') return englishHigherLevel.english;
+      if (level === 'Ordinary Level') return englishOrdinaryLevel.english;
+    }
+    
+    // Direct mapping for irish files
+    if (subject === 'irish') {
+      if (level === 'Higher Level') return irishHigherLevel.irish;
+      if (level === 'Ordinary Level') return irishOrdinaryLevel.irish;
+    }
+    
+    // Direct mapping for physical education files
+    if (subject === 'physicalEducation') {
+      // Import dynamically based on level
+      try {
+        // Physical Education currently only has Higher Level
+        const physEdHigherLevel = require('@/data/subjects/physical-education/higher-level').default;
+        if (level === 'Higher Level') return physEdHigherLevel.physicalEducation;
+      } catch (error) {
+        console.error("Error loading physical education data:", error);
       }
     }
-  }, [selectedSubject, selectedLevel]);
+    
+    // For other subjects, try to dynamically import the level data
+    try {
+      const levelFile = require(`@/data/subjects/${subject}/${level.toLowerCase().replace(" ", "-")}`).default;
+      if (levelFile && levelFile[subject]) {
+        return levelFile[subject];
+      }
+    } catch (error) {
+      console.log(`No direct level file found for ${subject}/${level}, falling back to compatibility layer`);
+    }
+    
+    // For other subjects, use the compatibility layer
+    return subjectUtils.getSubjectData(subject);
+  };
 
-  // Update available subtopics when selectedTopic changes
-  useEffect(() => {
-    if (selectedTopic !== "Random") {
-      try {
-        // Special case for mathematics
-        if (selectedSubject === "mathematics") {
-          const mathsData = selectedLevel === "Higher Level" 
-            ? mathsHigherLevel?.mathematics 
-            : selectedLevel === "Ordinary Level" 
-              ? mathsOrdinaryLevel?.mathematics 
-              : mathsFoundationLevel?.mathematics;
-          
-          // Map paper name to correct format for level files
-          const levelPaperName = mapPaperName(selectedSubject, selectedPaper, true);
-            
-          if (mathsData && mathsData.papers && mathsData.papers[levelPaperName]) {
-            const paperTopics = mathsData.papers[levelPaperName].topics;
-            if (paperTopics && paperTopics[selectedTopic] && Array.isArray(paperTopics[selectedTopic])) {
-              setAvailableSubtopics(paperTopics[selectedTopic]);
-            } else {
-              setAvailableSubtopics([]);
-            }
-          } else {
-            setAvailableSubtopics([]);
-          }
-        } else {
-          // Standard approach for other subjects
-          const currentSubject = subjectData[selectedSubject];
-          if (!currentSubject || !currentSubject.papers) {
-            setAvailableSubtopics([]);
-            return;
-          }
-          
-          const selectedPaperData = currentSubject.papers[selectedPaper];
-          
-          if (selectedPaperData && selectedPaperData.topics) {
-            const topicData = selectedPaperData.topics[selectedTopic];
-            if (Array.isArray(topicData)) {
-              setAvailableSubtopics(topicData);
-            } else {
-              setAvailableSubtopics([]);
-            }
-          } else {
-            setAvailableSubtopics([]);
+  // Get available levels for any subject - SIMPLIFIED
+  const getAvailableLevels = (subject: string): string[] => {
+    // Check for subjects with foundation level
+    if (['mathematics', 'irish', 'english'].includes(subject)) {
+      return ['Higher Level', 'Ordinary Level', 'Foundation Level'];
+    }
+    
+    // For other subjects, check if they have higher/ordinary level files
+    const levels = [];
+    try {
+      if (require(`@/data/subjects/${subject}/higher-level`)) {
+        levels.push('Higher Level');
+      }
+    } catch {}
+    
+    try {
+      if (require(`@/data/subjects/${subject}/ordinary-level`)) {
+        levels.push('Ordinary Level'); 
+      }
+    } catch {}
+    
+    return levels.length ? levels : ['Higher Level']; // Default to Higher Level if none found
+  };
+
+  // Get available papers for the selected subject and level - SIMPLIFIED
+  const getAvailablePapers = (subject: string, level: string): string[] => {
+    // Check if we have direct access for this subject
+    let papers = [];
+    
+    // Log direct level data retrieval
+    console.log(`Getting papers for ${subject}/${level}`);
+    
+    // Get papers from the level data (more reliable than index.ts)
+    const levelData = getDirectLevelData(subject, level);
+    if (levelData && levelData.papers) {
+      papers = Object.keys(levelData.papers);
+      console.log(`Direct papers from level data:`, papers);
+      if (papers.length > 0) {
+        return papers;
+      }
+    }
+    
+    // Fallback to the index.ts data via subjectData
+    const subjectDataFromIndex = subjectData[subject];
+    if (subjectDataFromIndex && subjectDataFromIndex.papers) {
+      papers = Object.keys(subjectDataFromIndex.papers);
+      console.log(`Papers from index.ts:`, papers);
+      if (papers.length > 0) {
+        return papers;
+      }
+    }
+    
+    // If all else fails, try compatibility layer
+    const compatData = subjectUtils.getSubjectData(subject);
+    if (compatData && compatData.papers) {
+      papers = Object.keys(compatData.papers);
+      console.log(`Papers from compatibility layer:`, papers);
+      return papers;
+    }
+    
+    return [];
+  };
+
+  // Function to get topics for a subject/paper - SIMPLIFIED
+  const getAvailableTopics = (subject: string, paper: string): string[] => {
+    // Try to get topics directly from the level data first
+    const levelData = getDirectLevelData(subject, selectedLevel);
+    console.log(`Getting topics for ${subject}, level data:`, levelData);
+    
+    // For core subjects, use the selected paper directly
+    if (isCoreSubject(subject)) {
+      console.log(`${subject} Level Data for topics:`, levelData);
+      if (levelData?.papers?.[paper]?.topics) {
+        const topics = Object.keys(levelData.papers[paper].topics);
+        console.log(`Direct topics for ${subject}/${selectedLevel}/${paper}:`, topics);
+        return topics;
+      }
+    } 
+    // For non-core subjects, handle paper selection differently
+    else {
+      console.log(`Non-core subject ${subject} Level Data:`, levelData);
+      
+      // Check if subject uses "papers" structure (like physicalEducation)
+      if (levelData && levelData.papers) {
+        // Find the appropriate paper to use
+        const availablePapers = Object.keys(levelData.papers);
+        let paperToUse = "";
+        
+        if (availablePapers.includes("Both")) {
+          paperToUse = "Both";
+        } else if (availablePapers.length > 0) {
+          paperToUse = availablePapers[0];
+        }
+        
+        console.log(`Using paper ${paperToUse} for topics in ${subject}`);
+        
+        if (paperToUse && levelData.papers[paperToUse] && levelData.papers[paperToUse].topics) {
+          const topics = Object.keys(levelData.papers[paperToUse].topics);
+          console.log(`${subject} topics from papers structure:`, topics);
+          return topics;
+        }
+      }
+      // Check if subject uses "sections" structure (like biology)
+      else if (levelData && levelData.sections) {
+        // Find the appropriate section to use
+        const availableSections = Object.keys(levelData.sections);
+        let sectionToUse = "";
+        
+        if (availableSections.length > 0) {
+          sectionToUse = availableSections[0]; // Use first section by default (e.g., "sectionA")
+        }
+        
+        console.log(`Using section ${sectionToUse} for topics in ${subject}`);
+        
+        if (sectionToUse && levelData.sections[sectionToUse] && levelData.sections[sectionToUse].topics) {
+          const topics = Object.keys(levelData.sections[sectionToUse].topics);
+          console.log(`${subject} topics from sections structure:`, topics);
+          return topics;
+        }
+      }
+    }
+    
+    // Fallback to compatibility layer for other subjects
+    const topics = subjectUtils.getTopics(subject, selectedLevel, paper);
+    console.log(`Compatibility layer topics for ${subject}/${selectedLevel}/${paper}:`, topics);
+    return topics;
+  };
+
+  // Function to get subtopics for a topic
+  const getSubtopicsForTopic = (subject: string, paper: string, topic: string): string[] => {
+    // Try to get subtopics directly from the level data first
+    const levelData = getDirectLevelData(subject, selectedLevel);
+    
+    // For core subjects, use the selected paper directly
+    if (isCoreSubject(subject)) {
+      console.log(`${subject} Level Data for subtopics:`, levelData?.papers?.[paper]?.topics);
+      console.log("Looking for topic:", topic);
+      
+      if (levelData?.papers?.[paper]?.topics?.[topic]) {
+        const subtopics = levelData.papers[paper].topics[topic];
+        console.log(`Direct subtopics for ${subject}/${selectedLevel}/${paper}/${topic}:`, subtopics);
+        return subtopics;
+      }
+    }
+    // For non-core subjects
+    else {
+      console.log(`Non-core subject ${subject} Level Data for subtopics:`, levelData);
+      console.log("Looking for topic:", topic);
+      
+      // Check if subject uses "papers" structure (like physicalEducation)
+      if (levelData && levelData.papers) {
+        // Find the appropriate paper to use
+        const availablePapers = Object.keys(levelData.papers);
+        let paperToUse = "";
+        
+        if (availablePapers.includes("Both")) {
+          paperToUse = "Both";
+        } else if (availablePapers.length > 0) {
+          paperToUse = availablePapers[0];
+        }
+        
+        console.log(`Using paper ${paperToUse} for subtopics in ${subject}`);
+        
+        if (paperToUse && 
+            levelData.papers[paperToUse] && 
+            levelData.papers[paperToUse].topics && 
+            levelData.papers[paperToUse].topics[topic]) {
+          const subtopics = levelData.papers[paperToUse].topics[topic];
+          console.log(`${subject} subtopics from papers structure:`, subtopics);
+          return subtopics;
+        }
+      }
+      // Check if subject uses "sections" structure (like biology)
+      else if (levelData && levelData.sections) {
+        // For subjects with sections, we need to find which section contains the topic
+        const availableSections = Object.keys(levelData.sections);
+        
+        // Search in all sections for the topic
+        for (const section of availableSections) {
+          if (levelData.sections[section] && 
+              levelData.sections[section].topics && 
+              levelData.sections[section].topics[topic]) {
+                
+            const subtopics = levelData.sections[section].topics[topic];
+            console.log(`${subject} subtopics found in section ${section}:`, subtopics);
+            return subtopics;
           }
         }
         
-        setSelectedSubtopic(""); // Reset subtopic when topic changes
+        console.log(`Topic ${topic} not found in any section for ${subject}`);
+      }
+    }
+    
+    // Fallback to compatibility layer
+    const subtopics = subjectUtils.getSubtopics(subject, selectedLevel, paper, topic);
+    console.log(`Compatibility layer subtopics for ${subject}/${selectedLevel}/${paper}/${topic}:`, subtopics);
+    return subtopics;
+  };
+
+  // Update the useEffect that reacts to paper change to directly access topics
+  useEffect(() => {
+    // Only core subjects use the paper selection
+    if (isCoreSubject(selectedSubject) && selectedPaper !== "Random" && selectedPaper !== "") {
+      // Get topics for the selected paper
+      const topics = getAvailableTopics(selectedSubject, selectedPaper);
+      console.log("Available topics for", selectedSubject, selectedPaper, ":", topics);
+      
+      // Check if there are any topics available
+      if (topics.length > 0) {
+        // Set the first topic as default if current selection is not valid
+        if (!topics.includes(selectedTopic)) {
+          setSelectedTopic(topics[0]);
+        }
+      } else {
+        setSelectedTopic("Random");
+      }
+    } else if (!isCoreSubject(selectedSubject)) {
+      // For non-core subjects
+      console.log("Handling non-core subject topic selection:", selectedSubject);
+      
+      // Get topics regardless of paper
+      const topics = getAvailableTopics(selectedSubject, "");
+      console.log("Available topics for non-core subject:", topics);
+      
+      if (topics.length > 0) {
+        // Set the first topic as default if current selection is not valid
+        if (!topics.includes(selectedTopic)) {
+          setSelectedTopic(topics[0]);
+        }
+      } else {
+        setSelectedTopic("Random");
+      }
+    } else {
+      setSelectedTopic("Random");
+    }
+  }, [selectedPaper, selectedSubject, selectedLevel]);
+
+  // Update useEffect for topic change to use direct subtopic access
+  useEffect(() => {
+    if (selectedTopic !== "Random") {
+      try {
+        // Get subtopics using the direct access function
+        const subtopics = getSubtopicsForTopic(selectedSubject, selectedPaper, selectedTopic);
+        console.log("Available subtopics for", selectedSubject, selectedPaper, selectedTopic, ":", subtopics);
+        setAvailableSubtopics(subtopics);
+        
+        // Reset subtopic if it's not valid
+        if (subtopics.length > 0 && !subtopics.includes(selectedSubtopic)) {
+          setSelectedSubtopic(subtopics[0]);
+        }
       } catch (error) {
         console.error("Error updating subtopics:", error);
         setAvailableSubtopics([]);
+        setSelectedSubtopic("");
       }
     } else {
       setAvailableSubtopics([]);
@@ -120,41 +380,111 @@ export function QuizForm() {
     }
   }, [selectedTopic, selectedPaper, selectedLevel, selectedSubject]);
 
+  // Get paper label based on subject data
+  const getPaperLabel = (subject: string): string => {
+    // Get metadata directly from subject data
+    const metadata = subjectUtils.getSubjectMetadata(subject);
+    return metadata.paperLabel || subjectUtils.getPaperLabel(subject);
+  };
+
+  // Get section label based on subject data
+  const getSectionLabel = (subject: string): string => {
+    // Get metadata directly from subject data
+    const metadata = subjectUtils.getSubjectMetadata(subject);
+    return metadata.sectionLabel || "Section";
+  };
+
+  // Get topic label based on subject data
+  const getTopicLabel = (subject: string): string => {
+    // Get metadata directly from subject data
+    const metadata = subjectUtils.getSubjectMetadata(subject);
+    return metadata.topicLabel || "Topic";
+  };
+
+  // Get subtopic label based on subject data
+  const getSubtopicLabel = (subject: string): string => {
+    // Get metadata directly from subject data
+    const metadata = subjectUtils.getSubjectMetadata(subject);
+    return metadata.subtopicLabel || "Subtopic";
+  };
+
+  // Get available levels based on current subject
+  const allLevels = getAvailableLevels(selectedSubject);
+
   // Reset default selections when subject changes
   useEffect(() => {
-    const currentSubject = subjectData[selectedSubject];
-    if (currentSubject) {
-      // Set default difficulty
-      const availableDifficulties = currentSubject.difficulty || [];
-      if (availableDifficulties.length > 0 && !availableDifficulties.includes(selectedDifficulty)) {
-        setSelectedDifficulty(availableDifficulties[0]);
+    console.log("Subject changed to:", selectedSubject);
+    
+    // Get levels directly from the selected subject data file
+    const levels = getAvailableLevels(selectedSubject);
+    console.log("Available levels:", levels);
+    
+    // Set a valid level
+    if (!levels.includes(selectedLevel)) {
+      setSelectedLevel(levels[0]);
+    }
+    
+    // Different handling for core vs non-core subjects
+    if (isCoreSubject(selectedSubject)) {
+      // Core subjects have papers
+      const availablePapers = getAvailablePapers(selectedSubject, selectedLevel);
+      console.log("Available papers for core subject:", availablePapers);
+      
+      if (availablePapers.length > 0 && !availablePapers.includes(selectedPaper)) {
+        setSelectedPaper(availablePapers[0]);
+      } else if (availablePapers.length === 0) {
+        // Set a default if no papers found
+        setSelectedPaper("Both");
       }
       
-      // Set default paper if not already set
-      const availablePapers = Object.keys(currentSubject.papers || {});
-      if (availablePapers.length > 0 && !availablePapers.includes(selectedPaper)) {
-        const newPaper = availablePapers[0];
-        setSelectedPaper(newPaper);
-        
-        // Set default section for the new paper
-        const paperData = currentSubject.papers[newPaper];
-        if (paperData && paperData.sections) {
-          const sections = paperData.sections;
-          if (sections.length > 0) {
-            setSelectedSection(sections[0]);
-          } else {
-            setSelectedSection("Short Questions");
+      // Set difficulty
+      const currentSubject = subjectData[selectedSubject];
+      if (currentSubject && currentSubject.difficulty) {
+        const availableDifficulties = currentSubject.difficulty;
+        if (availableDifficulties.length > 0 && !availableDifficulties.includes(selectedDifficulty)) {
+          setSelectedDifficulty(availableDifficulties[0]);
+        } else if (availableDifficulties.length === 0) {
+          setSelectedDifficulty("Random");
+        }
+      }
+    } else {
+      // Non-core subjects don't have paper selection
+      // Get sections directly from the level data
+      const levelData = getDirectLevelData(selectedSubject, selectedLevel || levels[0]);
+      
+      if (levelData && levelData.papers) {
+        const papers = Object.keys(levelData.papers);
+        if (papers.length > 0) {
+          const firstPaper = papers[0];
+          
+          // Set sections if available
+          if (levelData.papers[firstPaper] && levelData.papers[firstPaper].sections) {
+            const sections = levelData.papers[firstPaper].sections;
+            if (sections.length > 0 && !sections.includes(selectedSection)) {
+              setSelectedSection(sections[0]);
+            }
           }
           
-          // Set default topic for the new paper
-          if (paperData.topics) {
-            const topics = Object.keys(paperData.topics);
-            if (topics.length > 0) {
+          // Set topics if available
+          if (levelData.papers[firstPaper] && levelData.papers[firstPaper].topics) {
+            const topics = Object.keys(levelData.papers[firstPaper].topics);
+            if (topics.length > 0 && !topics.includes(selectedTopic)) {
               setSelectedTopic(topics[0]);
-            } else {
+            } else if (topics.length === 0) {
               setSelectedTopic("Random");
             }
           }
+        }
+      }
+      
+      // Set difficulty
+      const currentSubject = subjectData[selectedSubject];
+      if (currentSubject && currentSubject.difficulty) {
+        const availableDifficulties = currentSubject.difficulty;
+        if (availableDifficulties.length > 0 && !availableDifficulties.includes(selectedDifficulty)) {
+          setSelectedDifficulty(availableDifficulties[0]);
+        } else if (availableDifficulties.length === 0) {
+          setSelectedDifficulty("Random");
         }
       }
     }
@@ -187,6 +517,8 @@ export function QuizForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setProgress(0); // Reset progress when starting
+    
     if (!selectedLevel) {
       alert("Please select a level.");
       setLoading(false);
@@ -195,8 +527,8 @@ export function QuizForm() {
     
     // Check for placeholder values
     if (
-      (hasSubjectSections(selectedSubject, selectedPaper) && selectedSection === "no-sections-available") || 
-      (hasPaperTopics(selectedSubject, selectedPaper) && selectedTopic === "no-topics-available")
+      (selectedSection === "no-sections-available") || 
+      (selectedTopic === "no-topics-available")
     ) {
       alert("Please select valid options for all fields.");
       setLoading(false);
@@ -205,6 +537,15 @@ export function QuizForm() {
     
     simulateProgress();
     
+    console.log("Submitting quiz with data:", {
+      subject: selectedSubject,
+      level: selectedLevel,
+      paper: selectedPaper,
+      topic: selectedTopic,
+      subtopic: selectedSubtopic,
+      difficulty: selectedDifficulty
+    });
+    
     // Prepare the data to send to the API
     const requestData = {
       subject: selectedSubject,
@@ -212,15 +553,9 @@ export function QuizForm() {
       level: selectedLevel,
       paper: selectedPaper,
       paperType: getPaperLabel(selectedSubject).toLowerCase(),
-      // Only include sections if the subject has them
-      ...(hasSubjectSections(selectedSubject, selectedPaper) && { sections: selectedSection }),
-      // Only include topics if the subject has them
-      ...(hasPaperTopics(selectedSubject, selectedPaper) && { topics: selectedTopic }),
-      // Add subtopic if it exists and is selected (and not "any")
-      ...(hasPaperTopics(selectedSubject, selectedPaper) && 
-          selectedSubtopic && 
-          selectedSubtopic !== "any" && 
-          { subtopic: selectedSubtopic })
+      sections: selectedSection !== "no-sections-available" ? selectedSection : undefined,
+      topics: selectedTopic !== "no-topics-available" ? selectedTopic : undefined,
+      subtopic: selectedSubtopic && selectedSubtopic !== "any" ? selectedSubtopic : undefined
     };
     
     try {
@@ -239,468 +574,145 @@ export function QuizForm() {
         console.log("Data received:", data);
         
         if (data.questions && Array.isArray(data.questions)) {
+            // Create a unique ID for the quiz
+            const quizId = uuidv4();
+            
+            // Format the data for the Zustand store
+            const formattedQuizData = {
+              id: quizId,
+              title: quizTitle || "Untitled Quiz",
+              description: quizDescription || "",
+              subject: selectedSubject,
+              level: selectedLevel,
+              difficulty: selectedDifficulty,
+              paper: selectedPaper,
+              section: selectedSection,
+              topic: selectedTopic,
+              subtopic: selectedSubtopic,
+              questions: data.questions.map((q: any, index: number) => ({
+                id: `question-${index}`,
+                question: q.question,
+                solution: data.solutions[index]?.solution || "",
+                subject: selectedSubject,
+                level: selectedLevel,
+                topic: selectedTopic,
+                section: selectedSection,
+                subtopic: selectedSubtopic,
+              })),
+              solutions: data.solutions,
+            };
+            
+            // Save to Zustand store
+            setFormattedQuiz(formattedQuizData);
+            
+            // Save to database asynchronously (don't wait for it)
+            try {
+              // If you have user authentication, pass the user ID
+              // const userId = session?.user?.id;
+              saveQuizToDatabase(/* userId */);
+            } catch (dbError) {
+              console.error("Database save error:", dbError);
+              // Continue anyway since we have the data in Zustand
+            }
+            
           // Just pass the entire data object (includes metadata)
           router.push(
             `/quiz/generated?questions=${encodeURIComponent(JSON.stringify(data))}`
           );
         } else {
-          // Get error from data if available or use random message
-          const errorMsg = data.error || errorMessages[Math.floor(Math.random() * errorMessages.length)];
-          setErrorMessage(errorMsg);
-          setDebugInfo(data);
+            // Get error from data if available or use random message
+            const errorMsg = data.error || errorMessages[Math.floor(Math.random() * errorMessages.length)];
+            setErrorMessage(errorMsg);
+            setDebugInfo(data);
         }
       } else {
-        // Parse error response
-        const errorData = await response.json();
-        console.error("API Error:", errorData);
-        setDebugInfo(errorData);
-        
-        // Show detailed error message in development
-        if (process.env.NODE_ENV === 'development') {
-          setErrorMessage(`Error: ${errorData.error}${errorData.details ? ` - ${errorData.details}` : ''} (${errorData.errorType || 'Unknown'})`);
-        } else {
-          // In production, show user-friendly message but include error type
-          setErrorMessage(`${errorData.error || errorMessages[Math.floor(Math.random() * errorMessages.length)]} (${errorData.errorType || 'Unknown'})`);
-        }
+          // Parse error response
+          const errorData = await response.json();
+          console.error("API Error:", errorData);
+          setDebugInfo(errorData);
+          
+          // Show detailed error message in development
+          if (process.env.NODE_ENV === 'development') {
+            setErrorMessage(`Error: ${errorData.error}${errorData.details ? ` - ${errorData.details}` : ''} (${errorData.errorType || 'Unknown'})`);
+          } else {
+            // In production, show user-friendly message but include error type
+            setErrorMessage(`${errorData.error || errorMessages[Math.floor(Math.random() * errorMessages.length)]} (${errorData.errorType || 'Unknown'})`);
+          }
       }
     } catch (error) {
       console.error("Fetch error:", error);
-      setErrorMessage(`Network error: ${error instanceof Error ? error.message : 'Unknown'}`);
-      setDebugInfo({ networkError: error instanceof Error ? error.message : 'Unknown error' });
+        setErrorMessage(`Network error: ${error instanceof Error ? error.message : 'Unknown'}`);
+        setDebugInfo({ networkError: error instanceof Error ? error.message : 'Unknown error' });
     } finally {
       setLoading(false);
     }
   };
-
-  // Add more comprehensive label mappings for papers, sections, and topics
-  const getPaperLabel = (subject: string): string => {
-    // Custom labels for different subjects
-    const paperLabels: Record<string, string> = {
-      // Languages
-      french: "Component",
-      irish: "Component",
-      spanish: "Component",
-      german: "Component",
-      italian: "Component",
-      japanese: "Component",
-      
-      // Sciences
-      physics: "Paper",
-      chemistry: "Section",
-      biology: "Unit",
-      
-      // Practical subjects
-      physicalEducation: "Strand",
-      engineering: "Paper",
-      technology: "Component",
-      constructionstudies: "Component",
-      designandcommunicationgraphics: "Paper",
-      
-      // Mathematics and related
-      mathematics: "Paper",
-      appliedmathematics: "Paper",
-      
-      // Arts and humanities
-      music: "Component",
-      art: "Component",
-      dramafilmandtheatrestudies: "Component",
-      history: "Paper",
-      geography: "Paper"
-    };
     
-    return paperLabels[subject] || "Paper";
+  // Function to get sections for any subject/paper
+  const getSections = (subject: string, paper: string): string[] => {
+    // Use the compatibility layer to get paper data directly
+    const paperData = subjectUtils.getPaperData(subject, selectedLevel, paper);
+    
+    if (paperData && Array.isArray(paperData.sections) && paperData.sections.length > 0) {
+      return paperData.sections;
+    }
+    
+    return ["no-sections-available"];
   };
 
-  // Enhanced section label mappings
-  const getSectionLabel = (subject: string): string => {
-    // Custom labels for different subjects
-    const sectionLabels: Record<string, string> = {
-      // Languages
-      french: "Skill Area",
-      spanish: "Skill Area",
-      irish: "Skill Area",
-      
-      // Sciences
-      physics: "Topic Area",
-      chemistry: "Topic Group",
-      biology: "Unit",
-      
-      // Practical subjects
-      physicalEducation: "Module",
-      engineering: "Area",
-      technology: "Area",
-      constructionstudies: "Area",
-      
-      // Mathematics and related
-      mathematics: "Section",
-      appliedmathematics: "Section",
-      
-      // Arts and humanities
-      music: "Domain",
-      art: "Element",
-      history: "Period",
-      geography: "Theme"
-    };
+  // Helper function to display friendly subject names
+  const getFriendlySubjectName = (subject: string): string => {
+    // Get metadata directly from subject data
+    const metadata = subjectUtils.getSubjectMetadata(subject);
     
-    return sectionLabels[subject] || "Section";
-  };
-
-  // Enhanced topic label mappings
-  const getTopicLabel = (subject: string): string => {
-    // Custom labels for different subjects
-    const topicLabels: Record<string, string> = {
-      // Languages
-      french: "Theme",
-      spanish: "Theme",
-      irish: "Theme",
-      
-      // Sciences
-      physics: "Concept",
-      chemistry: "Category",
-      biology: "Topic",
-      
-      // Practical subjects
-      physicalEducation: "Area",
-      engineering: "Concept",
-      technology: "Skill Area",
-      
-      // Mathematics and related
-      mathematics: "Topic",
-      appliedmathematics: "Area",
-      
-      // Arts and humanities
-      music: "Focus",
-      art: "Medium",
-      history: "Theme",
-      geography: "Region"
-    };
-    
-    return topicLabels[subject] || "Topic";
-  };
-
-  // Add a function to get the subtopic label based on the selected subject
-  const getSubtopicLabel = (subject: string): string => {
-    // Custom labels for different subjects
-    const subtopicLabels: Record<string, string> = {
-      // Languages
-      french: "Focus Point",
-      spanish: "Focus Point",
-      irish: "Focus Point",
-      
-      // Sciences
-      physics: "Specific Topic",
-      chemistry: "Example",
-      biology: "Application",
-      
-      // Practical subjects
-      physicalEducation: "Skill",
-      engineering: "Application",
-      technology: "Technique",
-      
-      // Mathematics and related
-      mathematics: "Problem Type",
-      appliedmathematics: "Example",
-      
-      // Arts and humanities
-      music: "Example",
-      art: "Technique",
-      history: "Case Study",
-      geography: "Case Study"
-    };
-    
-    return subtopicLabels[subject] || "Subtopic";
-  };
-
-  // Add helper function to map paper names between different formats
-  const mapPaperName = (subject: string, paper: string, toLevel: boolean = false): string => {
-    // If subject is mathematics, map between index.ts and level files naming conventions
-    if (subject === "mathematics") {
-      if (toLevel) {
-        // Map from index.ts format to level file format
-        const mapping: Record<string, string> = {
-          "Both": "Both",
-          "Paper 1": "paper1",
-          "Paper 2": "paper2"
-        };
-        return mapping[paper] || paper;
-      } else {
-        // Map from level file format to index.ts format
-        const mapping: Record<string, string> = {
-          "Both": "Both",
-          "paper1": "Paper 1",
-          "paper2": "Paper 2"
-        };
-        return mapping[paper] || paper;
-      }
-    }
-    return paper;
-  };
-
-  // Add a function to determine if the paper structure implies it has topics
-  const hasPaperTopics = (subject: string, paper: string): boolean => {
-    const currentSubject = subjectData[subject];
-    if (!currentSubject || !currentSubject.papers || !currentSubject.papers[paper]) {
-      return false;
+    // If the subject data has a displayName, use it
+    if (metadata.displayName) {
+      return metadata.displayName;
     }
     
-    const paperData = currentSubject.papers[paper];
-    
-    // Special case for mathematics since it has a different structure
-    if (subject === "mathematics") {
-      // For mathematics, check structure in the higher-level or relevant level file
-      try {
-        // Try to access the mathematics specific structure from the appropriate level
-        const mathsData = selectedLevel === "Higher Level" 
-          ? mathsHigherLevel?.mathematics 
-          : selectedLevel === "Ordinary Level" 
-            ? mathsOrdinaryLevel?.mathematics 
-            : mathsFoundationLevel?.mathematics;
-
-        if (mathsData && mathsData.papers) {
-          // Map paper name to correct format for level files
-          const levelPaperName = mapPaperName(subject, paper, true);
-          
-          if (mathsData.papers[levelPaperName]) {
-            return !!mathsData.papers[levelPaperName].topics && Object.keys(mathsData.papers[levelPaperName].topics).length > 0;
-          }
-        }
-      } catch (error) {
-        console.error("Error checking maths paper topics:", error);
-      }
-    }
-    
-    // Standard check for other subjects
-    return !!paperData.topics && Object.keys(paperData.topics).length > 0;
-  };
-
-  // Add a function to check if a subject has sections, with special handling for mathematics
-  const hasSubjectSections = (subject: string, paper: string): boolean => {
-    const currentSubject = subjectData[subject];
-    if (!currentSubject || !currentSubject.papers || !currentSubject.papers[paper]) {
-      return false;
-    }
-    
-    // Special case for mathematics since it has a different structure
-    if (subject === "mathematics") {
-      try {
-        // Try to access the mathematics specific structure from the appropriate level
-        const mathsData = selectedLevel === "Higher Level" 
-          ? mathsHigherLevel?.mathematics 
-          : selectedLevel === "Ordinary Level" 
-            ? mathsOrdinaryLevel?.mathematics 
-            : mathsFoundationLevel?.mathematics;
-
-        if (mathsData && mathsData.papers) {
-          // Map paper name to correct format for level files
-          const levelPaperName = mapPaperName(subject, paper, true);
-          
-          if (mathsData.papers[levelPaperName] && mathsData.papers[levelPaperName].sections) {
-            return Array.isArray(mathsData.papers[levelPaperName].sections) && 
-                   mathsData.papers[levelPaperName].sections.length > 0;
-          }
-        }
-        return true; // Default to true for mathematics to show sections
-      } catch (error) {
-        console.error("Error checking maths sections:", error);
-        return true; // Default to true on error
-      }
-    }
-    
-    const paperData = currentSubject.papers[paper];
-    return Array.isArray(paperData.sections) && paperData.sections.length > 0;
-  };
-
-  // Add a function to get mathematics sections
-  const getMathsSections = (paper: string): string[] => {
-    try {
-      const mathsData = selectedLevel === "Higher Level" 
-        ? mathsHigherLevel?.mathematics 
-        : selectedLevel === "Ordinary Level" 
-          ? mathsOrdinaryLevel?.mathematics 
-          : mathsFoundationLevel?.mathematics;
-      
-      // Map paper name to correct format for level files
-      const levelPaperName = mapPaperName("mathematics", paper, true);
-        
-      if (mathsData && mathsData.papers && mathsData.papers[levelPaperName]) {
-        const paperSections = mathsData.papers[levelPaperName].sections;
-        if (Array.isArray(paperSections) && paperSections.length > 0) {
-          return paperSections;
-        }
-      }
-      return ["Short Questions", "Long Questions"]; // Default sections for mathematics
-    } catch (error) {
-      console.error("Error getting maths sections:", error);
-      return ["Short Questions", "Long Questions"]; // Default sections on error
-    }
-  };
-
-  // Add a function to get mathematics topics
-  const getMathsTopics = (paper: string): string[] => {
-    try {
-      const mathsData = selectedLevel === "Higher Level" 
-        ? mathsHigherLevel?.mathematics 
-        : selectedLevel === "Ordinary Level" 
-          ? mathsOrdinaryLevel?.mathematics 
-          : mathsFoundationLevel?.mathematics;
-      
-      // Map paper name to correct format for level files
-      const levelPaperName = mapPaperName("mathematics", paper, true);
-        
-      if (mathsData && mathsData.papers && mathsData.papers[levelPaperName]) {
-        const paperTopics = mathsData.papers[levelPaperName].topics;
-        if (paperTopics) {
-          return Object.keys(paperTopics);
-        }
-      }
-      return [];
-    } catch (error) {
-      console.error("Error getting maths topics:", error);
-      return [];
-    }
-  };
-
-  // Add a function to check if a paper has subtopics
-  const hasSubtopics = (subject: string, paper: string, section?: string, topic?: string): boolean => {
-    if (!subject || !paper || subject === 'placeholder' || paper === 'placeholder') {
-      return false;
-    }
-    
-    try {
-      // Special case for mathematics
-      if (subject === "mathematics") {
-        // For maths, check if the selected topic has subtopics (array with length > 0)
-        const mathsData = selectedLevel === "Higher Level" 
-          ? mathsHigherLevel?.mathematics 
-          : selectedLevel === "Ordinary Level" 
-            ? mathsOrdinaryLevel?.mathematics 
-            : mathsFoundationLevel?.mathematics;
-        
-        // Map paper name to correct format for level files
-        const levelPaperName = mapPaperName(subject, paper, true);
-            
-        if (mathsData && mathsData.papers && mathsData.papers[levelPaperName] && topic) {
-          const paperTopics = mathsData.papers[levelPaperName].topics;
-          return !!paperTopics && !!paperTopics[topic] && paperTopics[topic].length > 0;
-        }
-        return false;
-      }
-      
-      // Standard approach for other subjects
-      const subjectDataParam = getSubjectData(subject);
-      if (!subjectDataParam || !subjectDataParam.papers) return false;
-      
-      const paperData = subjectDataParam.papers[paper];
-      if (!paperData) return false;
-      
-      // If we have sections and topics
-      if (section && section !== 'placeholder' && topic && topic !== 'placeholder' && paperData.sections) {
-        const sectionData = paperData.sections[section];
-        if (sectionData && sectionData.topics) {
-          const topicData = sectionData.topics[topic];
-          return !!topicData && !!topicData.subtopics && Object.keys(topicData.subtopics).length > 0;
-        }
-      }
-      
-      // If we have just topics without sections
-      if (topic && topic !== 'placeholder' && paperData.topics) {
-        const topicData = paperData.topics[topic];
-        return !!topicData && !!topicData.subtopics && Object.keys(topicData.subtopics).length > 0;
-      }
-      
-      return false;
-    } catch (error) {
-      console.error("Error checking for subtopics:", error);
-      return false;
-    }
-  };
-
-  // Add a function to get subtopics for a given paper, section, and topic
-  const getSubtopics = (subject: string, paper: string, section?: string, topic?: string): string[] => {
-    if (!subject || !paper || subject === 'placeholder' || paper === 'placeholder') {
-      return [];
-    }
-    
-    try {
-      // Special case for mathematics
-      if (subject === "mathematics") {
-        // For maths, return the array of subtopics for the selected topic
-        const mathsData = selectedLevel === "Higher Level" 
-          ? mathsHigherLevel?.mathematics 
-          : selectedLevel === "Ordinary Level" 
-            ? mathsOrdinaryLevel?.mathematics 
-            : mathsFoundationLevel?.mathematics;
-        
-        // Map paper name to correct format for level files
-        const levelPaperName = mapPaperName(subject, paper, true);
-            
-        if (mathsData && mathsData.papers && mathsData.papers[levelPaperName] && topic) {
-          const paperTopics = mathsData.papers[levelPaperName].topics;
-          if (paperTopics && paperTopics[topic] && Array.isArray(paperTopics[topic])) {
-            return paperTopics[topic];
-          }
-        }
-        return [];
-      }
-      
-      // Standard approach for other subjects
-      const subjectDataParam = getSubjectData(subject);
-      if (!subjectDataParam || !subjectDataParam.papers) return [];
-      
-      const paperData = subjectDataParam.papers[paper];
-      if (!paperData) return [];
-      
-      // If we have sections and topics
-      if (section && section !== 'placeholder' && topic && topic !== 'placeholder' && paperData.sections) {
-        const sectionData = paperData.sections[section];
-        if (sectionData && sectionData.topics) {
-          const topicData = sectionData.topics[topic];
-          if (topicData && topicData.subtopics) {
-            return Object.keys(topicData.subtopics);
-          }
-        }
-      }
-      
-      // If we have just topics without sections
-      if (topic && topic !== 'placeholder' && paperData.topics) {
-        const topicData = paperData.topics[topic];
-        if (topicData && topicData.subtopics) {
-          return Object.keys(topicData.subtopics);
-        }
-      }
-      
-      return [];
-    } catch (error) {
-      console.error("Error getting subtopics:", error);
-      return [];
-    }
+    // Otherwise use simple capitalization
+    return subject.charAt(0).toUpperCase() + subject.slice(1);
   };
 
   return (
-    <><form onSubmit={handleSubmit} className="space-y-6 mx-auto max-w-2xl px-4 md:px-8">
-<Card className="w-full">
+    <form onSubmit={handleSubmit} className="space-y-6 mx-auto max-w-2xl px-4 md:px-8">
+      <Card className="w-full">
         <CardContent className="pt-6">
             <div className="space-y-2">
               <Label>Quiz Title</Label>
-              <Input placeholder="Enter quiz title..." />
+              <Input 
+                placeholder="Enter quiz title..." 
+                value={quizTitle}
+                onChange={(e) => setQuizTitle(e.target.value)}
+              />
             </div>
 
             <div className="space-y-2">
               <Label>Description</Label>
-              <Textarea placeholder="Enter quiz description..." />
+              <Textarea 
+                placeholder="Enter quiz description..." 
+                value={quizDescription}
+                onChange={(e) => setQuizDescription(e.target.value)}
+              />
             </div>
 
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Subject</Label>
-                <Select onValueChange={setSelectedSubject} defaultValue="mathematics">
-                  <SelectTrigger>
+                <Select
+                  value={selectedSubject}
+                  onValueChange={(value: string) => {
+                    setSelectedSubject(value);
+                    setErrorMessage(null);
+                  }}
+                >
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select subject" />
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.keys(subjectData).map((subject) => (
+                    {availableSubjects.map((subject) => (
                       <SelectItem key={subject} value={subject}>
-                        {subject.charAt(0).toUpperCase() + subject.slice(1)}
+                        {getFriendlySubjectName(subject)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -741,25 +753,33 @@ export function QuizForm() {
                       </Select>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label>{getPaperLabel(selectedSubject)}</Label>
-                      <Select onValueChange={setSelectedPaper}>
-                        <SelectTrigger>
-                          <SelectValue placeholder={`Select ${getPaperLabel(selectedSubject).toLowerCase()}`} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Object.entries(subjectData[selectedSubject]?.papers || {}).map(
-                            ([key, paper]: [string, any]) => (
-                              <SelectItem key={key} value={key}>
-                                {paper.name}
-                              </SelectItem>
-                            )
-                          )}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    {/* Only show paper dropdown for core subjects */}
+                    {isCoreSubject(selectedSubject) && (
+                      <div className="space-y-2">
+                        <Label>{subjectUtils.getPaperLabel(selectedSubject)}</Label>
+                        <Select onValueChange={setSelectedPaper}>
+                          <SelectTrigger>
+                            <SelectValue placeholder={`Select ${subjectUtils.getPaperLabel(selectedSubject).toLowerCase()}`} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {getAvailablePapers(selectedSubject, selectedLevel).map((paper) => {
+                              // Get paper display name from the level data if possible
+                              const levelData = getDirectLevelData(selectedSubject, selectedLevel);
+                              const paperName = levelData?.papers?.[paper]?.name || paper;
+                              
+                              return (
+                                <SelectItem key={paper} value={paper}>
+                                  {paperName}
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
 
-                    {hasSubjectSections(selectedSubject, selectedPaper) && (
+                    {/* For non-core subjects, get data directly from the level data structure */}
+                    {!isCoreSubject(selectedSubject) && (
                       <div className="space-y-2">
                         <Label>{getSectionLabel(selectedSubject)}</Label>
                         <Select onValueChange={(value) => {
@@ -772,37 +792,120 @@ export function QuizForm() {
                             <SelectValue placeholder={`Select ${getSectionLabel(selectedSubject).toLowerCase()}`} />
                           </SelectTrigger>
                           <SelectContent>
-                            {selectedSubject === "mathematics" ? (
-                              // For mathematics, get sections from the level-specific data
-                              getMathsSections(selectedPaper).length > 0 ? 
-                                getMathsSections(selectedPaper).map(
-                                  (section) => (
-                                    <SelectItem key={section} value={section}>
-                                      {section}
-                                    </SelectItem>
-                                  )
-                                ) : 
-                                <SelectItem value="Short Questions">Short Questions</SelectItem>
-                            ) : (
-                              // For other subjects, use the standard approach
-                              subjectData[selectedSubject]?.papers[selectedPaper]?.sections?.length > 0 ? 
-                                subjectData[selectedSubject]?.papers[selectedPaper]?.sections?.map(
-                                  (section: string) => (
-                                    <SelectItem key={section} value={section}>
-                                      {section}
-                                    </SelectItem>
-                                  )
-                                ) : (
-                                  <SelectItem value="Short Questions">Short Questions</SelectItem>
-                                )
-                            )}
+                            {/* Get sections directly from level data if possible */}
+                            {(() => {
+                              const levelData = getDirectLevelData(selectedSubject, selectedLevel);
+                              let sections: string[] = [];
+                              
+                              // First check if we have a "papers" structure (like Physical Education)
+                              if (levelData?.papers) {
+                                // If there's only one paper, use its sections
+                                const papers = Object.keys(levelData.papers);
+                                if (papers.length === 1) {
+                                  sections = levelData.papers[papers[0]]?.sections || [];
+                                } else if (papers.length > 1) {
+                                  // If there are multiple papers, use the "Both" paper's sections if it exists
+                                  sections = levelData.papers["Both"]?.sections || 
+                                            levelData.papers[papers[0]]?.sections || [];
+                                }
+                              }
+                              // Then check if we have a "sections" structure (like Biology)
+                              else if (levelData?.sections) {
+                                // For biology-like structure, use the section names as options
+                                const availableSections = Object.keys(levelData.sections);
+                                sections = availableSections.map(sectionKey => {
+                                  // Use the section name property if available, otherwise use the key
+                                  return levelData.sections[sectionKey]?.name || sectionKey;
+                                });
+                              }
+                              
+                              // Fallback to compatibility layer if needed
+                              if (sections.length === 0) {
+                                sections = getSections(selectedSubject, "Both");
+                              }
+                              
+                              console.log(`Available sections for ${selectedSubject}:`, sections);
+                              
+                              return sections.length > 0 ? 
+                                sections.map((section) => (
+                                  <SelectItem key={section} value={section}>
+                                    {section}
+                                  </SelectItem>
+                                )) : 
+                                <SelectItem value="Short Questions">Short Questions</SelectItem>;
+                            })()}
                           </SelectContent>
                         </Select>
                       </div>
                     )}
 
-                    {hasPaperTopics(selectedSubject, selectedPaper) && (
+                    {/* Only show sections for core subjects with papers */}
+                    {isCoreSubject(selectedSubject) && subjectUtils.hasSubjectSections(selectedSubject, selectedPaper) && (
+                    <div className="space-y-2">
+                        <Label>{getSectionLabel(selectedSubject)}</Label>
+                        <Select onValueChange={(value) => {
+                          // Skip setting the value if it's the placeholder
+                          if (value !== "no-sections-available") {
+                            setSelectedSection(value);
+                          }
+                        }}>
+                        <SelectTrigger>
+                            <SelectValue placeholder={`Select ${getSectionLabel(selectedSubject).toLowerCase()}`} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {getSections(selectedSubject, selectedPaper).length > 0 ? 
+                                getSections(selectedSubject, selectedPaper).map(
+                            (section) => (
+                              <SelectItem key={section} value={section}>
+                                {section}
+                              </SelectItem>
+                                  )
+                                ) : 
+                                <SelectItem value="Short Questions">Short Questions</SelectItem>
+                          }
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    )}
+
+                    {/* Topic selection for non-core subjects - NEW */}
+                    {!isCoreSubject(selectedSubject) && (
                       <div className="space-y-2">
+                        <Label>{getTopicLabel(selectedSubject)}</Label>
+                        <Select 
+                          value={selectedTopic}
+                          onValueChange={(value) => {
+                            // Skip setting the value if it's the placeholder
+                            if (value !== "no-topics-available") {
+                              setSelectedTopic(value);
+                            }
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder={`Select ${getTopicLabel(selectedSubject).toLowerCase()}`} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {(() => {
+                              // Get topics directly using our utility function that handles paper selection internally
+                              const topics = getAvailableTopics(selectedSubject, "");
+                              console.log(`Rendering topics for ${selectedSubject}:`, topics);
+                              
+                              return topics.length > 0 ? 
+                                topics.map((topic) => (
+                                  <SelectItem key={topic} value={topic}>
+                                    {topic}
+                                  </SelectItem>
+                                )) : 
+                                <SelectItem value="no-topics-available">No {getTopicLabel(selectedSubject).toLowerCase()}s available</SelectItem>;
+                            })()}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+
+                    {/* Topic selection for core subjects */}
+                    {isCoreSubject(selectedSubject) && subjectUtils.hasPaperTopics(selectedSubject, selectedPaper) && (
+                    <div className="space-y-2">
                         <Label>{getTopicLabel(selectedSubject)}</Label>
                         <Select onValueChange={(value) => {
                           // Skip setting the value if it's the placeholder
@@ -810,14 +913,12 @@ export function QuizForm() {
                             setSelectedTopic(value);
                           }
                         }}>
-                          <SelectTrigger>
+                        <SelectTrigger>
                             <SelectValue placeholder={`Select ${getTopicLabel(selectedSubject).toLowerCase()}`} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {selectedSubject === "mathematics" ? (
-                              // For mathematics, get topics from the level-specific data
-                              getMathsTopics(selectedPaper).length > 0 ? 
-                                getMathsTopics(selectedPaper).map(
+                        </SelectTrigger>
+                        <SelectContent>
+                            {getAvailableTopics(selectedSubject, selectedPaper).length > 0 ? 
+                                getAvailableTopics(selectedSubject, selectedPaper).map(
                                   (topic) => (
                                     <SelectItem key={topic} value={topic}>
                                       {topic}
@@ -825,61 +926,46 @@ export function QuizForm() {
                                   )
                                 ) : 
                                 <SelectItem value="no-topics-available">No {getTopicLabel(selectedSubject).toLowerCase()}s available</SelectItem>
-                            ) : (
-                              // For other subjects, use the standard approach
-                              Object.keys(subjectData[selectedSubject]?.papers[selectedPaper]?.topics || {}).length > 0 ? 
-                                Object.keys(subjectData[selectedSubject]?.papers[selectedPaper]?.topics || {}).map(
-                                  (topics) => (
-                                    <SelectItem key={topics} value={topics}>
-                                      {topics}
-                                    </SelectItem>
-                                  )
-                                ) : 
-                                <SelectItem value="no-topics-available">No {getTopicLabel(selectedSubject).toLowerCase()}s available</SelectItem>
-                            )}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                          }
+                        </SelectContent>
+                      </Select>
+                    </div>
                     )}
 
-                    {selectedTopic !== "Random" && availableSubtopics.length > 0 && (
-                      <div className="space-y-2">
+                    {selectedTopic !== "Random" && selectedTopic !== "no-topics-available" && availableSubtopics.length > 0 && (
+                    <div className="space-y-2">
                         <Label>{getSubtopicLabel(selectedSubject)}</Label>
                         <Select onValueChange={setSelectedSubtopic}>
-                          <SelectTrigger>
+                        <SelectTrigger>
                             <SelectValue placeholder={`Select ${getSubtopicLabel(selectedSubject).toLowerCase()}`} />
-                          </SelectTrigger>
-                          <SelectContent>
+                        </SelectTrigger>
+                        <SelectContent>
                             <SelectItem value="any">Any {getSubtopicLabel(selectedSubject).toLowerCase()}</SelectItem>
-                            {availableSubtopics.map((subtopic) => (
+                          {availableSubtopics.map((subtopic) => (
                               <SelectItem key={subtopic} value={subtopic || `subtopic-${Math.random()}`}>
                                 {subtopic || "Unnamed subtopic"}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                     )}
                   </>
                 )}
             </div>
            
         </CardContent>
-        <CardFooter>
+        <CardFooter className="flex flex-col gap-4">
+          {/* Show progress bar only when loading */}
+          {loading && (
+            <div className="w-full">
+              <div className="text-center mb-2">Generating quiz...</div>
+              <Progress value={progress} className="w-full h-2" />
+            </div>
+          )}
+          
           <Button type="submit" disabled={loading} className="w-full">
-            {loading ? (
-              <div className="flex items-center justify-center">
-                <div className="mr-2">Generating...</div>
-                <div className="w-20 bg-gray-300 rounded-full h-2">
-                  <div
-                    className="bg-primary h-2 rounded-full transition-all duration-300 ease-in-out"
-                    style={{ width: `${progress}%` }}
-                  ></div>
-                </div>
-              </div>
-            ) : (
-              <>Generate Questions</>
-            )}
+            {loading ? "Please wait..." : "Generate Questions"}
           </Button>
         </CardFooter>
       </Card>
@@ -913,7 +999,6 @@ export function QuizForm() {
           </Card>
         </div>
       )}
-    </form></>
-    
+    </form>
   );
 }

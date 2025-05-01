@@ -144,6 +144,7 @@ export default function Sidebar() {
           >
             <FiEdit size={20} /> {isOpen && "Create Quiz"}
           </Link>
+          
           <Link 
             href="/exams" 
             className="flex items-center gap-3 px-3 py-2 rounded hover:bg-brand-dark transition"

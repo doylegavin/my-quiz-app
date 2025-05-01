@@ -1,8 +1,8 @@
 import higherLevel from './higher-level';
 
 // Extract topics from higher-level.ts for use in the main index
-const strand1Topics = higherLevel.physicalEducation.papers["Strand 1"].topics;
-const strand2Topics = higherLevel.physicalEducation.papers["Strand 2"].topics;
+const strand1Topics = higherLevel.physicalEducation?.papers?.["Strand 1"]?.topics || {};
+const strand2Topics = higherLevel.physicalEducation?.papers?.["Strand 2"]?.topics || {};
 
 export const physicalEducation = {
   papers: {

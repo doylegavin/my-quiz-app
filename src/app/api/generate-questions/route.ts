@@ -1,6 +1,19 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { getSubjectPrompt } from "@/lib/prompts/subjectPrompts";
+import { getDifficultySpecificPrompt } from "@/lib/prompts/enhancedPromptUtils";
+import { useEnhancedSubjectStore } from "@/lib/stores/enhancedSubjectStore";
+import { registerEnhancedSubjects } from "@/data/subjects/enhanced-samples";
+
+// Initialize enhanced subjects at module level
+// This ensures the store is ready before any API requests
+registerEnhancedSubjects();
+console.log("Enhanced subjects registered in generate-questions API route");
+
+// Get a list of available subjects from the enhanced store
+const enhancedStore = useEnhancedSubjectStore.getState();
+const enhancedSubjects = enhancedStore.subjects;
+console.log("Available enhanced subjects:", Object.keys(enhancedSubjects));
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -77,8 +90,22 @@ export async function POST(req: Request) {
     const requiresLatex = calculationSubjects.includes(subject);
     const isLanguageSubject = languageSubjects.includes(subject);
     
-    // Get subject-specific prompt if available
-    const subjectPrompt = getSubjectPrompt(subject, level);
+    // Get subject-specific prompt using enhanced system if available
+    let subjectPrompt;
+    if (subject && level) {
+      // Use the enhanced prompt with difficulty-specific instructions
+      subjectPrompt = getDifficultySpecificPrompt(
+        subject,
+        level,
+        difficulty || 'Random',
+        paper,
+        topic !== 'Random' ? topic : undefined,
+        subtopic !== 'any' ? subtopic : undefined
+      );
+    } else {
+      // Fall back to original prompt if missing required data
+      subjectPrompt = getSubjectPrompt(subject, level);
+    }
     
     // Build the base instructions - use subject-specific if available, otherwise use generic
     let baseInstructions = subjectPrompt.baseInstructions;

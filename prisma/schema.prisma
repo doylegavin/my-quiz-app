@@ -8,20 +8,21 @@ datasource db {
 }
 
 model User {
-  id            String     @id @default(cuid())
-  name          String?
-  email         String?    @unique
-  password      String?
-  emailVerified DateTime?
-  image         String?
-  role          Role       @default(STUDENT)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  facebookId    String?    @unique
-  accounts      Account[]
-  progress      Progress[]
-  quizzes       Quiz[]
-  sessions      Session[]
+  id               String          @id @default(cuid())
+  name             String?
+  email            String?         @unique
+  password         String?
+  emailVerified    DateTime?
+  image            String?
+  role             Role            @default(STUDENT)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  facebookId       String?         @unique
+  accounts         Account[]
+  progress         Progress[]
+  quizzes          Quiz[]
+  sessions         Session[]
+  generatedQuizzes GeneratedQuiz[]
 }
 
 model Account {
@@ -30,12 +31,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?  @db.Text
-  access_token      String?  @db.Text
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?  @db.Text
+  id_token          String? @db.Text
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -106,6 +107,34 @@ model Game {
   timeStarted DateTime   @default(now())
   topic       String
   questions   Question[]
+}
+
+model GeneratedQuiz {
+  id          String              @id @default(cuid())
+  title       String?
+  description String?
+  subject     String
+  level       String
+  difficulty  String              @default("Random")
+  paper       String?
+  section     String?
+  topic       String?
+  subtopic    String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  isPublic    Boolean             @default(true)
+  userId      String?
+  user        User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
+  questions   GeneratedQuestion[]
+}
+
+model GeneratedQuestion {
+  id       String        @id @default(cuid())
+  question String        @db.Text
+  solution String        @db.Text
+  metadata Json?
+  quizId   String
+  quiz     GeneratedQuiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
 }
 
 enum Role {
