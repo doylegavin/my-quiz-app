@@ -42,6 +42,11 @@ export interface EnhancedSubject {
   levels: Record<string, EnhancedLevel>;
   keywords?: string[];
   relatedSubjects?: string[];
+  paperLabel?: string;
+  sectionLabel?: string;
+  topicLabel?: string;
+  subtopicLabel?: string;
+  metadata?: Record<string, any>;
 }
 
 // Type for the overall enhanced subjects data structure
