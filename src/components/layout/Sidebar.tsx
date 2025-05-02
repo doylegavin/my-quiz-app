@@ -19,6 +19,16 @@ export default function Sidebar() {
   const initialStateSet = useRef(false);
   const router = useRouter();
 
+  // Initialize EmailJS
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY) {
+      emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY);
+      console.log("EmailJS initialized");
+    } else {
+      console.error("EmailJS public key not found");
+    }
+  }, []);
+
   // Detect screen size and set initial state only once
   useEffect(() => {
     const handleResize = () => {
@@ -41,21 +51,36 @@ export default function Sidebar() {
     e.preventDefault();
     if (!feedback.trim()) return; // Prevent empty submissions
     setIsSubmitting(true);
+    
+    console.log("Submitting feedback:", feedback);
+    console.log("EmailJS keys:", {
+      serviceId: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID,
+      templateId: process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID,
+      publicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY?.substring(0, 5) + "..." // Log only part of the key for security
+    });
 
-    emailjs
-      .send(
+    try {
+      const result = await emailjs.send(
         process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
         process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
-        { message: feedback },
+        { 
+          message: feedback,
+          from_name: session?.user?.name || "Anonymous User",
+          from_email: session?.user?.email || "anonymous@user.com"
+        },
         process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
-      )
-      .then(() => {
-        setFeedback("");
-        setFeedbackSent(true);
-        setTimeout(() => setFeedbackSent(false), 3000);
-      })
-      .catch(() => alert("Failed to send feedback. Please try again."))
-      .finally(() => setIsSubmitting(false));
+      );
+      
+      console.log("EmailJS success:", result);
+      setFeedback("");
+      setFeedbackSent(true);
+      setTimeout(() => setFeedbackSent(false), 3000);
+    } catch (error) {
+      console.error("EmailJS error:", error);
+      alert("Failed to send feedback. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleSignOut = async () => {

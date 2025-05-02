@@ -553,6 +553,26 @@ export function getSubjectPrompt(subject: string, level: string): SubjectPromptT
   // Convert to lowercase and remove spaces for consistent matching
   const normalizedSubject = subject.toLowerCase().replace(/\s+/g, '');
   
+  // First, try to get subject-specific prompts from the subject folder
+  try {
+    // Dynamic import attempt for subject-specific prompts
+    // This will check for a prompts.ts file in the subject folder
+    const subjectPrompts = require(`@/data/subjects/${normalizedSubject}/prompts`).default;
+    
+    if (subjectPrompts) {
+      console.log(`Found subject-specific prompts for ${subject}`);
+      return {
+        baseInstructions: subjectPrompts.baseInstructions,
+        userPrompt: subjectPrompts.userPrompt,
+        exampleQuestion: subjectPrompts.exampleQuestion,
+        exampleSolution: subjectPrompts.exampleSolution
+      };
+    }
+  } catch (error) {
+    // If no specific prompts file is found, continue with normal prompt lookup
+    console.log(`No subject-specific prompts found for ${subject}, using standard templates`);
+  }
+  
   // Get subject-specific templates if available
   const subjectTemplates = subjectPrompts[normalizedSubject];
   

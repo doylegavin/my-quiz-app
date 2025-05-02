@@ -348,10 +348,10 @@ export function QuizForm() {
         if (!topics.includes(selectedTopic)) {
           setSelectedTopic(topics[0]);
         }
-      } else {
+        } else {
         setSelectedTopic("Random");
-      }
-    } else {
+        }
+      } else {
       setSelectedTopic("Random");
     }
   }, [selectedPaper, selectedSubject, selectedLevel]);
@@ -514,16 +514,16 @@ export function QuizForm() {
   
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
     setProgress(0); // Reset progress when starting
     
-    if (!selectedLevel) {
-      alert("Please select a level.");
-      setLoading(false);
-      return;
-    }
+  if (!selectedLevel) {
+    alert("Please select a level.");
+    setLoading(false);
+    return;
+  }
     
     // Check for placeholder values
     if (
@@ -535,7 +535,7 @@ export function QuizForm() {
       return;
     }
     
-    simulateProgress();
+  simulateProgress();
     
     console.log("Submitting quiz with data:", {
       subject: selectedSubject,
@@ -545,35 +545,35 @@ export function QuizForm() {
       subtopic: selectedSubtopic,
       difficulty: selectedDifficulty
     });
-    
-    // Prepare the data to send to the API
-    const requestData = {
-      subject: selectedSubject,
-      difficulty: selectedDifficulty,
-      level: selectedLevel,
-      paper: selectedPaper,
+  
+  // Prepare the data to send to the API
+  const requestData = {
+    subject: selectedSubject,
+    difficulty: selectedDifficulty,
+    level: selectedLevel,
+    paper: selectedPaper,
       paperType: getPaperLabel(selectedSubject).toLowerCase(),
       sections: selectedSection !== "no-sections-available" ? selectedSection : undefined,
       topics: selectedTopic !== "no-topics-available" ? selectedTopic : undefined,
       subtopic: selectedSubtopic && selectedSubtopic !== "any" ? selectedSubtopic : undefined
-    };
+  };
+  
+  try {
+    // Make an API call to fetch questions
+    const response = await fetch("/api/generate-questions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestData),
+    });
     
-    try {
-      // Make an API call to fetch questions
-      const response = await fetch("/api/generate-questions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestData),
-      });
+    console.log("Request data:", requestData); // Log request data
+    console.log("Response:", response);
+    
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Data received:", data);
       
-      console.log("Request data:", requestData); // Log request data
-      console.log("Response:", response);
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Data received:", data);
-        
-        if (data.questions && Array.isArray(data.questions)) {
+      if (data.questions && Array.isArray(data.questions)) {
             // Create a unique ID for the quiz
             const quizId = uuidv4();
             
@@ -615,17 +615,17 @@ export function QuizForm() {
               // Continue anyway since we have the data in Zustand
             }
             
-          // Just pass the entire data object (includes metadata)
-          router.push(
-            `/quiz/generated?questions=${encodeURIComponent(JSON.stringify(data))}`
-          );
-        } else {
+        // Just pass the entire data object (includes metadata)
+        router.push(
+          `/quiz/generated?questions=${encodeURIComponent(JSON.stringify(data))}`
+        );
+      } else {
             // Get error from data if available or use random message
             const errorMsg = data.error || errorMessages[Math.floor(Math.random() * errorMessages.length)];
             setErrorMessage(errorMsg);
             setDebugInfo(data);
-        }
-      } else {
+      }
+    } else {
           // Parse error response
           const errorData = await response.json();
           console.error("API Error:", errorData);
@@ -638,16 +638,16 @@ export function QuizForm() {
             // In production, show user-friendly message but include error type
             setErrorMessage(`${errorData.error || errorMessages[Math.floor(Math.random() * errorMessages.length)]} (${errorData.errorType || 'Unknown'})`);
           }
-      }
-    } catch (error) {
-      console.error("Fetch error:", error);
+    }
+  } catch (error) {
+    console.error("Fetch error:", error);
         setErrorMessage(`Network error: ${error instanceof Error ? error.message : 'Unknown'}`);
         setDebugInfo({ networkError: error instanceof Error ? error.message : 'Unknown error' });
-    } finally {
-      setLoading(false);
-    }
-  };
-    
+  } finally {
+    setLoading(false);
+  }
+};
+  
   // Function to get sections for any subject/paper
   const getSections = (subject: string, paper: string): string[] => {
     // Use the compatibility layer to get paper data directly
@@ -673,10 +673,10 @@ export function QuizForm() {
     // Otherwise use simple capitalization
     return subject.charAt(0).toUpperCase() + subject.slice(1);
   };
-
+  
   return (
     <form onSubmit={handleSubmit} className="space-y-6 mx-auto max-w-2xl px-4 md:px-8">
-      <Card className="w-full">
+<Card className="w-full">
         <CardContent className="pt-6">
             <div className="space-y-2">
               <Label>Quiz Title</Label>
@@ -755,13 +755,13 @@ export function QuizForm() {
 
                     {/* Only show paper dropdown for core subjects */}
                     {isCoreSubject(selectedSubject) && (
-                      <div className="space-y-2">
+                    <div className="space-y-2">
                         <Label>{subjectUtils.getPaperLabel(selectedSubject)}</Label>
-                        <Select onValueChange={setSelectedPaper}>
-                          <SelectTrigger>
+                      <Select onValueChange={setSelectedPaper}>
+                        <SelectTrigger>
                             <SelectValue placeholder={`Select ${subjectUtils.getPaperLabel(selectedSubject).toLowerCase()}`} />
-                          </SelectTrigger>
-                          <SelectContent>
+                        </SelectTrigger>
+                        <SelectContent>
                             {getAvailablePapers(selectedSubject, selectedLevel).map((paper) => {
                               // Get paper display name from the level data if possible
                               const levelData = getDirectLevelData(selectedSubject, selectedLevel);
@@ -770,7 +770,7 @@ export function QuizForm() {
                               return (
                                 <SelectItem key={paper} value={paper}>
                                   {paperName}
-                                </SelectItem>
+                              </SelectItem>
                               );
                             })}
                           </SelectContent>
@@ -834,9 +834,9 @@ export function QuizForm() {
                                 )) : 
                                 <SelectItem value="Short Questions">Short Questions</SelectItem>;
                             })()}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                        </SelectContent>
+                      </Select>
+                    </div>
                     )}
 
                     {/* Only show sections for core subjects with papers */}
@@ -859,7 +859,7 @@ export function QuizForm() {
                               <SelectItem key={section} value={section}>
                                 {section}
                               </SelectItem>
-                                  )
+                            )
                                 ) : 
                                 <SelectItem value="Short Questions">Short Questions</SelectItem>
                           }
@@ -898,9 +898,9 @@ export function QuizForm() {
                                 )) : 
                                 <SelectItem value="no-topics-available">No {getTopicLabel(selectedSubject).toLowerCase()}s available</SelectItem>;
                             })()}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                        </SelectContent>
+                      </Select>
+                    </div>
                     )}
 
                     {/* Topic selection for core subjects */}
@@ -922,8 +922,8 @@ export function QuizForm() {
                                   (topic) => (
                                     <SelectItem key={topic} value={topic}>
                                       {topic}
-                                    </SelectItem>
-                                  )
+                              </SelectItem>
+                            )
                                 ) : 
                                 <SelectItem value="no-topics-available">No {getTopicLabel(selectedSubject).toLowerCase()}s available</SelectItem>
                           }
@@ -961,7 +961,7 @@ export function QuizForm() {
             <div className="w-full">
               <div className="text-center mb-2">Generating quiz...</div>
               <Progress value={progress} className="w-full h-2" />
-            </div>
+      </div>
           )}
           
           <Button type="submit" disabled={loading} className="w-full">
@@ -991,14 +991,14 @@ export function QuizForm() {
                   {showDebug && debugInfo && (
                     <div className="mt-4 p-4 bg-gray-900 text-gray-100 rounded-md overflow-x-auto">
                       <pre className="text-xs">{JSON.stringify(debugInfo, null, 2)}</pre>
-                    </div>
-                  )}
+  </div>
+)}
                 </>
               )}
             </CardContent>
           </Card>
-        </div>
-      )}
+          </div>
+        )}
     </form>
   );
 }
