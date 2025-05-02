@@ -39,7 +39,7 @@ export default function Home() {
         </div>
 
         <h1 className="text-4xl md:text-7xl font-bold tracking-tight mb-4 pb-4 bg-gradient-to-r from-brand to-brand bg-clip-text text-transparent">
-          Exam prep, for everyone
+          <i>Exam prep for everyone</i>
         </h1>
         <p className="text-lg md:text-2xl text-gray-700 max-w-3xl mx-auto mb-8">
           Join Hundreds of Students & Teachers Saving Hours on Exam Revision
@@ -52,9 +52,44 @@ export default function Home() {
         <p className="text-sm text-gray-500 mt-3">No card needed. Takes seconds to start.</p>
       </motion.section>
 
+
+ {/* Embedded YouTube Video */}
+ <motion.section 
+        className="container mx-auto px-4 py-8 text-center"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeIn}
+      >
+        <h2 className="text-3xl font-bold mb-12">See Examinaite in Action</h2>
+        
+        {/* Video container with aspect ratio */}
+        <div className="w-full max-w-3xl mx-auto aspect-video relative">
+          <iframe
+            src="https://www.youtube.com/embed/ASDahINSk7E"
+            title="Examinaite Demo Video"
+            frameBorder="0"
+            allowFullScreen
+            className="rounded-lg shadow-lg absolute inset-0 w-full h-full"
+          ></iframe>
+        </div>
+        
+        <p className="text-gray-600 mt-6 text-lg">
+          See how Examinaite simplifies exam preparation in 90 seconds.
+        </p>
+        
+        <div className="flex gap-4 justify-center pt-12">
+          <Link href="/quiz/create">
+            <Button size="lg" className="bg-brand hover:bg-brand/90 py-6 px-8 text-lg">
+              🟢 <strong>TRY FOR FREE</strong>
+            </Button>
+          </Link>
+        </div>
+      </motion.section>
+
       {/* How It Works Section */}
       <motion.section 
-        className="container mx-auto px-4 py-20 text-center"
+        className="container mx-auto px-4 py-8 text-center"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
@@ -102,9 +137,51 @@ export default function Home() {
         </Link>
       </motion.section>
 
+
+{/* Why Examinaite? */}
+<motion.section 
+        className="container mx-auto px-4 py-8 text-center"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeIn}
+      >
+        <h2 className="text-3xl font-bold mb-12">Why Examinaite?</h2>
+        <ul className="text-lg text-gray-600 max-w-2xl mx-auto space-y-6">
+          <li className="flex items-start justify-center text-center">
+            <div className="flex flex-col items-center">
+              <CheckCircle className="text-green-500 mb-2 h-6 w-6" />
+              <div>
+                <strong className="text-xl text-gray-800">Instant Question Generation</strong>
+                <p className="mt-1">Save hours creating custom, Leaving Cert-standard questions.</p>
+              </div>
+            </div>
+          </li>
+          <li className="flex items-start justify-center text-center">
+            <div className="flex flex-col items-center">
+              <CheckCircle className="text-green-500 mb-2 h-6 w-6" />
+              <div>
+                <strong className="text-xl text-gray-800">Step-by-Step Solutions</strong>
+                <p className="mt-1">Enhance real understanding, not just memorisation.</p>
+              </div>
+            </div>
+          </li>
+          <li className="flex items-start justify-center text-center">
+            <div className="flex flex-col items-center">
+              <CheckCircle className="text-green-500 mb-2 h-6 w-6" />
+              <div>
+                <strong className="text-xl text-gray-800">Exam-Ready Format</strong>
+                <p className="mt-1">Practise confidently with officially formatted questions.</p>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </motion.section>
+
+
       {/* Who is it for? */}
       <motion.section 
-        className="container mx-auto px-4 py-20 text-center"
+        className="container mx-auto px-4 py-8 text-center"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
@@ -149,7 +226,7 @@ export default function Home() {
 
       {/* Testimonials Section - Kept unchanged as instructed */}
       <motion.section 
-        className="container mx-auto px-4 py-20 text-center"
+        className="container mx-auto px-4 py-8 text-center"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
@@ -233,83 +310,13 @@ export default function Home() {
         </div>
       </motion.section>
 
-      {/* Embedded YouTube Video */}
-      <motion.section 
-        className="container mx-auto px-4 py-20 text-center"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        variants={fadeIn}
-      >
-        <h2 className="text-3xl font-bold mb-12">See Examinaite in Action</h2>
-        
-        {/* Video container with aspect ratio */}
-        <div className="w-full max-w-3xl mx-auto aspect-video relative">
-          <iframe
-            src="https://www.youtube.com/embed/8xGoWuRCyws"
-            title="Examinaite Demo Video"
-            frameBorder="0"
-            allowFullScreen
-            className="rounded-lg shadow-lg absolute inset-0 w-full h-full"
-          ></iframe>
-        </div>
-        
-        <p className="text-gray-600 mt-6 text-lg">
-          See how Examinaite simplifies exam preparation in 90 seconds.
-        </p>
-        
-        <div className="flex gap-4 justify-center pt-12">
-          <Link href="/quiz/create">
-            <Button size="lg" className="bg-brand hover:bg-brand/90 py-6 px-8 text-lg">
-              🟢 <strong>TRY FOR FREE</strong>
-            </Button>
-          </Link>
-        </div>
-      </motion.section>
+     
 
-      {/* Why Examinaite? */}
-      <motion.section 
-        className="container mx-auto px-4 py-20 text-center"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        variants={fadeIn}
-      >
-        <h2 className="text-3xl font-bold mb-12">Why Examinaite?</h2>
-        <ul className="text-lg text-gray-600 max-w-2xl mx-auto space-y-6">
-          <li className="flex items-start justify-center text-center">
-            <div className="flex flex-col items-center">
-              <CheckCircle className="text-green-500 mb-2 h-6 w-6" />
-              <div>
-                <strong className="text-xl text-gray-800">Instant Question Generation</strong>
-                <p className="mt-1">Save hours creating custom, Leaving Cert-standard questions.</p>
-              </div>
-            </div>
-          </li>
-          <li className="flex items-start justify-center text-center">
-            <div className="flex flex-col items-center">
-              <CheckCircle className="text-green-500 mb-2 h-6 w-6" />
-              <div>
-                <strong className="text-xl text-gray-800">Step-by-Step Solutions</strong>
-                <p className="mt-1">Enhance real understanding, not just memorisation.</p>
-              </div>
-            </div>
-          </li>
-          <li className="flex items-start justify-center text-center">
-            <div className="flex flex-col items-center">
-              <CheckCircle className="text-green-500 mb-2 h-6 w-6" />
-              <div>
-                <strong className="text-xl text-gray-800">Exam-Ready Format</strong>
-                <p className="mt-1">Practise confidently with officially formatted questions.</p>
-              </div>
-            </div>
-          </li>
-        </ul>
-      </motion.section>
+      
 
       {/* Easy Onboarding Section (New Section) */}
       <motion.section 
-        className="container mx-auto px-4 py-20 text-center bg-gray-50 rounded-xl shadow-inner"
+        className="container mx-auto px-4 py-8 text-center bg-gray-50 rounded-xl shadow-inner"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
@@ -355,7 +362,7 @@ export default function Home() {
 
       {/* Backed By Section */}
       <motion.section 
-        className="container mx-auto px-4 py-20 text-center"
+        className="container mx-auto px-4 py-8 text-center"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
@@ -410,7 +417,7 @@ export default function Home() {
       
       {/* Final CTA */}
       <motion.section 
-        className="container mx-auto px-4 py-16 text-center"
+        className="container mx-auto px-4 py-8 text-center"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}

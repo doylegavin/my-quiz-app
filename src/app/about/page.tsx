@@ -51,7 +51,7 @@ export default function About() {
         {/* Embedded YouTube Video */}
         <div className="w-full max-w-3xl mx-auto aspect-video relative mb-12">
           <iframe
-            src="https://www.youtube.com/embed/8xGoWuRCyws"
+            src="https://www.youtube.com/embed/ASDahINSk7E"
             title="Examinaite Demo Video"
             frameBorder="0"
             allowFullScreen
