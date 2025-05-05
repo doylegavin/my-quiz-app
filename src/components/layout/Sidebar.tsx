@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { FiMenu, FiX, FiHome, FiEdit, FiInfo, FiSend, FiUser, FiLogOut, FiLogIn, FiFileText } from "react-icons/fi";
+import { LuBrain } from "react-icons/lu";
 import { useSession, signOut } from "next-auth/react";
 import emailjs from "@emailjs/browser";
 import { useRouter } from "next/navigation";
@@ -177,6 +178,16 @@ export default function Sidebar() {
           >
             <FiFileText size={20} /> {isOpen && "Exam Papers"}
           </Link>
+          
+          {/* VARK Learning Style Assessment Link */}
+          <Link 
+            href="/vark" 
+            className="flex items-center gap-3 px-3 py-2 rounded hover:bg-brand-dark transition"
+            onClick={() => isMobile && setIsOpen(false)}
+          >
+            <LuBrain size={20} /> {isOpen && "Which learner are you?"}
+          </Link>
+          
           <Link 
             href="/about" 
             className="flex items-center gap-3 px-3 py-2 rounded hover:bg-brand-dark transition"

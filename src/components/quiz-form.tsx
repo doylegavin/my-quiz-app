@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +35,9 @@ import irishOrdinaryLevel from '@/data/subjects/irish/ordinary-level';
 // Define core subjects that need special handling
 const CORE_SUBJECTS = ['mathematics', 'english', 'irish'];
 
+import { Combobox } from "@/components/ui/combobox";
+import FilterableSelect from "@/components/FilterableSelect";
+
 export function QuizForm() {
   // Add reference to Zustand store
   const { setFormattedQuiz, saveQuizToDatabase } = useFormattedQuizStore();
@@ -56,10 +59,76 @@ export function QuizForm() {
   const [quizDescription, setQuizDescription] = useState<string>("");
   const [availableSubjects, setAvailableSubjects] = useState<string[]>([]);
 
+  // Helper function to display friendly subject names
+  const getFriendlySubjectName = (subject: string): string => {
+    // Special case for mathematics (keep it as is)
+    if (subject === 'mathematics') {
+      return 'Mathematics';
+    }
+    
+    // Handle multi-word subjects with proper spacing and capitalization
+    // Example: computerScience -> Computer Science
+    if (subject.match(/[A-Z]/)) {
+      return subject
+        .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+        .trim();
+    }
+    
+    // For dash-separated subject names
+    // Example: drama-film-and-theatre-studies -> Drama Film And Theatre Studies
+    if (subject.includes('-')) {
+      return subject
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    }
+    
+    // For regular subjects
+    return subject.charAt(0).toUpperCase() + subject.slice(1);
+  };
+  
+  // Special subjects that need manual formatting correction
+  const formatSpecialSubjects = (name: string): string => {
+    // Add specific corrections for subjects that need special handling
+    const corrections: Record<string, string> = {
+      'Computer science': 'Computer Science',
+      'Agricultural science': 'Agricultural Science',
+      'Religious education': 'Religious Education',
+      'Physical education': 'Physical Education',
+      'Home economics': 'Home Economics',
+      'Mandarin chinese': 'Mandarin Chinese',
+      'Ancient greek': 'Ancient Greek',
+      'Hebrew studies': 'Hebrew Studies',
+      'Politics and society': 'Politics and Society',
+      'Drama film and theatre studies': 'Drama, Film and Theatre Studies',
+      'Design and communication graphics': 'Design and Communication Graphics',
+      'Physics and chemistry': 'Physics and Chemistry',
+      'Applied mathematics': 'Applied Mathematics',
+      'Mathematical applications': 'Mathematical Applications',
+      'Construction studies': 'Construction Studies',
+      'Classical studies': 'Classical Studies'
+    };
+    
+    return corrections[name] || name;
+  };
+
   // Initialize available subjects
   useEffect(() => {
     // Get all subjects dynamically from the data files
-    const subjects = Object.keys(subjectData);
+    const subjects = Object.keys(subjectData)
+      // Sort alphabetically by display name
+      .sort((a, b) => {
+        // Always keep mathematics first
+        if (a === 'mathematics') return -1;
+        if (b === 'mathematics') return 1;
+        
+        // Otherwise sort by friendly name
+        return getFriendlySubjectName(a).localeCompare(getFriendlySubjectName(b));
+      });
+    
     setAvailableSubjects(subjects);
     
     // Simple logging without hardcoded values
@@ -660,20 +729,15 @@ const handleSubmit = async (e: React.FormEvent) => {
     return ["no-sections-available"];
   };
 
-  // Helper function to display friendly subject names
-  const getFriendlySubjectName = (subject: string): string => {
-    // Get metadata directly from subject data
-    const metadata = subjectUtils.getSubjectMetadata(subject);
-    
-    // If the subject data has a displayName, use it
-    if (metadata.displayName) {
-      return metadata.displayName;
-    }
-    
-    // Otherwise use simple capitalization
-    return subject.charAt(0).toUpperCase() + subject.slice(1);
-  };
-  
+  // Create subject options for the filterable select
+  const subjectOptions = useMemo(() => {
+    return availableSubjects.map(subject => ({
+      value: subject,
+      label: formatSpecialSubjects(getFriendlySubjectName(subject)),
+      disabled: false
+    }));
+  }, [availableSubjects]);
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6 mx-auto max-w-2xl px-4 md:px-8">
 <Card className="w-full">
@@ -699,24 +763,16 @@ const handleSubmit = async (e: React.FormEvent) => {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Subject</Label>
-                <Select
+                <FilterableSelect
+                  options={subjectOptions}
                   value={selectedSubject}
-                  onValueChange={(value: string) => {
+                  onChange={(value) => {
                     setSelectedSubject(value);
                     setErrorMessage(null);
                   }}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select subject" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableSubjects.map((subject) => (
-                      <SelectItem key={subject} value={subject}>
-                        {getFriendlySubjectName(subject)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  placeholder="Search subjects..."
+                  title={formatSpecialSubjects(getFriendlySubjectName(selectedSubject))}
+                />
               </div>
 
                 <div className="space-y-2">

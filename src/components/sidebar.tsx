@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FiMenu, FiX, FiHome, FiEdit, FiInfo, FiSend, FiUser, FiLogOut, FiLogIn, FiFileText } from "react-icons/fi";
+import { LuBrain } from "react-icons/lu";
 import { useSession, signIn, signOut } from "next-auth/react";
 import emailjs from "@emailjs/browser";
 import { useRouter } from "next/navigation";
@@ -77,6 +78,9 @@ export default function Sidebar() {
         </Link>
         <Link href="/exams" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-brand-dark transition">
           <FiFileText size={20} /> {isOpen && "Exam Papers"}
+        </Link>
+        <Link href="/vark" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-brand-dark transition">
+          <LuBrain size={20} /> {isOpen && "Which learner are you?"}
         </Link>
         <Link href="/about" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-brand-dark transition">
           <FiInfo size={20} /> {isOpen && "About"}
