@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import ExamCountdown from "@/components/countdown/ExamCountdown";
 
 // Define animation variants
 const fadeIn = {
@@ -19,7 +20,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 w-full max-w-[100vw] overflow-x-hidden">
       {/* Hero Section */}
       <motion.section 
-        className="container mx-auto px-4 pt-16 pb-8 text-center"
+        className="container mx-auto px-4 pt-16 pb-4 sm:pb-8 text-center"
         initial="hidden"
         animate="visible"
         variants={fadeIn}
@@ -38,30 +39,39 @@ export default function Home() {
           </div>
         </div>
 
-        <h1 className="text-4xl md:text-7xl font-bold tracking-tight mb-4 pb-4 bg-gradient-to-r from-brand to-brand bg-clip-text text-transparent">
+        <h1 className="text-3xl sm:text-4xl md:text-7xl font-bold tracking-tight mb-2 sm:mb-4 pb-2 sm:pb-4 bg-gradient-to-r from-brand to-brand bg-clip-text text-transparent">
           <i>Exam prep for everyone</i>
         </h1>
-        <p className="text-lg md:text-2xl text-gray-700 max-w-3xl mx-auto mb-8">
+        <p className="text-base sm:text-lg md:text-2xl text-gray-700 max-w-3xl mx-auto mb-4 sm:mb-8">
           Join Hundreds of Students & Teachers Saving Hours on Exam Revision
         </p>
         <Link href="/quiz/create">
-          <Button size="lg" className="mt-2 bg-brand hover:bg-brand/90 py-6 px-8 text-lg">
+          <Button size="default" className="mt-2 bg-brand hover:bg-brand/90 py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg">
             Start Free Now
           </Button>
         </Link>
         <p className="text-sm text-gray-500 mt-3">No card needed. Takes seconds to start.</p>
       </motion.section>
 
+      {/* Exam Countdown Section */}
+      <motion.section
+        className="container mx-auto px-4 py-4 sm:py-6"
+        initial="hidden"
+        animate="visible"
+        variants={fadeIn}
+      >
+        <ExamCountdown />
+      </motion.section>
 
- {/* Embedded YouTube Video */}
- <motion.section 
-        className="container mx-auto px-4 py-8 text-center"
+      {/* Embedded YouTube Video */}
+      <motion.section 
+        className="container mx-auto px-4 py-4 sm:py-8 text-center"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
         variants={fadeIn}
       >
-        <h2 className="text-3xl font-bold mb-12">See Examinaite in Action</h2>
+        <h2 className="text-3xl font-bold mb-8 sm:mb-12">See Examinaite in Action</h2>
         
         {/* Video container with aspect ratio */}
         <div className="w-full max-w-3xl mx-auto aspect-video relative">
@@ -78,9 +88,9 @@ export default function Home() {
           See how Examinaite simplifies exam preparation in 90 seconds.
         </p>
         
-        <div className="flex gap-4 justify-center pt-12">
+        <div className="flex gap-4 justify-center pt-8 sm:pt-12">
           <Link href="/quiz/create">
-            <Button size="lg" className="bg-brand hover:bg-brand/90 py-6 px-8 text-lg">
+            <Button size="default" className="bg-brand hover:bg-brand/90 py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg">
               🟢 <strong>TRY FOR FREE</strong>
             </Button>
           </Link>
@@ -89,13 +99,13 @@ export default function Home() {
 
       {/* How It Works Section */}
       <motion.section 
-        className="container mx-auto px-4 py-8 text-center"
+        className="container mx-auto px-4 py-4 sm:py-8 text-center"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
         variants={fadeIn}
       >
-        <h2 className="text-3xl font-bold mb-12 text-center" style={{textAlign: 'center'}}>How It Works</h2>
+        <h2 className="text-3xl font-bold mb-8 sm:mb-12 text-center" style={{textAlign: 'center'}}>How It Works</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 text-center">
           <motion.div whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }}>
             <Card className="h-full shadow-md">
@@ -131,22 +141,21 @@ export default function Home() {
           </motion.div>
         </div>
         <Link href="/quiz/create">
-          <Button size="lg" className="mt-10 bg-brand hover:bg-brand/90 py-6 px-8 text-lg">
+          <Button size="default" className="mt-8 sm:mt-10 bg-brand hover:bg-brand/90 py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg">
             Generate Your First Question <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </Link>
       </motion.section>
 
-
-{/* Why Examinaite? */}
-<motion.section 
-        className="container mx-auto px-4 py-8 text-center"
+      {/* Why Examinaite? */}
+      <motion.section 
+        className="container mx-auto px-4 py-4 sm:py-8 text-center"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
         variants={fadeIn}
       >
-        <h2 className="text-3xl font-bold mb-12">Why Examinaite?</h2>
+        <h2 className="text-3xl font-bold mb-8 sm:mb-12">Why Examinaite?</h2>
         <ul className="text-lg text-gray-600 max-w-2xl mx-auto space-y-6">
           <li className="flex items-start justify-center text-center">
             <div className="flex flex-col items-center">
@@ -178,16 +187,15 @@ export default function Home() {
         </ul>
       </motion.section>
 
-
       {/* Who is it for? */}
       <motion.section 
-        className="container mx-auto px-4 py-8 text-center"
+        className="container mx-auto px-4 py-4 sm:py-8 text-center"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
         variants={fadeIn}
       >
-        <h2 className="text-3xl font-bold mb-12 text-center" style={{textAlign: 'center'}}>Who Is It For?</h2>
+        <h2 className="text-3xl font-bold mb-8 sm:mb-12 text-center" style={{textAlign: 'center'}}>Who Is It For?</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 text-center">
           <motion.div whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }}>
             <Card className="h-full shadow-md">
@@ -224,15 +232,15 @@ export default function Home() {
         </div>
       </motion.section>
 
-      {/* Testimonials Section - Kept unchanged as instructed */}
+      {/* Testimonials Section */}
       <motion.section 
-        className="container mx-auto px-4 py-8 text-center"
+        className="container mx-auto px-4 py-4 sm:py-8 text-center"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
         variants={fadeIn}
       >
-        <h2 className="text-3xl font-bold mb-12">What Teachers Are Saying</h2>
+        <h2 className="text-3xl font-bold mb-8 sm:mb-12">What Teachers Are Saying</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           
           {/* Testimonial 1 */}
@@ -301,28 +309,24 @@ export default function Home() {
             <p className="mt-4 text-gray-600 font-semibold">— 6+ Years Teacher, Ireland & UK</p>
           </motion.div>
         </div>
-        <div className="flex gap-4 justify-center pt-16">
+        <div className="flex gap-4 justify-center pt-8 sm:pt-16">
           <Link href="/quiz/create">
-            <Button size="lg" className="bg-brand hover:bg-brand/90 py-3 md:py-6 px-8 text-lg">
+            <Button size="default" className="bg-brand hover:bg-brand/90 py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg">
                <strong>Give it a Go 💪</strong>
             </Button>
           </Link>
         </div>
       </motion.section>
 
-     
-
-      
-
-      {/* Easy Onboarding Section (New Section) */}
+      {/* Easy Onboarding Section */}
       <motion.section 
-        className="container mx-auto px-4 py-8 text-center bg-gray-50 rounded-xl shadow-inner"
+        className="container mx-auto px-4 py-4 sm:py-8 text-center bg-gray-50 rounded-xl shadow-inner"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
         variants={fadeIn}
       >
-        <h2 className="text-3xl font-bold mb-12">Get Started in 3 Easy Steps:</h2>
+        <h2 className="text-3xl font-bold mb-8 sm:mb-12">Get Started in 3 Easy Steps:</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
           <motion.div 
@@ -354,7 +358,7 @@ export default function Home() {
         </div>
         
         <Link href="/quiz/create">
-          <Button size="lg" className="mt-12 bg-brand hover:bg-brand/90 py-6 px-8 text-lg">
+          <Button size="default" className="mt-8 sm:mt-12 bg-brand hover:bg-brand/90 py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg">
             Start Free Now
           </Button>
         </Link>
@@ -362,13 +366,13 @@ export default function Home() {
 
       {/* Backed By Section */}
       <motion.section 
-        className="container mx-auto px-4 py-8 text-center"
+        className="container mx-auto px-4 py-4 sm:py-8 text-center"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
         variants={fadeIn}
       >
-        <h2 className="text-3xl font-bold mb-12">Backed By</h2>
+        <h2 className="text-3xl font-bold mb-8 sm:mb-12">Backed By</h2>
         <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 mb-8">
           <Link 
             href="https://www.newfrontiers.ie/" 
@@ -417,20 +421,20 @@ export default function Home() {
       
       {/* Final CTA */}
       <motion.section 
-        className="container mx-auto px-4 py-8 text-center"
+        className="container mx-auto px-4 py-4 sm:py-8 text-center"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
         variants={fadeIn}
       >
-        <h2 className="text-3xl font-bold mb-6">Ready to Transform Your Exam Preparation?</h2>
-        <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+        <h2 className="text-3xl font-bold mb-4 sm:mb-6">Ready to Transform Your Exam Preparation?</h2>
+        <p className="text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto">
           Join hundreds of students and teachers who are already saving hours on exam preparation.
         </p>
         <Link href="/quiz/create">
           <Button 
-            size="lg" 
-            className="bg-brand hover:bg-brand/90 py-6 px-10 text-xl"
+            size="default" 
+            className="bg-brand hover:bg-brand/90 py-4 sm:py-6 px-6 sm:px-10 text-base sm:text-xl"
           >
             Start Free Now <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
