@@ -32,16 +32,16 @@ declare module "next-auth/jwt" {
   }
 }
 
-// Improve the getBaseUrl function
+// Ensure this function works in production
 function getBaseUrl() {
   // For local development, explicitly use localhost:3000
   if (process.env.NODE_ENV === "development") {
     return "http://localhost:3000";
   }
   
-  // For production, explicitly use examinaite.ie
+  // For production, explicitly use www.examinaite.ie
   if (process.env.NODE_ENV === "production") {
-    return "https://examinaite.ie";
+    return "https://www.examinaite.ie";
   }
   
   // Fallback to environment variable or default
@@ -61,9 +61,11 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
-    jwt: ({ token, user }) => {
+    jwt: ({ token, user, account }) => {
+      // When signing in
       if (user) {
         token.id = user.id;
       }

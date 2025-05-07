@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 // GET /api/user/profile - Get current user profile
 export async function GET() {
   const session = await getServerSession(authOptions);
+  console.log("GET /api/user/profile session:", session ? "Found session" : "No session");
 
   if (!session?.user) {
     return NextResponse.json(
@@ -15,6 +16,10 @@ export async function GET() {
   }
 
   try {
+    // Log the session user details to help debug
+    console.log("Session user email:", session.user.email);
+    console.log("Session user id:", session.user.id);
+    
     // Determine how to find the user
     const userWhere = session.user.id 
       ? { id: session.user.id } 
@@ -23,12 +28,14 @@ export async function GET() {
         : null;
 
     if (!userWhere) {
+      console.error("Could not identify user - no ID or email in session");
       return NextResponse.json(
         { error: "Could not identify user" },
         { status: 400 }
       );
     }
 
+    console.log("Looking up user with:", userWhere);
     const user = await prisma.user.findUnique({
       where: userWhere,
       select: {
@@ -47,14 +54,16 @@ export async function GET() {
     });
 
     if (!user) {
+      console.error("User not found in database with criteria:", userWhere);
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    console.log("User found, returning profile data");
     return NextResponse.json({ user });
   } catch (error) {
     console.error("Error fetching user profile:", error);
     return NextResponse.json(
-      { error: "Failed to fetch user profile" },
+      { error: "Failed to fetch user profile", details: String(error) },
       { status: 500 }
     );
   }
@@ -63,6 +72,7 @@ export async function GET() {
 // PUT /api/user/profile - Update user profile
 export async function PUT(request: Request) {
   const session = await getServerSession(authOptions);
+  console.log("PUT /api/user/profile session:", session ? "Found session" : "No session");
 
   if (!session?.user) {
     return NextResponse.json(
@@ -73,6 +83,7 @@ export async function PUT(request: Request) {
 
   try {
     const data = await request.json();
+    console.log("PUT profile data received:", Object.keys(data));
     
     // Extract the fields we want to update
     const {
@@ -85,6 +96,10 @@ export async function PUT(request: Request) {
       image,
     } = data;
 
+    // Log the session user details to help debug
+    console.log("Session user email:", session.user.email);
+    console.log("Session user id:", session.user.id);
+    
     // First, find the user to make sure we have their ID
     const userWhere = session.user.id 
       ? { id: session.user.id } 
@@ -93,6 +108,7 @@ export async function PUT(request: Request) {
         : null;
 
     if (!userWhere) {
+      console.error("Could not identify user - no ID or email in session");
       return NextResponse.json(
         { error: "Could not identify user" },
         { status: 400 }
@@ -100,14 +116,18 @@ export async function PUT(request: Request) {
     }
 
     // First, get the user to make sure they exist
+    console.log("Looking up user with:", userWhere);
     const user = await prisma.user.findUnique({
       where: userWhere,
-      select: { id: true },
+      select: { id: true, email: true },
     });
 
     if (!user) {
+      console.error("User not found in database with criteria:", userWhere);
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
+
+    console.log("User found with ID:", user.id);
 
     // Check if username is unique if provided
     if (username) {
@@ -124,6 +144,7 @@ export async function PUT(request: Request) {
     }
 
     // Update user profile with the verified user ID
+    console.log("Updating user profile for user ID:", user.id);
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
       data: {
@@ -149,11 +170,12 @@ export async function PUT(request: Request) {
       },
     });
 
+    console.log("User profile updated successfully");
     return NextResponse.json({ user: updatedUser });
   } catch (error) {
     console.error("Error updating user profile:", error);
     return NextResponse.json(
-      { error: "Failed to update user profile" },
+      { error: "Failed to update user profile", details: String(error) },
       { status: 500 }
     );
   }
