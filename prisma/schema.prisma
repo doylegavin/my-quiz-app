@@ -8,21 +8,28 @@ datasource db {
 }
 
 model User {
-  id               String          @id @default(cuid())
-  name             String?
-  email            String?         @unique
-  password         String?
-  emailVerified    DateTime?
-  image            String?
-  role             Role            @default(STUDENT)
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  facebookId       String?         @unique
-  accounts         Account[]
-  progress         Progress[]
-  quizzes          Quiz[]
-  sessions         Session[]
-  generatedQuizzes GeneratedQuiz[]
+  id                          String          @id @default(cuid())
+  name                        String?
+  username                    String?         @unique
+  preferredName               String?
+  pronouns                    String?
+  email                       String?         @unique
+  password                    String?
+  emailVerified               DateTime?
+  emailVerificationToken      String?         
+  emailVerificationTokenExpiry DateTime?
+  image                       String?
+  locale                      String?         @default("en-US")
+  timezone                    String?         @default("UTC")
+  role                        Role            @default(STUDENT)
+  createdAt                   DateTime        @default(now())
+  updatedAt                   DateTime        @updatedAt
+  facebookId                  String?         @unique
+  accounts                    Account[]
+  progress                    Progress[]
+  quizzes                     Quiz[]
+  sessions                    Session[]
+  generatedQuizzes            GeneratedQuiz[]
 }
 
 model Account {

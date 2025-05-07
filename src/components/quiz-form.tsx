@@ -1023,7 +1023,9 @@ const handleSubmit = async (e: React.FormEvent) => {
           <Button type="submit" disabled={loading} className="w-full">
             {loading ? "Please wait..." : "Generate Questions"}
           </Button>
-          <p className="text-sm text-gray-500 mt-3">AI can make mistakes, so please check the questions before using them in an exam.</p>
+          <p className="text-sm text-gray-500 mt-3">AI can make mistakes, so please check the questions before using them in an exam.
+            
+          </p>
 
         </CardFooter>
       </Card>

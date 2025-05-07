@@ -4,6 +4,7 @@ const nextConfig = {
   reactStrictMode: true,
   experimental: {
   },
+  transpilePackages: ['react-image-crop']
 }
 
 module.exports = nextConfig;
