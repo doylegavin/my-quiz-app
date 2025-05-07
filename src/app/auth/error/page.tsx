@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function AuthError() {
+function AuthErrorContent() {
   const searchParams = useSearchParams();
   const [errorMessage, setErrorMessage] = useState('An error occurred during authentication');
   const [errorDescription, setErrorDescription] = useState('Please try signing in again.');
@@ -97,5 +97,32 @@ export default function AuthError() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Loading fallback for suspense
+function AuthErrorLoading() {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center p-4">
+      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md dark:bg-gray-800">
+        <div className="mb-6 flex justify-center">
+          <div className="h-20 w-20 animate-pulse rounded-full bg-gray-200 p-4 dark:bg-gray-700"></div>
+        </div>
+        <div className="mb-2 h-8 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+        <div className="mb-6 h-4 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+        <div className="flex flex-col space-y-3 sm:flex-row sm:space-x-3 sm:space-y-0">
+          <div className="h-10 flex-1 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+          <div className="h-10 flex-1 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function AuthError() {
+  return (
+    <Suspense fallback={<AuthErrorLoading />}>
+      <AuthErrorContent />
+    </Suspense>
   );
 } 

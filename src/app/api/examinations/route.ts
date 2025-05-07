@@ -31,4 +31,7 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}
+
+// Set runtime to nodejs to avoid crypto module issues
+export const runtime = 'nodejs'; 

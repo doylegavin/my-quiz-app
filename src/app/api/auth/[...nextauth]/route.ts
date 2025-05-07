@@ -8,5 +8,5 @@ const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
 
-// Add Edge Runtime support
-export const runtime = 'edge';
+// Change to Node.js runtime (instead of Edge) to avoid crypto module issues
+export const runtime = 'nodejs';
