@@ -81,7 +81,7 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/signin",
     signOut: `/signout`,
-    error: `/error`,
+    error: `/auth/error`,
     newUser: `/signup`,
   },
   providers: [
@@ -130,6 +130,7 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  debug: process.env.NEXTAUTH_DEBUG === "true",
   useSecureCookies: process.env.NODE_ENV === "production",
   cookies: {
     sessionToken: {
@@ -139,7 +140,6 @@ export const authOptions: NextAuthOptions = {
         sameSite: "lax",
         path: "/",
         secure: process.env.NODE_ENV === "production",
-        domain: process.env.NODE_ENV === "production" ? ".examinaite.ie" : undefined
       },
     },
     callbackUrl: {
@@ -148,7 +148,6 @@ export const authOptions: NextAuthOptions = {
         sameSite: "lax",
         path: "/",
         secure: process.env.NODE_ENV === "production",
-        domain: process.env.NODE_ENV === "production" ? ".examinaite.ie" : undefined
       }
     },
     csrfToken: {
@@ -158,7 +157,6 @@ export const authOptions: NextAuthOptions = {
         sameSite: "lax",
         path: "/",
         secure: process.env.NODE_ENV === "production",
-        domain: process.env.NODE_ENV === "production" ? ".examinaite.ie" : undefined
       }
     },
     pkceCodeVerifier: {
@@ -169,7 +167,6 @@ export const authOptions: NextAuthOptions = {
         path: "/",
         secure: process.env.NODE_ENV === "production",
         maxAge: 900,
-        domain: process.env.NODE_ENV === "production" ? ".examinaite.ie" : undefined
       }
     },
     state: {
@@ -180,7 +177,6 @@ export const authOptions: NextAuthOptions = {
         path: "/",
         secure: process.env.NODE_ENV === "production",
         maxAge: 900,
-        domain: process.env.NODE_ENV === "production" ? ".examinaite.ie" : undefined
       }
     }
   },
