@@ -43,7 +43,10 @@ export default function Home() {
           <i>Exam prep for everyone</i>
         </h1>
         <p className="text-base sm:text-lg md:text-2xl text-gray-700 max-w-3xl mx-auto mb-4 sm:mb-8">
-          Join Hundreds of Students & Teachers Saving Hours on Exam Revision
+          We're looking for students and teachers to join our testing phase and give us feedback and make us better. 
+          <br></br>
+          <br></br>
+          Join Hundreds of users Saving Hours on Exam Revision today
         </p>
         <Link href="/quiz/create">
           <Button size="default" className="mt-2 bg-brand hover:bg-brand/90 py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg">
