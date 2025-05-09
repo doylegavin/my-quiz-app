@@ -1,6 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
 // Define which routes should be protected
+// Temporarily commented out for public access
 const isProtectedRoute = createRouteMatcher([
   '/quiz/create(.*)', 
   '/profile(.*)', 
@@ -8,8 +9,9 @@ const isProtectedRoute = createRouteMatcher([
 ])
 
 export default clerkMiddleware(async (auth, req) => {
-  // Protect routes that match our pattern
-  if (isProtectedRoute(req)) await auth.protect()
+  // Temporarily allow all routes to be accessed without authentication
+  // Comment: Remove this comment and uncomment the line below when ready to restore protection
+  // if (isProtectedRoute(req)) await auth.protect()
 })
 
 export const config = {
