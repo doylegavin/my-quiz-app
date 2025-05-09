@@ -1,160 +1,114 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth/nextAuth";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 
 // GET /api/user/profile - Get current user profile
-export async function GET() {
-  const session = await getServerSession(authOptions);
-
-  if (!session?.user) {
+export async function GET(request: NextRequest) {
+  // Get the user ID from Clerk
+  const { userId } = auth();
+  
+  // Check if the user is authenticated
+  if (!userId) {
     return NextResponse.json(
-      { error: "You must be logged in to access this endpoint" },
+      { error: "You must be signed in to access this endpoint" },
       { status: 401 }
     );
   }
 
   try {
-    // Determine how to find the user
-    const userWhere = session.user.id 
-      ? { id: session.user.id } 
-      : session.user.email 
-        ? { email: session.user.email }
-        : null;
-
-    if (!userWhere) {
-      return NextResponse.json(
-        { error: "Could not identify user" },
-        { status: 400 }
-      );
-    }
-
+    // Fetch the user from the database using their Clerk user ID
     const user = await prisma.user.findUnique({
-      where: userWhere,
-      select: {
-        id: true,
-        name: true,
-        username: true,
-        preferredName: true,
-        pronouns: true,
-        email: true,
-        emailVerified: true,
-        image: true,
-        locale: true,
-        timezone: true,
-        role: true,
+      where: {
+        clerkId: userId,
       },
     });
 
+    // If the user doesn't exist in the database yet, create them
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json(
+        { user: null, message: "User not found in database" },
+        { status: 404 }
+      );
     }
 
+    // Return the user data
     return NextResponse.json({ user });
   } catch (error) {
-    console.error("Error fetching user profile:", error);
+    console.error("Error fetching user:", error);
     return NextResponse.json(
-      { error: "Failed to fetch user profile" },
+      { error: "An error occurred while fetching user data" },
       { status: 500 }
     );
   }
 }
 
 // PUT /api/user/profile - Update user profile
-export async function PUT(request: Request) {
-  const session = await getServerSession(authOptions);
-
-  if (!session?.user) {
+export async function PUT(request: NextRequest) {
+  // Get the user ID from Clerk
+  const { userId } = auth();
+  
+  // Check if the user is authenticated
+  if (!userId) {
     return NextResponse.json(
-      { error: "You must be logged in to update your profile" },
+      { error: "You must be signed in to access this endpoint" },
       { status: 401 }
     );
   }
 
   try {
-    const data = await request.json();
+    // Parse the request body
+    const body = await request.json();
     
-    // Extract the fields we want to update
-    const {
-      name,
-      username,
-      preferredName,
-      pronouns,
-      locale,
-      timezone,
-      image,
-    } = data;
-
-    // First, find the user to make sure we have their ID
-    const userWhere = session.user.id 
-      ? { id: session.user.id } 
-      : session.user.email 
-        ? { email: session.user.email }
-        : null;
-
-    if (!userWhere) {
-      return NextResponse.json(
-        { error: "Could not identify user" },
-        { status: 400 }
-      );
-    }
-
-    // First, get the user to make sure they exist
+    // Fetch the user from the database
     const user = await prisma.user.findUnique({
-      where: userWhere,
-      select: { id: true, email: true },
+      where: {
+        clerkId: userId,
+      },
     });
 
+    // If the user doesn't exist in our database yet, create them
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    // Check if username is unique if provided
-    if (username) {
-      const existingUser = await prisma.user.findUnique({
-        where: { username },
+      const newUser = await prisma.user.create({
+        data: {
+          clerkId: userId,
+          name: body.name,
+          username: body.username,
+          preferredName: body.preferredName,
+          pronouns: body.pronouns,
+          locale: body.locale,
+          timezone: body.timezone,
+          image: body.image,
+        },
       });
-
-      if (existingUser && existingUser.id !== user.id) {
-        return NextResponse.json(
-          { error: "Username is already taken" },
-          { status: 400 }
-        );
-      }
+      
+      return NextResponse.json({ user: newUser });
     }
 
-    // Update user profile with the verified user ID
+    // Update the user's profile
     const updatedUser = await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        name,
-        username,
-        preferredName,
-        pronouns,
-        locale,
-        timezone,
-        image,
-        updatedAt: new Date(),
+      where: {
+        clerkId: userId,
       },
-      select: {
-        id: true,
-        name: true,
-        username: true,
-        preferredName: true,
-        pronouns: true,
-        email: true,
-        image: true,
-        locale: true,
-        timezone: true,
+      data: {
+        name: body.name,
+        username: body.username,
+        preferredName: body.preferredName,
+        pronouns: body.pronouns,
+        locale: body.locale,
+        timezone: body.timezone,
+        image: body.image,
       },
     });
 
     return NextResponse.json({ user: updatedUser });
   } catch (error) {
-    console.error("Error updating user profile:", error);
+    console.error("Error updating user:", error);
     return NextResponse.json(
-      { error: "Failed to update user profile" },
+      { error: "An error occurred while updating user data" },
       { status: 500 }
     );
   }
-} 
+}
+
+// Set runtime to nodejs
+export const runtime = 'nodejs'; 

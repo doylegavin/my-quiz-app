@@ -1,8 +1,8 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
-import useProtectedPage from "@/hooks/useProtectedPage";
+import { redirect } from "next/navigation";
 import AvatarUpload from "@/components/profile/AvatarUpload";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,20 +32,23 @@ interface ProfileFormData {
 }
 
 export default function ProfilePage() {
-  const { authOverlay } = useProtectedPage();
+  const { isLoaded, isSignedIn, user } = useUser();
   
-  return (
-    <>
-      <ProfileContent />
-      
-      {/* Auth overlay - shows when user is not authenticated */}
-      {authOverlay}
-    </>
-  );
+  // Show loading state while Clerk loads
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
+  
+  // Redirect to sign-in if not signed in
+  if (!isSignedIn) {
+    return redirect("/sign-in");
+  }
+  
+  return <ProfileContent />;
 }
 
 function ProfileContent() {
-  const { data: session, update: updateSession } = useSession();
+  const { user } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -70,13 +73,13 @@ function ProfileContent() {
         if (data.user) {
           setUserData(data.user);
           setFormData({
-            name: data.user.name || "",
-            username: data.user.username || "",
+            name: data.user.name || user?.fullName || "",
+            username: data.user.username || user?.username || "",
             preferredName: data.user.preferredName || "",
             pronouns: data.user.pronouns || "",
             locale: data.user.locale || "en-US",
             timezone: data.user.timezone || "UTC",
-            image: data.user.image || null,
+            image: data.user.image || user?.imageUrl || null,
           });
         }
       } catch (err) {
@@ -84,10 +87,10 @@ function ProfileContent() {
       }
     };
 
-    if (session?.user?.id) {
+    if (user) {
       fetchUserData();
     }
-  }, [session?.user?.id]);
+  }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -123,15 +126,16 @@ function ProfileContent() {
         throw new Error(data.error || "Failed to update profile");
       }
 
-      // Update session with new user data
-      await updateSession({
-        ...session,
-        user: {
-          ...session?.user,
-          name: formData.name,
-          image: formData.image,
-        },
-      });
+      // Update Clerk user metadata if needed
+      try {
+        // You may want to update Clerk user data too
+        await user?.update({
+          firstName: formData.name.split(" ")[0],
+          lastName: formData.name.split(" ").slice(1).join(" "),
+        });
+      } catch (error) {
+        console.error("Error updating Clerk user:", error);
+      }
 
       setSuccess("Profile updated successfully");
       
@@ -257,51 +261,46 @@ function ProfileContent() {
                     <Input
                       id="pronouns"
                       name="pronouns"
-                      placeholder="e.g. they/them, she/her, he/him"
+                      placeholder="e.g. she/her, he/him, they/them"
                       value={formData.pronouns}
                       onChange={handleChange}
                     />
                     <p className="text-xs text-gray-500">
-                      This helps us address you appropriately
+                      Optional - This helps us address you correctly in communications
                     </p>
                   </div>
 
-                  {/* Locale & Timezone */}
-                  <div className="grid gap-6 md:grid-cols-2">
-                    {/* Locale */}
+                  {/* Language and Timezone */}
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                      <Label htmlFor="locale">Language & Region</Label>
-                      <Select 
-                        value={formData.locale} 
+                      <Label htmlFor="locale">Language</Label>
+                      <Select
+                        value={formData.locale}
                         onValueChange={(value) => handleSelectChange("locale", value)}
                       >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select language and region" />
+                        <SelectTrigger id="locale">
+                          <SelectValue placeholder="Select language" />
                         </SelectTrigger>
                         <SelectContent>
                           {locales.map((locale) => (
-                            <SelectItem key={locale.code} value={locale.code}>
-                              {locale.name}
+                            <SelectItem key={locale.value} value={locale.value}>
+                              {locale.label}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
-                      <p className="text-xs text-gray-500">
-                        Determines date formats and language preferences
-                      </p>
                     </div>
 
-                    {/* Timezone */}
                     <div className="space-y-2">
                       <Label htmlFor="timezone">Timezone</Label>
-                      <Select 
-                        value={formData.timezone} 
+                      <Select
+                        value={formData.timezone}
                         onValueChange={(value) => handleSelectChange("timezone", value)}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger id="timezone">
                           <SelectValue placeholder="Select timezone" />
                         </SelectTrigger>
-                        <SelectContent className="max-h-[300px]">
+                        <SelectContent>
                           {timezones.map((timezone) => (
                             <SelectItem key={timezone.value} value={timezone.value}>
                               {timezone.label}
@@ -309,41 +308,16 @@ function ProfileContent() {
                           ))}
                         </SelectContent>
                       </Select>
-                      <p className="text-xs text-gray-500">
-                        Used for scheduling and reminders
-                      </p>
                     </div>
                   </div>
 
-                  {/* Email (Read-only) */}
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input
-                      id="email"
-                      readOnly
-                      value={userData?.email || ""}
-                      className="bg-gray-50 dark:bg-gray-800"
-                    />
-                    <div className="flex items-center">
-                      <div className={`mr-2 h-2 w-2 rounded-full ${userData?.emailVerified ? 'bg-green-500' : 'bg-amber-500'}`}></div>
-                      <p className="text-xs text-gray-500">
-                        {userData?.emailVerified 
-                          ? 'Email verified' 
-                          : 'Email not verified. Check your inbox for a verification link.'}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Submit Button */}
-                  <div className="pt-4">
-                    <Button
-                      type="submit"
-                      className="w-full sm:w-auto"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Saving..." : "Save Changes"}
-                    </Button>
-                  </div>
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full md:w-auto"
+                  >
+                    {isLoading ? "Saving..." : "Save Changes"}
+                  </Button>
                 </form>
               </CardContent>
             </Card>
@@ -351,16 +325,21 @@ function ProfileContent() {
         </TabsContent>
 
         <TabsContent value="account">
-          <Card>
-            <CardHeader>
-              <CardTitle>Account Settings</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-500 dark:text-gray-400">
-                Account management features will be available soon.
-              </p>
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl">Account Settings</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-500 mb-6">
+                  Manage your account settings through Clerk. You can change your email, password, and enable two-factor authentication.
+                </p>
+                <Button onClick={() => window.location.href = "/user/account"}>
+                  Manage Account
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>
