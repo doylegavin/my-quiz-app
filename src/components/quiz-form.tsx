@@ -586,7 +586,7 @@ export function QuizForm() {
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   setLoading(true);
-    setProgress(0); // Reset progress when starting
+  setProgress(0); // Reset progress when starting
     
   if (!selectedLevel) {
     alert("Please select a level.");
@@ -594,26 +594,26 @@ const handleSubmit = async (e: React.FormEvent) => {
     return;
   }
     
-    // Check for placeholder values
-    if (
-      (selectedSection === "no-sections-available") || 
-      (selectedTopic === "no-topics-available")
-    ) {
-      alert("Please select valid options for all fields.");
-      setLoading(false);
-      return;
-    }
+  // Check for placeholder values
+  if (
+    (selectedSection === "no-sections-available") || 
+    (selectedTopic === "no-topics-available")
+  ) {
+    alert("Please select valid options for all fields.");
+    setLoading(false);
+    return;
+  }
     
   simulateProgress();
     
-    console.log("Submitting quiz with data:", {
-      subject: selectedSubject,
-      level: selectedLevel,
-      paper: selectedPaper,
-      topic: selectedTopic,
-      subtopic: selectedSubtopic,
-      difficulty: selectedDifficulty
-    });
+  console.log("Submitting quiz with data:", {
+    subject: selectedSubject,
+    level: selectedLevel,
+    paper: selectedPaper,
+    topic: selectedTopic,
+    subtopic: selectedSubtopic,
+    difficulty: selectedDifficulty
+  });
   
   // Prepare the data to send to the API
   const requestData = {
@@ -621,10 +621,10 @@ const handleSubmit = async (e: React.FormEvent) => {
     difficulty: selectedDifficulty,
     level: selectedLevel,
     paper: selectedPaper,
-      paperType: getPaperLabel(selectedSubject).toLowerCase(),
-      sections: selectedSection !== "no-sections-available" ? selectedSection : undefined,
-      topics: selectedTopic !== "no-topics-available" ? selectedTopic : undefined,
-      subtopic: selectedSubtopic && selectedSubtopic !== "any" ? selectedSubtopic : undefined
+    paperType: getPaperLabel(selectedSubject).toLowerCase(),
+    sections: selectedSection !== "no-sections-available" ? selectedSection : undefined,
+    topics: selectedTopic !== "no-topics-available" ? selectedTopic : undefined,
+    subtopic: selectedSubtopic && selectedSubtopic !== "any" ? selectedSubtopic : undefined
   };
   
   try {
@@ -643,75 +643,68 @@ const handleSubmit = async (e: React.FormEvent) => {
       console.log("Data received:", data);
       
       if (data.questions && Array.isArray(data.questions)) {
-            // Create a unique ID for the quiz
-            const quizId = uuidv4();
+        // Create a unique ID for the quiz
+        const quizId = uuidv4();
             
-            // Format the data for the Zustand store
-            const formattedQuizData = {
-              id: quizId,
-              title: quizTitle || "Untitled Quiz",
-              description: quizDescription || "",
-              subject: selectedSubject,
-              level: selectedLevel,
-              difficulty: selectedDifficulty,
-              paper: selectedPaper,
-              section: selectedSection,
-              topic: selectedTopic,
-              subtopic: selectedSubtopic,
-              questions: data.questions.map((q: any, index: number) => ({
-                id: `question-${index}`,
-                question: q.question,
-                solution: data.solutions[index]?.solution || "",
-                subject: selectedSubject,
-                level: selectedLevel,
-                topic: selectedTopic,
-                section: selectedSection,
-                subtopic: selectedSubtopic,
-              })),
-              solutions: data.solutions,
-            };
+        // Format the data for the Zustand store
+        const formattedQuizData = {
+          id: quizId,
+          title: quizTitle || "Untitled Quiz",
+          description: quizDescription || "",
+          subject: selectedSubject,
+          level: selectedLevel,
+          difficulty: selectedDifficulty,
+          paper: selectedPaper,
+          section: selectedSection,
+          topic: selectedTopic,
+          subtopic: selectedSubtopic,
+          questions: data.questions.map((q: any, index: number) => ({
+            id: `question-${index}`,
+            question: q.question,
+            solution: data.solutions[index]?.solution || "",
+            subject: selectedSubject,
+            level: selectedLevel,
+            topic: selectedTopic,
+            section: selectedSection,
+            subtopic: selectedSubtopic,
+          })),
+          solutions: data.solutions,
+        };
             
-            // Save to Zustand store
-            setFormattedQuiz(formattedQuizData);
+        // Save to Zustand store
+        setFormattedQuiz(formattedQuizData);
             
-            // Save to database asynchronously (don't wait for it)
-            try {
-              // If you have user authentication, pass the user ID
-              // const userId = session?.user?.id;
-              saveQuizToDatabase(/* userId */);
-            } catch (dbError) {
-              console.error("Database save error:", dbError);
-              // Continue anyway since we have the data in Zustand
-            }
+        // Skip database save if user is not logged in
+        // No need to check auth status - just proceed to generated page
             
         // Just pass the entire data object (includes metadata)
         router.push(
           `/quiz/generated?questions=${encodeURIComponent(JSON.stringify(data))}`
         );
       } else {
-            // Get error from data if available or use random message
-            const errorMsg = data.error || errorMessages[Math.floor(Math.random() * errorMessages.length)];
-            setErrorMessage(errorMsg);
-            setDebugInfo(data);
+        // Get error from data if available or use random message
+        const errorMsg = data.error || errorMessages[Math.floor(Math.random() * errorMessages.length)];
+        setErrorMessage(errorMsg);
+        setDebugInfo(data);
       }
     } else {
-          // Parse error response
-          const errorData = await response.json();
-          console.error("API Error:", errorData);
-          setDebugInfo(errorData);
+      // Parse error response
+      const errorData = await response.json();
+      console.error("API Error:", errorData);
+      setDebugInfo(errorData);
           
-          // Show detailed error message in development
-          if (process.env.NODE_ENV === 'development') {
-            setErrorMessage(`Error: ${errorData.error}${errorData.details ? ` - ${errorData.details}` : ''} (${errorData.errorType || 'Unknown'})`);
-          } else {
-            // In production, show user-friendly message but include error type
-            setErrorMessage(`${errorData.error || errorMessages[Math.floor(Math.random() * errorMessages.length)]} (${errorData.errorType || 'Unknown'})`);
-          }
+      // Show detailed error message in development
+      if (process.env.NODE_ENV === 'development') {
+        setErrorMessage(`Error: ${errorData.error}${errorData.details ? ` - ${errorData.details}` : ''} (${errorData.errorType || 'Unknown'})`);
+      } else {
+        // In production, show user-friendly message but include error type
+        setErrorMessage(`${errorData.error || errorMessages[Math.floor(Math.random() * errorMessages.length)]} (${errorData.errorType || 'Unknown'})`);
+      }
     }
   } catch (error) {
     console.error("Fetch error:", error);
-        setErrorMessage(`Network error: ${error instanceof Error ? error.message : 'Unknown'}`);
-        setDebugInfo({ networkError: error instanceof Error ? error.message : 'Unknown error' });
+    setErrorMessage(`Network error: ${error instanceof Error ? error.message : 'Unknown'}`);
+    setDebugInfo({ networkError: error instanceof Error ? error.message : 'Unknown error' });
   } finally {
     setLoading(false);
   }
