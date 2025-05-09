@@ -1,29 +1,29 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@clerk/nextjs';
 import { usePathname } from 'next/navigation';
 import AuthModal from '@/components/auth/AuthModal';
 
 export default function useProtectedPage() {
-  const { data: session, status } = useSession();
+  const { userId, isLoaded: isAuthLoaded } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const pathname = usePathname();
   
-  // Debug the session state to help diagnose issues
+  // Debug the auth state to help diagnose issues
   useEffect(() => {
-    console.log('Session status:', status);
-    console.log('Session data:', session);
-  }, [status, session]);
+    console.log('Auth loaded:', isAuthLoaded);
+    console.log('User ID:', userId);
+  }, [isAuthLoaded, userId]);
   
   useEffect(() => {
     // Show modal only if authentication check is complete and user is not signed in
-    if (status === 'unauthenticated') {
+    if (isAuthLoaded && !userId) {
       setShowAuthModal(true);
-    } else if (status === 'authenticated') {
+    } else if (isAuthLoaded && userId) {
       setShowAuthModal(false);
     }
-  }, [status]);
+  }, [isAuthLoaded, userId]);
 
   // Handle successful authentication
   const handleAuthenticated = () => {
@@ -45,13 +45,13 @@ export default function useProtectedPage() {
   );
 
   return {
-    session,
-    status,
+    session: userId ? { user: { id: userId } } : null, // Compatible with old format
+    status: !isAuthLoaded ? 'loading' : userId ? 'authenticated' : 'unauthenticated',
     showAuthModal,
     closeAuthModal: handleAuthenticated,
     returnUrl: pathname,
-    isAuthenticated: status === 'authenticated',
-    isLoading: status === 'loading',
+    isAuthenticated: isAuthLoaded && !!userId,
+    isLoading: !isAuthLoaded,
     authOverlay
   };
 } 

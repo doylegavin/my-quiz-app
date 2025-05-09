@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@clerk/nextjs';
 import { QuizQuestion } from '@/types';
 
 interface QuizPageProps {
@@ -14,7 +14,7 @@ interface QuizPageProps {
 export default function QuizPage({ params }: QuizPageProps) {
   const { id } = params;
   const router = useRouter();
-  const { data: session } = useSession();
+  const { userId } = useAuth();
   
   const [quiz, setQuiz] = useState<{
     id: string;
