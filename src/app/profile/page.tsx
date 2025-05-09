@@ -283,8 +283,8 @@ function ProfileContent() {
                         </SelectTrigger>
                         <SelectContent>
                           {locales.map((locale) => (
-                            <SelectItem key={locale.value} value={locale.value}>
-                              {locale.label}
+                            <SelectItem key={locale.code} value={locale.code}>
+                              {locale.name}
                             </SelectItem>
                           ))}
                         </SelectContent>
