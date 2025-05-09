@@ -1,4 +1,4 @@
-import { clerkMiddleware, redirectToSignIn } from "@clerk/nextjs/server";
+import { clerkMiddleware, getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -8,16 +8,21 @@ export default function middleware(req: NextRequest) {
   const protectedPaths = ["/quiz/create", "/profile"];
   const path = req.nextUrl.pathname;
   
-  // Use a clerk instance to get auth state
-  const { userId } = clerkMiddleware().getAuth(req);
+  // Get auth state
+  const { userId } = getAuth(req);
   
   // If path is protected and user isn't signed in, redirect to sign-in
   if (protectedPaths.some(protectedPath => path.startsWith(protectedPath)) && !userId) {
-    return redirectToSignIn({ returnBackUrl: req.url });
+    // Create a URL for the sign-in page with a redirect back URL
+    const signInUrl = new URL('/sign-in', req.url);
+    signInUrl.searchParams.set('redirect_url', req.url);
+    
+    // Redirect to the sign-in page
+    return NextResponse.redirect(signInUrl);
   }
   
-  // Continue with the request if authenticated or not a protected route
-  return clerkMiddleware()(req);
+  // Continue with the request
+  return NextResponse.next();
 }
 
 export const config = {
