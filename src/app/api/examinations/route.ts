@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchExamPapers } from "@/lib/utils/examinations";
 
+// Mark this route as dynamic to prevent static rendering issues
+export const dynamic = 'force-dynamic';
+
 /**
  * API route to fetch exam papers from examinations.ie based on query parameters
  */

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 
+// Mark this route as dynamic to prevent static rendering issues
+export const dynamic = 'force-dynamic';
+
 /**
  * API route to proxy the download of an exam paper from examinations.ie
  */
