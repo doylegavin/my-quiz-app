@@ -5,7 +5,7 @@ import { auth } from "@clerk/nextjs/server";
 // GET /api/user/profile - Get current user profile
 export async function GET(request: NextRequest) {
   // Get the user ID from Clerk
-  const { userId } = auth();
+  const { userId } = await auth();
   
   // Check if the user is authenticated
   if (!userId) {
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 // PUT /api/user/profile - Update user profile
 export async function PUT(request: NextRequest) {
   // Get the user ID from Clerk
-  const { userId } = auth();
+  const { userId } = await auth();
   
   // Check if the user is authenticated
   if (!userId) {
