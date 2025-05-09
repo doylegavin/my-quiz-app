@@ -3,7 +3,7 @@ import "./globals.css";
 import React from 'react';
 import Script from "next/script";
 import type { Metadata } from 'next';
-import { ClerkProvider, SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 import dynamic from "next/dynamic";
 import EnhancedSubjectsInitializer from "@/components/EnhancedSubjectsInitializer";
 
@@ -48,7 +48,6 @@ export default function RootLayout({
           <link 
             rel="stylesheet" 
             href="https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-regular.css" 
-            integrity="sha256-zx3wUmxQs7upzWzWXz8CRwtl0TdSFGeLLXz4LEhMNhk=" 
             crossOrigin="anonymous" 
           />
         </head>
@@ -85,15 +84,6 @@ export default function RootLayout({
             <Sidebar />
             {/* Main content area - flex-1 ensures it takes up remaining space */}
             <main className="flex-1 p-4 md:p-6 overflow-x-hidden w-full">
-              {/* Auth header */}
-              <div className="mb-4 flex justify-end">
-                <SignedIn>
-                  <UserButton afterSignOutUrl="/" />
-                </SignedIn>
-                <SignedOut>
-                  <SignInButton mode="modal" />
-                </SignedOut>
-              </div>
               <div className="max-w-full">
                 {children}
               </div>
