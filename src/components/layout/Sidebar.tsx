@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { FiMenu, FiX, FiHome, FiEdit, FiInfo, FiSend, FiUser, FiLogOut, FiLogIn, FiFileText } from "react-icons/fi";
 import { LuBrain } from "react-icons/lu";
-import { useSession, signOut } from "next-auth/react";
+import { useAuth, useUser, SignOutButton } from "@clerk/nextjs";
 import emailjs from "@emailjs/browser";
 import { useRouter } from "next/navigation";
 
@@ -12,7 +12,8 @@ import { useRouter } from "next/navigation";
  */
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false); // Default to closed
-  const { data: session, status } = useSession();
+  const { isLoaded, userId } = useAuth();
+  const { user } = useUser();
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedbackSent, setFeedbackSent] = useState(false);
@@ -66,8 +67,8 @@ export default function Sidebar() {
         process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
         { 
           message: feedback,
-          from_name: session?.user?.name || "Anonymous User",
-          from_email: session?.user?.email || "anonymous@user.com"
+          from_name: user?.fullName || "Anonymous User",
+          from_email: user?.primaryEmailAddress?.emailAddress || "anonymous@user.com"
         },
         process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
       );
@@ -84,28 +85,9 @@ export default function Sidebar() {
     }
   };
 
-  const handleSignOut = async () => {
-    try {
-      console.log("Starting sign out process");
-      // First clear client-side session
-      const result = await signOut({ 
-        redirect: false,
-        callbackUrl: '/'
-      });
-      console.log("Sign out completed:", result);
-      
-      // Force a hard refresh after sign out to ensure all state is cleared
-      window.location.href = '/';
-    } catch (error) {
-      console.error('Error signing out:', error);
-      // Fallback approach
-      window.location.href = '/api/auth/signout';
-    }
-  };
-
   const handleSignIn = () => {
-    // Use the new route naming
-    router.push("/signin?callbackUrl=/");
+    // Redirect to Clerk sign-in page
+    router.push("/sign-in");
   };
 
   // If on mobile and sidebar is closed, just show the hamburger button
@@ -223,11 +205,11 @@ export default function Sidebar() {
 
         {/* Sign In / User Info (Always at the bottom) */}
         <div className="mt-auto p-4 border-t border-brand">
-          {status === "loading" ? (
+          {!isLoaded ? (
             <div className="flex justify-center">
               <div className="animate-pulse h-10 w-full bg-brand-dark rounded"></div>
             </div>
-          ) : session?.user ? (
+          ) : userId ? (
             <div className="flex items-center justify-between">
               <Link 
                 href="/profile" 
@@ -235,7 +217,7 @@ export default function Sidebar() {
                 onClick={() => isMobile && setIsOpen(false)}
               >
                 <img 
-                  src={session.user.image || "/default-avatar.png"} 
+                  src={user?.imageUrl || "/default-avatar.png"} 
                   alt="Profile" 
                   className="w-10 h-10 rounded-full"
                   onError={(e) => {
@@ -243,15 +225,16 @@ export default function Sidebar() {
                     (e.target as HTMLImageElement).src = "/default-avatar.png";
                   }}
                 />
-                {isOpen && <span className="text-lg truncate max-w-[120px]">{session.user.name}</span>}
+                {isOpen && <span className="text-lg truncate max-w-[120px]">{user?.fullName}</span>}
               </Link>
-              <button
-                onClick={handleSignOut}
-                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                aria-label="Sign out"
-              >
-                {isOpen ? "Logout" : <FiLogOut />}
-              </button>
+              <SignOutButton>
+                <button
+                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+                  aria-label="Sign out"
+                >
+                  {isOpen ? "Logout" : <FiLogOut />}
+                </button>
+              </SignOutButton>
             </div>
           ) : (
             <button
