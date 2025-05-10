@@ -6,6 +6,7 @@ import type { Metadata } from 'next';
 import { ClerkProvider } from "@clerk/nextjs";
 import dynamic from "next/dynamic";
 import EnhancedSubjectsInitializer from "@/components/EnhancedSubjectsInitializer";
+import { PostHogProvider } from './providers';
 
 const Sidebar = dynamic(() => import('@/components/layout/Sidebar'), { ssr: false });
 
@@ -42,55 +43,57 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider proxyUrl={process.env.NEXT_PUBLIC_CLERK_PROXY_URL}>
-      <html lang="en" suppressHydrationWarning>
-        <head>
-          {/* Add the OpenDyslexic font */}
-          <link 
-            rel="stylesheet" 
-            href="https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-regular.css" 
-            crossOrigin="anonymous" 
-          />
-        </head>
-        <body className="min-h-screen antialiased bg-background text-foreground font-dyslexic">
-          {/* MathJax configuration script */}
-          <Script id="mathjax-config" strategy="beforeInteractive">
-            {`
-              window.MathJax = {
-                tex: {
-                  inlineMath: [['\\\\(', '\\\\)'], ['$', '$']],
-                  displayMath: [['\\\\[', '\\\\]'], ['$$', '$$']],
-                  processEscapes: true
-                },
-                svg: {
-                  fontCache: 'global'
-                }
-              };
-            `}
-          </Script>
-          {/* MathJax library from CDN */}
-          <Script
-            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
-            strategy="beforeInteractive"
-            async
-          />
-          <Script
-            src="https://www.geogebra.org/apps/deployggb.js"
-            strategy="beforeInteractive"
-          />
-          
-          <div className="flex min-h-screen">
-            {/* Initialize enhanced subjects */}
-            <EnhancedSubjectsInitializer />
-            <Sidebar />
-            {/* Main content area - flex-1 ensures it takes up remaining space */}
-            <main className="flex-1 p-4 md:p-6 overflow-x-hidden w-full">
-              <div className="max-w-full">
-                {children}
-              </div>
-            </main>
-          </div>
-        </body>
-      </html>
+      <PostHogProvider>
+        <html lang="en" suppressHydrationWarning>
+          <head>
+            {/* Add the OpenDyslexic font */}
+            <link 
+              rel="stylesheet" 
+              href="https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-regular.css" 
+              crossOrigin="anonymous" 
+            />
+          </head>
+          <body className="min-h-screen antialiased bg-background text-foreground font-dyslexic">
+            {/* MathJax configuration script */}
+            <Script id="mathjax-config" strategy="beforeInteractive">
+              {`
+                window.MathJax = {
+                  tex: {
+                    inlineMath: [['\\\\(', '\\\\)'], ['$', '$']],
+                    displayMath: [['\\\\[', '\\\\]'], ['$$', '$$']],
+                    processEscapes: true
+                  },
+                  svg: {
+                    fontCache: 'global'
+                  }
+                };
+              `}
+            </Script>
+            {/* MathJax library from CDN */}
+            <Script
+              src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+              strategy="beforeInteractive"
+              async
+            />
+            <Script
+              src="https://www.geogebra.org/apps/deployggb.js"
+              strategy="beforeInteractive"
+            />
+            
+            <div className="flex min-h-screen">
+              {/* Initialize enhanced subjects */}
+              <EnhancedSubjectsInitializer />
+              <Sidebar />
+              {/* Main content area - flex-1 ensures it takes up remaining space */}
+              <main className="flex-1 p-4 md:p-6 overflow-x-hidden w-full">
+                <div className="max-w-full">
+                  {children}
+                </div>
+              </main>
+            </div>
+          </body>
+        </html>
+      </PostHogProvider>
     </ClerkProvider>
   );
 }
