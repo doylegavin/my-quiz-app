@@ -55,6 +55,3 @@ function SuspendedPostHogPageView() {
 export function Providers({ children }: { children: ReactNode }) {
   return <PostHogProvider>{children}</PostHogProvider>
 }
-
-// Re-export PostHogProvider for use in layout.tsx
-export { PostHogProvider } from "./PostHogProvider"
