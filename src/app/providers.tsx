@@ -4,9 +4,10 @@ import { ReactNode } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
 import { useEffect, Suspense } from "react"
 import posthog from "posthog-js"
-import { PostHogProvider as PHProvider, usePostHog } from "posthog-js/react"
+import { PostHogProvider as OriginalPostHogProvider, usePostHog } from "posthog-js/react"
 
-export function PostHogProvider({ children }: { children: React.ReactNode }) {
+// Main PostHog wrapper component
+function PostHogWrapper({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
       api_host: "/ingest",
@@ -18,10 +19,10 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <PHProvider client={posthog}>
+    <OriginalPostHogProvider client={posthog}>
       <SuspendedPostHogPageView />
       {children}
-    </PHProvider>
+    </OriginalPostHogProvider>
   )
 }
 
@@ -52,6 +53,10 @@ function SuspendedPostHogPageView() {
   )
 }
 
+// Main application providers wrapper - this is used in layout.tsx
 export function Providers({ children }: { children: ReactNode }) {
-  return <PostHogProvider>{children}</PostHogProvider>
+  return <PostHogWrapper>{children}</PostHogWrapper>
 }
+
+// The PostHogProvider export that's used in layout.tsx
+export const PostHogProvider = PostHogWrapper
