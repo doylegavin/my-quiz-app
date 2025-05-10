@@ -37,6 +37,7 @@ const CORE_SUBJECTS = ['mathematics', 'english', 'irish'];
 
 import { Combobox } from "@/components/ui/combobox";
 import FilterableSelect from "@/components/FilterableSelect";
+import posthog from "posthog-js";
 
 export function QuizForm() {
   // Add reference to Zustand store
@@ -605,6 +606,17 @@ const handleSubmit = async (e: React.FormEvent) => {
   }
     
   simulateProgress();
+  
+  // Track quiz generation with PostHog
+  posthog.capture("quiz_generation_attempt", {
+    subject: selectedSubject,
+    level: selectedLevel,
+    paper: selectedPaper,
+    topic: selectedTopic,
+    subtopic: selectedSubtopic,
+    difficulty: selectedDifficulty,
+    quiz_title: quizTitle || "Untitled Quiz"
+  });
     
   console.log("Submitting quiz with data:", {
     subject: selectedSubject,
