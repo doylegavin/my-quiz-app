@@ -8,6 +8,7 @@ import { CheckCircle, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import ExamCountdown from "@/components/countdown/ExamCountdown";
+import FeedbackButton from "@/components/FeedbackButton";
 
 // Define animation variants
 const fadeIn = {
@@ -18,6 +19,9 @@ const fadeIn = {
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 w-full max-w-[100vw] overflow-x-hidden">
+      {/* Add FeedbackButton */}
+      <FeedbackButton />
+      
       {/* Hero Section */}
       <motion.section 
         className="container mx-auto px-4 pt-16 pb-4 sm:pb-8 text-center"
